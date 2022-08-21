@@ -17,8 +17,6 @@
 
 CCoinsViewDB *pcoinsdbview = nullptr;
 
-using namespace std;
-
 static const char DB_COIN = 'C';
 static const char DB_BLOCK_FILES = 'f';
 static const char DB_TXINDEX = 't';
@@ -266,14 +264,14 @@ size_t CCoinsViewDB::TotalWriteBufferSize() const
     return db.TotalWriteBufferSize();
 }
 
-CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, string folder, bool fMemory, bool fWipe)
+CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, std::string folder, bool fMemory, bool fWipe)
     : CDBWrapper(GetDataDir() / folder.c_str() / "index", nCacheSize, fMemory, fWipe)
 {
 }
 
 bool CBlockTreeDB::ReadBlockFileInfo(int nFile, CBlockFileInfo &info)
 {
-    return Read(make_pair(DB_BLOCK_FILES, nFile), info);
+    return Read(std::make_pair(DB_BLOCK_FILES, nFile), info);
 }
 
 bool CBlockTreeDB::WriteReindexing(bool fReindexing)
@@ -348,7 +346,7 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
     for (std::vector<std::pair<int, const CBlockFileInfo *> >::const_iterator it = fileInfo.begin();
          it != fileInfo.end(); it++)
     {
-        batch.Write(make_pair(DB_BLOCK_FILES, it->first), *it->second);
+        batch.Write(std::make_pair(DB_BLOCK_FILES, it->first), *it->second);
     }
     if (!pblockdb)
     {
@@ -356,7 +354,7 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
     }
     for (std::vector<const CBlockIndex *>::const_iterator it = blockinfo.begin(); it != blockinfo.end(); it++)
     {
-        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), CDiskBlockIndex(*it));
+        batch.Write(std::make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), CDiskBlockIndex(*it));
     }
     return WriteBatch(batch, true);
 }
@@ -378,7 +376,7 @@ bool CBlockTreeDB::ReadFlag(const std::string &name, bool &fValue)
 bool CBlockTreeDB::FindBlockIndex(uint256 blockhash, CDiskBlockIndex *pindex)
 {
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
     // Load mapBlockIndex
     while (pcursor->Valid())
     {
@@ -423,7 +421,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 {
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
 
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
 
     // Load mapBlockIndex
     while (pcursor->Valid())
@@ -472,7 +470,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 bool CBlockTreeDB::GetSortedHashIndex(std::vector<std::pair<int, CDiskBlockIndex> > &hashesByHeight)
 {
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
     // Load mapBlockIndex
     while (pcursor->Valid())
     {
