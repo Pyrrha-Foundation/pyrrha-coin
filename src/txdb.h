@@ -116,66 +116,6 @@ struct CDiskTxPos : public CDiskBlockPos
     }
 };
 
-class CCoinsViewDBCursor;
-
-/** CCoinsView backed by the coin database (chainstate/) */
-class CCoinsViewDB : public CCoinsView
-{
-protected:
-    CDBWrapper db;
-
-public:
-    CCoinsViewDB(size_t nCacheSize,
-        bool fMemory = false,
-        bool fWipe = false,
-        bool fObfuscate = false,
-        COverrideOptions *overridecache = nullptr);
-
-    bool GetCoin(const COutPoint &outpoint, Coin &coin) const override;
-    bool HaveCoin(const COutPoint &outpoint) const override;
-    uint256 GetBestBlock() const;
-    uint256 _GetBestBlock() const override;
-    uint256 GetBestBlock(BlockDBMode mode) const;
-    uint256 _GetBestBlock(BlockDBMode mode) const;
-    void WriteBestBlock(const uint256 &hashBlock);
-    void _WriteBestBlock(const uint256 &hashBlock);
-    void WriteBestBlock(const uint256 &hashBlock, BlockDBMode mode);
-    void _WriteBestBlock(const uint256 &hashBlock, BlockDBMode mode);
-    bool BatchWrite(CCoinsMap &mapCoins,
-        const uint256 &hashBlock,
-        const uint64_t nBestCoinHeight,
-        size_t &nChildCachedCoinsUsage) override;
-    CCoinsViewCursor *Cursor() const override;
-
-    size_t EstimateSize() const override;
-
-    //! Return the current memory allocated for the write buffers
-    size_t TotalWriteBufferSize() const;
-};
-
-/** Specialization of CCoinsViewCursor to iterate over a CCoinsViewDB */
-class CCoinsViewDBCursor : public CCoinsViewCursor
-{
-public:
-    ~CCoinsViewDBCursor() {}
-    bool GetKey(COutPoint &key) const;
-    bool GetValue(Coin &coin) const;
-    unsigned int GetValueSize() const;
-
-    bool Valid() const;
-    void Next();
-
-private:
-    CCoinsViewDBCursor(CDBIterator *pcursorIn, const uint256 &hashBlockIn)
-        : CCoinsViewCursor(hashBlockIn), pcursor(pcursorIn)
-    {
-    }
-    std::unique_ptr<CDBIterator> pcursor;
-    std::pair<char, COutPoint> keyTmp;
-
-    friend class CCoinsViewDB;
-};
-
 /** Access to the block database (blocks/index/) */
 class CBlockTreeDB : public CDBWrapper
 {
@@ -202,9 +142,6 @@ public:
     bool LoadBlockIndexGuts();
     bool GetSortedHashIndex(std::vector<std::pair<int, CDiskBlockIndex> > &hashesByHeight);
 };
-
-/** Global variable that points to the coins database */
-extern CCoinsViewDB *pcoinsdbview;
 
 /**
  * Access to the txindex database (indexes/txindex/)
