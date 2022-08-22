@@ -131,6 +131,10 @@ public:
     explicit uint160(const uint8_t *vch) : base_blob<160>(vch) {}
 };
 
+// the underlying btye array of uint256 is protected, to avoid reworking class privacy
+// protections we can convert to and from a raw byte array form, uint256_t
+typedef uint8_t uint256_t[32];
+
 /** 256-bit opaque blob.
  * @note This type is called uint256 for historical reasons only. It is an
  * opaque blob of 256 bits and has no integer operations. Use arith_uint256 if
@@ -155,6 +159,8 @@ public:
      * @note This hash is not stable between little and big endian.
      */
     uint64_t GetHash(const uint256 &salt) const;
+
+    void GetRaw(uint256_t &value) const { std::memcpy(value, data, 32); }
 };
 
 /* uint256 from const char *.
