@@ -274,7 +274,7 @@ public:
     }
 
     template <typename K, typename V>
-    bool Write(const K &key, const V &value, bool fSync = false)
+    bool Write(const K &key, const V &value, bool fSync = true)
     {
         CDBBatch batch(*this);
         batch.Write(key, value);
@@ -308,14 +308,14 @@ public:
     }
 
     template <typename K>
-    bool Erase(const K &key, bool fSync = false)
+    bool Erase(const K &key, bool fSync = true)
     {
         CDBBatch batch(*this);
         batch.Erase(key);
         return WriteBatch(batch, fSync);
     }
 
-    bool WriteBatch(CDBBatch &batch, bool fSync = false);
+    bool WriteBatch(CDBBatch &batch, bool fSync = true);
 
     // not available for LevelDB; provide for compatibility with BDB
     bool Flush() { return true; }

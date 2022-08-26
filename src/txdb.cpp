@@ -20,7 +20,7 @@ static const char DB_OUTPOINT_INDEX = 'p';
 static const char DB_TXINDEX_BLOCK = 'T';
 static const char DB_BLOCK_INDEX = 'b';
 
-static const char DB_BEST_BLOCK = 'B';
+const char DB_BEST_BLOCK = 'B';
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';

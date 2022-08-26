@@ -135,6 +135,17 @@ public:
 // protections we can convert to and from a raw byte array form, uint256_t
 typedef uint8_t uint256_t[32];
 
+inline std::string uint256t_ToString(const uint256_t &data)
+{
+    char psz[65];
+    for (unsigned int i = 0; i < 32; i++)
+    {
+        sprintf(psz + (i * 2), "%02x", data[i]);
+    }
+    return std::string(psz, psz + 64);
+}
+
+
 /** 256-bit opaque blob.
  * @note This type is called uint256 for historical reasons only. It is an
  * opaque blob of 256 bits and has no integer operations. Use arith_uint256 if
