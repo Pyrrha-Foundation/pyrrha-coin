@@ -49,6 +49,10 @@ NEXA_TEST_SUITE = \
 
 # test_nexa binary #
 NEXA_TESTS =\
+  cashdrive/test_cpp/test_add.cpp \
+  cashdrive/test_cpp/test_create.cpp \
+  cashdrive/test_cpp/test_main.cpp \
+  cashdrive/test_cpp/test_spend.cpp \
   respend/test/respendrelayer_tests.cpp \
   respend/test/respenddetector_tests.cpp \
   test/grouptoken_tests.cpp \
