@@ -3082,7 +3082,7 @@ bool ConnectTip(CValidationState &state,
     int64_t nTime4 = GetStopwatchMicros();
     nTimeFlush += nTime4 - nTime3;
     LOG(BENCH, "  - Flush: %.2fms [%.2fs]\n", (nTime4 - nTime3) * 0.001, nTimeFlush * 0.000001);
-    if (!FlushStateToDisk(state, FLUSH_STATE_IF_NEEDED))
+    if (!FlushStateToDisk(state, FLUSH_STATE_ALWAYS))
         return false;
     int64_t nTime5 = GetStopwatchMicros();
     nTimeChainState += nTime5 - nTime4;
