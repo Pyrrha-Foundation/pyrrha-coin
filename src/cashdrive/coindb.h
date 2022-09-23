@@ -67,7 +67,7 @@ struct CoinEntryKey
     }
     CoinEntryKey(const uint256_t value) : key_prefix(DB_COIN)
     {
-        std::memcpy(key, value, 32);
+        std::memcpy(key, value, UINT256_NUM_BYTES);
     }
     template <typename Stream>
     void Serialize(Stream &s) const
@@ -98,6 +98,22 @@ struct CoinEntryValue
     uint256_t key; // outpoint hash
     Coin value;
 
+    CoinEntryValue()
+    {
+        SetNull();
+    }
+
+    CoinEntryValue(const CoinEntryValue &a)
+    {
+        key_bits = a.key_bits;
+        root_group = a.root_group;
+        std::memcpy(key_parent, a.key_parent, UINT256_NUM_BYTES);
+        std::memcpy(key_left, a.key_left, UINT256_NUM_BYTES);
+        std::memcpy(key_right, a.key_right, UINT256_NUM_BYTES);
+        std::memcpy(key, a.key, UINT256_NUM_BYTES);
+        value = a.value;
+    }
+
     std::string ToString()
     {
         return strprintf("key_bits = %u, root_group = %u, key_parent = %s, key_left = %s, key_right = %s, key = %s, value = %s \n", key_bits, root_group,
@@ -109,10 +125,10 @@ struct CoinEntryValue
     {
         key_bits = 0;
         root_group = 0;
-        std::memset(key_parent, 0, 32);
-        std::memset(key_left, 0, 32);
-        std::memset(key_right, 0, 32);
-        std::memset(key, 0, 32);
+        std::memset(key_parent, 0, UINT256_NUM_BYTES);
+        std::memset(key_left, 0, UINT256_NUM_BYTES);
+        std::memset(key_right, 0, UINT256_NUM_BYTES);
+        std::memset(key, 0, UINT256_NUM_BYTES);
         value.Clear();
     }
 
@@ -129,6 +145,18 @@ struct CoinEntryValue
     {
         return !(*this == a);
     }
+
+    void operator=(const CoinEntryValue &a)
+    {
+        key_bits = a.key_bits;
+        root_group = a.root_group;
+        std::memcpy(key_parent, a.key_parent, UINT256_NUM_BYTES);
+        std::memcpy(key_left, a.key_left, UINT256_NUM_BYTES);
+        std::memcpy(key_right, a.key_right, UINT256_NUM_BYTES);
+        std::memcpy(key, a.key, UINT256_NUM_BYTES);
+        value = a.value;
+    }
+
     template <typename Stream>
     void Serialize(Stream &s) const
     {
@@ -166,13 +194,7 @@ struct CoinEntryValue
 };
 
 static const uint256_t INVALID_KEY = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-static const CoinEntryValue INVALID_ENTRY = CoinEntryValue{0,
-    0,
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    emptyCoin};
+static const CoinEntryValue INVALID_ENTRY;
 
 /** Specialization of CCoinsViewCursor to iterate over a CCoinsViewDB */
 class CCoinsViewDBCursor : public CCoinsViewCursor
@@ -241,7 +263,6 @@ private:
         const CoinEntryValue &new_parent_value);
 
     void _MakeNewRoot();
-    void _IncremenKey(uint256_t &key);
     void _IncrementLastKeyUsed();
     void _WriteLastKeyUsed();
     CoinEntryValue _FindCoin(const COutPoint &outpoint) const;

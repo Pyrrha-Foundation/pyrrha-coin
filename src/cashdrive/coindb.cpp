@@ -104,10 +104,10 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
     {
         // this is the first time cashdrive has been used, set the first root
         current_root_group = 0;
-        std::memset(current_root_key, 0, UINT256_NUM_BYTES);
-        _IncremenKey(current_root_key); // key is 1
-        std::memcpy(next_db_key_available, current_root_key, UINT256_NUM_BYTES);
-        _IncrementLastKeyUsed(); // key is 2
+        std::memset(next_db_key_available, 0, UINT256_NUM_BYTES);
+        next_db_key_available[0] = 1; // key is 1 for the first root, key 0 is the invalid key
+        std::memcpy(current_root_key, next_db_key_available, UINT256_NUM_BYTES);
+        _IncrementLastKeyUsed(); // key is 2 for the next key needed
         assert(std::memcmp(current_root_key, UINT256_ZERO, UINT256_NUM_BYTES) != 0);
         db.Write(DB_ROOT_KEY, uint256(current_root_key));
         db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
@@ -139,10 +139,10 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     CDBBatch batch(db);
     CoinEntryKey interior_key(next_db_key_available);
     _IncrementLastKeyUsed();
-    _WriteLastKeyUsed();
     CoinEntryValue interior_value;
     interior_value.SetNull();
     std::memcpy(interior_value.key, key, UINT256_NUM_BYTES);
+    interior_value.root_group = parent_value.root_group;
     // calculate key_bits
     uint32_t i = 0;
     while(std::memcmp(&key[i], &replacing_value.key[i], 1) == 0)
@@ -336,9 +336,9 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_copy_entry_with_new_paren
     CoinEntryKey copy_key(next_db_key_available);
     _IncrementLastKeyUsed();
     CoinEntryValue copy_value = value;
+    std::memcpy(copy_value.key_parent, new_parent_key, UINT256_NUM_BYTES);
+    copy_value.root_group = new_parent_value.root_group;
     std::pair<CoinEntryKey, CoinEntryValue> copy_entry = std::make_pair(copy_key, copy_value);
-    std::memcpy(copy_entry.second.key_parent, new_parent_key, UINT256_NUM_BYTES);
-    copy_entry.second.root_group = new_parent_value.root_group;
     return copy_entry;
 }
 
@@ -347,7 +347,7 @@ bool CCoinsViewDBCursor::GetKey(uint256_t &key) const
     // Return cached key
     if (keyTmp.first == DB_COIN)
     {
-        std::memcpy(key, keyTmp.second, 32);
+        std::memcpy(key, keyTmp.second, UINT256_NUM_BYTES);
         return true;
     }
     return false;
@@ -403,23 +403,26 @@ bool CCoinsViewDB::GetCoin(const COutPoint &outpoint, Coin &coin) const
 
 void CCoinsViewDB::_MakeNewRoot()
 {
-    // not yet implemented
-}
-
-void CCoinsViewDB::_IncremenKey(uint256_t &key)
-{
-    int32_t i = 0;
-    uint32_t* pn = (uint32_t*)key;
-    while (++pn[i] == 0 && i < 7)
-    {
-        i++;
-    }
+    CoinEntryValue current_root_value = _GetRootValue();
+    current_root_value.root_group += 1;
+    current_root_group = current_root_value.root_group;
+    std::memcpy(current_root_key, next_db_key_available, UINT256_NUM_BYTES);
+    _IncrementLastKeyUsed();
+    db.Write(DB_ROOT_KEY, uint256(current_root_key));
+    db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
+    // new roots start as copies of the previous root with an incremented root group
+    db.Write(CoinEntryKey(current_root_key), current_root_value);
 }
 
 void CCoinsViewDB::_IncrementLastKeyUsed()
 {
     _WriteLastKeyUsed();
-    _IncremenKey(next_db_key_available);
+    int32_t i = 0;
+    uint32_t* pn = (uint32_t*)next_db_key_available;
+    while (++pn[i] == 0 && i < 7)
+    {
+        i++;
+    }
 }
 
 void CCoinsViewDB::_WriteLastKeyUsed()
@@ -609,10 +612,9 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
         }
         return false;
     }
-    CDBBatch batch(db);
     // create the new entry we will be adding
     // key
-    CoinEntryKey key(this->next_db_key_available);
+    CoinEntryKey key(next_db_key_available);
     _IncrementLastKeyUsed();
     // value
     CoinEntryValue value;
@@ -646,6 +648,53 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
         {
             LOGA("MINT(): next_key: %s, next_value: %s \n", uint256t_ToString(next_value.key).c_str(), next_value.ToString().c_str());
         }
+        // if next is a leaf node...
+        if (next_value.key_bits == 256)
+        {
+            // create a new interior node for a parent and write it to the db
+            std::pair<CoinEntryKey, CoinEntryValue> new_parent_node = _make_new_interior_node(parent_key, parent_value, next_key, next_value, value.key);
+            // update values we are tracking
+            std::memcpy(next_key, new_parent_node.first.key, UINT256_NUM_BYTES);
+            next_value = new_parent_node.second;
+            std::memcpy(parent_key, new_parent_node.second.key_parent, UINT256_NUM_BYTES);
+            if (!db.Read(CoinEntryKey(parent_key), parent_value))
+            {
+                // this is a critical error, if they key we are reading from is not
+                // invalid, then the entry should not be missing
+                assert(false);
+            }
+            if (cashdrive_debug)
+            {
+                LOGA("Mint(): leaf node case, making new interior node and cycling \n");
+            }
+            continue;
+        }
+        // traversing down in either direction requires the next node to be duplicated for this root group
+        // need to make a copy for the current root group
+        if (next_value.root_group != current_root_group)
+        {
+            // the parent will always be in the correct root group
+            std::pair<CoinEntryKey, CoinEntryValue> entry_copy = _copy_entry_with_new_parent(next_value, parent_key, parent_value);
+            if (isLeft == true)
+            {
+                std::memcpy(parent_value.key_left, entry_copy.first.key, UINT256_NUM_BYTES);
+            }
+            else
+            {
+                std::memcpy(parent_value.key_right, entry_copy.first.key, UINT256_NUM_BYTES);
+            }
+            CDBBatch batch(db);
+            batch.Write(entry_copy.first, entry_copy.second);
+            batch.Write(CoinEntryKey(parent_key), parent_value);
+            db.WriteBatch(batch);
+            std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
+            next_value = entry_copy.second;
+            if (cashdrive_debug)
+            {
+                LOGA("Mint(): copied entry with new parent\n");
+            }
+            assert(next_value.root_group == current_root_group);
+        }
         if (next_value.key_bits == 0)
         {
             if (cashdrive_debug)
@@ -676,27 +725,6 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
                 }
                 continue;
             }
-        }
-        // if next is a leaf node...
-        if (next_value.key_bits == 256)
-        {
-            // create a new interior node for a parent and write it to the db
-            std::pair<CoinEntryKey, CoinEntryValue> new_parent_node = _make_new_interior_node(parent_key, parent_value, next_key, next_value, value.key);
-            // update values we are tracking
-            std::memcpy(next_key, new_parent_node.first.key, UINT256_NUM_BYTES);
-            next_value = new_parent_node.second;
-            std::memcpy(parent_key, new_parent_node.second.key_parent, UINT256_NUM_BYTES);
-            if (!db.Read(CoinEntryKey(parent_key), parent_value))
-            {
-                // this is a critical error, if they key we are reading from is not
-                // invalid, then the entry should not be missing
-                assert(false);
-            }
-            if (cashdrive_debug)
-            {
-                LOGA("Mint(): leaf node case, making new interior node and cycling \n");
-            }
-            continue;
         }
         // next is an interior node
         int32_t res = _compare_key_bits(value.key, next_value.key, next_value.key_bits);
@@ -746,21 +774,6 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
                 bit_to_check = BIN_00000001;
             }
             res = (value.key[byte_to_check] & bit_to_check);
-            // traversing down in either direction requires the next node to be duplicated for this root group
-            // need to make a copy for the current root group
-            if (next_value.root_group != current_root_group)
-            {
-                // the parent will always be in the correct root group
-                std::pair<CoinEntryKey, CoinEntryValue> entry_copy = _copy_entry_with_new_parent(next_value, parent_key, parent_value);
-                // write the created copy to the db
-                batch.Write(entry_copy.first, entry_copy.second);
-                std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
-                next_value = entry_copy.second;
-                if (cashdrive_debug)
-                {
-                    LOGA("Mint(): copied entry with new parent\n");
-                }
-            }
             if (res <= 0)
             {
                 std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
@@ -825,6 +838,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
             LOGA("Mint(): added new node on parent right \n");
         }
     }
+    CDBBatch batch(db);
     // parent has been updated, write the changges
     batch.Write(CoinEntryKey(parent_key), parent_value);
     // populate the value parent key with the parent key
@@ -875,34 +889,6 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             // invalid, then the entry should not be missing
             assert(false);
         }
-        // special root case
-        if (next_value.key_bits == 0)
-        {
-            if ((outpoint_key[0] & BIN_10000000) == BIN_10000000)
-            {
-                std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
-                parent_value = next_value;
-                std::memcpy(next_key, next_value.key_right, UINT256_NUM_BYTES);
-                isLeft = false;
-                if (cashdrive_debug)
-                {
-                    LOGA("Spend(): root case, going right \n");
-                }
-                continue;
-            }
-            else
-            {
-                std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
-                parent_value = next_value;
-                std::memcpy(next_key, next_value.key_left, UINT256_NUM_BYTES);
-                isLeft = true;
-                if (cashdrive_debug)
-                {
-                    LOGA("Spend(): root case, going left \n");
-                }
-                continue;
-            }
-        }
         // is next the node we are looking for?
         if (next_value.key_bits == 256)
         {
@@ -938,28 +924,49 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
         {
             // the parent will always be in the correct root group
             std::pair<CoinEntryKey, CoinEntryValue> entry_copy = _copy_entry_with_new_parent(next_value, parent_key, parent_value);
-            // write the created copy to the db
-            db.Write(entry_copy.first, entry_copy.second);
-            std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
-            next_value = entry_copy.second;
             if (isLeft == true)
             {
-                if (cashdrive_debug)
-                {
-                    LOGA("Spend(): updated root group, continuing \n");
-                }
-                std::memcpy(parent_value.key_left, next_key, UINT256_NUM_BYTES);
+                std::memcpy(parent_value.key_left, entry_copy.first.key, UINT256_NUM_BYTES);
             }
             else
             {
+                std::memcpy(parent_value.key_right, entry_copy.first.key, UINT256_NUM_BYTES);
+            }
+            CDBBatch batch(db);
+            batch.Write(entry_copy.first, entry_copy.second);
+            batch.Write(CoinEntryKey(parent_key), parent_value);
+            db.WriteBatch(batch);
+            std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
+            next_value = entry_copy.second;
+            assert(next_value.root_group == current_root_group);
+        }
+        // special root case
+        if (next_value.key_bits == 0)
+        {
+            if ((outpoint_key[0] & BIN_10000000) == BIN_10000000)
+            {
+                std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
+                parent_value = next_value;
+                std::memcpy(next_key, next_value.key_right, UINT256_NUM_BYTES);
+                isLeft = false;
                 if (cashdrive_debug)
                 {
-                    LOGA("Spend(): updated root group, continuing \n");
+                    LOGA("Spend(): root case, going right \n");
                 }
-                std::memcpy(parent_value.key_right, next_key, UINT256_NUM_BYTES);
+                continue;
             }
-            // parent value was updated, write the changes to the db
-            db.Write(CoinEntryKey(parent_key), parent_value);
+            else
+            {
+                std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
+                parent_value = next_value;
+                std::memcpy(next_key, next_value.key_left, UINT256_NUM_BYTES);
+                isLeft = true;
+                if (cashdrive_debug)
+                {
+                    LOGA("Spend(): root case, going left \n");
+                }
+                continue;
+            }
         }
         res = _compare_key_bits(outpoint_key, next_value.key, next_value.key_bits);
         if (res == 0)
@@ -1163,10 +1170,12 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                         assert(false);
                     }
                     std::memcpy(parent_left_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
+                    CDBBatch batch(db);
                     // parent_left_value was updated, write the changes to the db
-                    db.Write(CoinEntryKey(parent_value.key_left), parent_left_value);
+                    batch.Write(CoinEntryKey(parent_value.key_left), parent_left_value);
                     // parent_parent_value.key_left was updated, wrtie the changes to the db
-                    db.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    batch.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    db.WriteBatch(batch);
                 }
                 else // parent_parent->right == parent
                 {
@@ -1183,10 +1192,12 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                         assert(false);
                     }
                     std::memcpy(parent_left_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
+                    CDBBatch batch(db);
                     // parent_left_value was updated, write the changes to the db
-                    db.Write(CoinEntryKey(parent_value.key_left), parent_left_value);
+                    batch.Write(CoinEntryKey(parent_value.key_left), parent_left_value);
                     // parent_parent_value.key_right was updated, wrtie the changes to the db
-                    db.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    batch.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    db.WriteBatch(batch);
                 }
             }
             else if (children == 2)
@@ -1207,11 +1218,12 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                         assert(false);
                     }
                     std::memcpy(parent_right_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
+                    CDBBatch batch(db);
                     // parent_right_value was updated, write the changes to the db
-                    db.Write(CoinEntryKey(parent_value.key_right), parent_right_value);
+                    batch.Write(CoinEntryKey(parent_value.key_right), parent_right_value);
                     // parent_parent_value.key_left was updated, wrtie the changes to the db
-                    db.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
-
+                    batch.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    db.WriteBatch(batch);
                 }
                 else // parent_parent->right == parent
                 {
@@ -1224,10 +1236,12 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                         assert(false);
                     }
                     std::memcpy(parent_right_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
+                    CDBBatch batch(db);
                     // parent_right_value was updated, write the changes to the db
-                    db.Write(CoinEntryKey(parent_value.key_right), parent_right_value);
+                    batch.Write(CoinEntryKey(parent_value.key_right), parent_right_value);
                     // parent_parent_value.key_right was updated, wrtie the changes to the db
-                    db.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    batch.Write(CoinEntryKey(parent_parent_key), parent_parent_value);
+                    db.WriteBatch(batch);
                 }
             }
             std::memcpy(parent_key, parent_parent_key, UINT256_NUM_BYTES);
@@ -1449,14 +1463,14 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins,
     size_t &nChildCachedCoinsUsage)
 {
     WRITELOCK(cs_utxo);
-    CDBBatch batch(db);
     size_t count = 0;
     size_t changed = 0;
     size_t nBatchWrites = 0;
-    size_t batch_size = nMaxDBBatchSize;
     size_t spent_coins = 0;
 
     LOG(COINDB, "starting committing process\n");
+    // a new root is generated every block. because we flush every block we can generate the new root here
+    _MakeNewRoot();
     // typedef std::unordered_map<COutPoint, CCoinsCacheEntry, SaltedOutpointHasher> CCoinsMap;
     for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();)
     {
@@ -1493,16 +1507,6 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins,
                 }
             }
             changed++;
-
-            // In order to prevent the spikes in memory usage that used to happen when we prepared large as
-            // was possible, we instead break up the batches such that the performance gains for writing to
-            // leveldb are still realized but the memory spikes are not seen.
-            if (batch.SizeEstimate() > batch_size)
-            {
-                db.WriteBatch(batch);
-                batch.Clear();
-                nBatchWrites++;
-            }
         }
         else
         {
@@ -1514,12 +1518,11 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins,
     {
         _WriteBestBlock(hashBlock);
     }
-    bool ret = db.WriteBatch(batch);
     LOG(COINDB,
         "Committing %u changed transactions (out of %u) to coin database with %u batch writes and %u spent coins...\n",
         (unsigned int)changed, (unsigned int)count, (unsigned int)nBatchWrites, (unsigned int)spent_coins);
 
-    return ret;
+    return true;
 }
 
 CCoinsViewCursor *CCoinsViewDB::Cursor() const
