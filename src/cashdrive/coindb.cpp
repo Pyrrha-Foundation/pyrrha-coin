@@ -431,6 +431,82 @@ void CCoinsViewDB::_WriteLastKeyUsed()
     db.Write(DB_LAST_KEY_USED, uint256(next_db_key_available));
 }
 
+static void sha256ab(const uint256_t &a, const uint256_t &b, uint256_t res)
+{
+    CSHA256 hasher;
+    hasher.Write(a, 32);
+    hasher.Write(b, 32);
+    hasher.Finalize(res);
+}
+
+CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
+{
+
+    CoinEntryValue parent_value;
+    if (!db.Read(CoinEntryKey(parent_key), parent_value))
+    {
+        assert(false);
+    }
+    // root case check, root is only non leaf node where it is possible to only
+    // have one child
+    int nCase = 0;
+    if (parent_value.key_bits == 0)
+    {
+        // if missing left child
+        if (std::memcmp(parent_value.key_left, INVALID_KEY, UINT256_NUM_BYTES) == 0 &&
+            std::memcmp(parent_value.key_right, INVALID_KEY, UINT256_NUM_BYTES) != 0)
+        {
+            nCase = 1;
+        }
+        // if missing right child
+        else if (std::memcmp(parent_value.key_left, INVALID_KEY, UINT256_NUM_BYTES) != 0 &&
+            std::memcmp(parent_value.key_right, INVALID_KEY, UINT256_NUM_BYTES) == 0)
+        {
+            nCase = 2;
+        }
+        else if (std::memcmp(parent_value.key_left, INVALID_KEY, UINT256_NUM_BYTES) == 0 &&
+            std::memcmp(parent_value.key_right, INVALID_KEY, UINT256_NUM_BYTES) == 0)
+        {
+            nCase = 3;
+        }
+    }
+    CoinEntryValue left_value;
+    if (nCase != 1 && nCase != 3)
+    {
+        if (!db.Read(CoinEntryKey(parent_value.key_left), left_value))
+        {
+            assert(false);
+        }
+    }
+    CoinEntryValue right_value;
+    if (nCase != 2 && nCase != 3)
+    {
+        if (!db.Read(CoinEntryKey(parent_value.key_right), right_value))
+        {
+            assert(false);
+        }
+    }
+    if (nCase == 0)
+    {
+        sha256ab(left_value.fingerprint, right_value.fingerprint, parent_value.fingerprint);
+    }
+    else if (nCase == 1) // only used in root node
+    {
+        sha256ab(INVALID_KEY, right_value.fingerprint, parent_value.fingerprint);
+    }
+    else if (nCase == 2) // only used in root node
+    {
+        sha256ab(left_value.fingerprint, INVALID_KEY, parent_value.fingerprint);
+    }
+    else if (nCase == 3) // only used in root node for an empty trie
+    {
+        sha256ab(INVALID_KEY, INVALID_KEY, parent_value.fingerprint);
+    }
+    db.Write(CoinEntryKey(parent_key), parent_value);
+    return parent_value;
+}
+
+
 // use the find algorithm from bitwise_trie to go from current root to what should be outpoint
 // in the trie if it exists
 // see BitwiseTrie_find in bitwise_trie.c for original find algorithm
@@ -620,6 +696,9 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     CoinEntryValue value;
     value.SetNull();
     outpoint.hash.GetRaw(value.key);
+    // the key is also the fingerprint for a leaf node as a shortcut for calculating
+    // the fingerprint of the parent node
+    outpoint.hash.GetRaw(value.fingerprint);
     value.value = coin;
     value.key_bits = 256;
     bool isLeft = false;
@@ -843,10 +922,17 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     batch.Write(CoinEntryKey(parent_key), parent_value);
     // populate the value parent key with the parent key
     std::memcpy(value.key_parent, parent_key, UINT256_NUM_BYTES);
+    // leaf nodes do not have a relevant root group
     value.root_group = parent_value.root_group;
     // value has been created, write it to the db
     batch.Write(key, value);
     db.WriteBatch(batch);
+    // update fingerprint
+    while (std::memcmp(parent_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
+    {
+        parent_value = _UpdateFingerprint(parent_key);
+        std::memcpy(parent_key, parent_value.key_parent, UINT256_NUM_BYTES);
+    }
     return true;
 }
 
@@ -862,6 +948,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
         {
             LOGA("Spend(): FIND FAILURE \n");
         }
+        // TODO : return true but dbgassert for testing to catch failures
         return false;
     }
     uint256_t outpoint_key;
@@ -1097,6 +1184,8 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 {
                     LOGA("Spend(): back up to root, breaking \n");
                 }
+                // we must update the fingerprint for the root before breaking
+                parent_value = _UpdateFingerprint(parent_key);
                 break;
             }
             if (!db.Read(CoinEntryKey(parent_parent_key), parent_parent_value))
@@ -1245,6 +1334,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 }
             }
             std::memcpy(parent_key, parent_parent_key, UINT256_NUM_BYTES);
+            parent_value = _UpdateFingerprint(parent_key);
         }
     }
     return removed;
@@ -1284,6 +1374,11 @@ static std::pair<CoinEntryKey, CoinEntryValue> _TrieStack_pop(TrieStack** top)
     return res;
 }
 
+uint256 CCoinsViewDB::GetFingerprint()
+{
+    return uint256(_GetRootValue().fingerprint);
+}
+
 void CCoinsViewDB::_debug_print_trie()
 {
     std::pair<CoinEntryKey, CoinEntryValue> invalid_node = std::make_pair(CoinEntryKey(INVALID_KEY), INVALID_ENTRY);
@@ -1318,9 +1413,10 @@ void CCoinsViewDB::_debug_print_trie()
             {
                 LOGA("going up \n");
                 node = _TrieStack_pop(&stack);
-                //if (node.second.key_bits == 256)
+                if (node.second.key_bits == 256)
                 {
-                    LOGA(">>>>node has key %s, value %s \n", uint256t_ToString(node.first.key).c_str(), node.second.ToString().c_str());
+                    //LOGA(">>>>node has key %s, value %s \n", uint256t_ToString(node.first.key).c_str(), node.second.ToString().c_str());
+                    LOGA(">>>>node has key %s\n", uint256t_ToString(node.second.key).c_str());
                 }
                 CoinEntryValue right_value;
                 //LOGA("right_key = %s \n", uint256t_ToString(node.second.key_right));

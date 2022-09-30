@@ -51,6 +51,7 @@ NEXA_TEST_SUITE = \
 NEXA_TESTS =\
   cashdrive/test_cpp/test_add.cpp \
   cashdrive/test_cpp/test_create.cpp \
+  cashdrive/test_cpp/test_fingerprint.cpp \
   cashdrive/test_cpp/test_main.cpp \
   cashdrive/test_cpp/test_spend.cpp \
   respend/test/respendrelayer_tests.cpp \

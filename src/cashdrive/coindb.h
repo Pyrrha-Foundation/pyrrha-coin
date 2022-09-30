@@ -91,6 +91,7 @@ struct CoinEntryValue
     // cashdrive metadata
     uint32_t key_bits;
     uint32_t root_group;
+    uint256_t fingerprint; // in leaf nodes, the key is also the fingerprint
     uint256_t key_parent; // not an outpoint hash
     uint256_t key_left; // not an outpoint hash
     uint256_t key_right; // not an outpoint hash
@@ -107,6 +108,7 @@ struct CoinEntryValue
     {
         key_bits = a.key_bits;
         root_group = a.root_group;
+        std::memcpy(fingerprint, a.fingerprint, UINT256_NUM_BYTES);
         std::memcpy(key_parent, a.key_parent, UINT256_NUM_BYTES);
         std::memcpy(key_left, a.key_left, UINT256_NUM_BYTES);
         std::memcpy(key_right, a.key_right, UINT256_NUM_BYTES);
@@ -116,8 +118,8 @@ struct CoinEntryValue
 
     std::string ToString()
     {
-        return strprintf("key_bits = %u, root_group = %u, key_parent = %s, key_left = %s, key_right = %s, key = %s, value = %s \n", key_bits, root_group,
-            uint256t_ToString(key_parent).c_str(), uint256t_ToString(key_left).c_str(), uint256t_ToString(key_right).c_str(),
+        return strprintf("key_bits = %u, root_group = %u, fingerprint = %s, key_parent = %s, key_left = %s, key_right = %s, key = %s, value = %s \n", key_bits, root_group,
+            uint256t_ToString(fingerprint).c_str(), uint256t_ToString(key_parent).c_str(), uint256t_ToString(key_left).c_str(), uint256t_ToString(key_right).c_str(),
             uint256t_ToString(key).c_str(), value.out.ToString().c_str());
     }
 
@@ -125,6 +127,7 @@ struct CoinEntryValue
     {
         key_bits = 0;
         root_group = 0;
+        std::memset(fingerprint, 0, UINT256_NUM_BYTES);
         std::memset(key_parent, 0, UINT256_NUM_BYTES);
         std::memset(key_left, 0, UINT256_NUM_BYTES);
         std::memset(key_right, 0, UINT256_NUM_BYTES);
@@ -132,6 +135,7 @@ struct CoinEntryValue
         value.Clear();
     }
 
+    // fingerprint is not part of == purely because it may not be the most recent
     bool operator==(const CoinEntryValue &a) const
     {
         return (key_bits == a.key_bits && root_group == a.root_group
@@ -150,6 +154,7 @@ struct CoinEntryValue
     {
         key_bits = a.key_bits;
         root_group = a.root_group;
+        std::memcpy(fingerprint, a.fingerprint, UINT256_NUM_BYTES);
         std::memcpy(key_parent, a.key_parent, UINT256_NUM_BYTES);
         std::memcpy(key_left, a.key_left, UINT256_NUM_BYTES);
         std::memcpy(key_right, a.key_right, UINT256_NUM_BYTES);
@@ -162,10 +167,12 @@ struct CoinEntryValue
     {
         s << key_bits;
         s << root_group;
+        uint256 fingerprint256(fingerprint);
         uint256 key_parent256(key_parent);
         uint256 key_left256(key_left);
         uint256 key_right256(key_right);
         uint256 key256(key);
+        s << fingerprint256;
         s << key_parent256;
         s << key_left256;
         s << key_right256;
@@ -177,6 +184,9 @@ struct CoinEntryValue
     {
         s >> key_bits;
         s >> root_group;
+        uint256 fingerprint256;
+        s >> fingerprint256;
+        fingerprint256.GetRaw(fingerprint);
         uint256 key_parent256;
         s >> key_parent256;
         key_parent256.GetRaw(key_parent);
@@ -266,7 +276,8 @@ private:
     void _IncrementLastKeyUsed();
     void _WriteLastKeyUsed();
     CoinEntryValue _FindCoin(const COutPoint &outpoint) const;
-    void _debug_print_trie();
+    CoinEntryValue _UpdateFingerprint(const uint256_t &parent_key);
+
 
 public:
     CCoinsViewDB(size_t nCacheSize,
@@ -279,6 +290,8 @@ public:
     CoinEntryValue _GetRootValue() const;
     CoinEntryValue _GetValueByKey(const uint256_t &key) const; // used only in tests
     CoinEntryValue _GetValueByOutpoint(const COutPoint &outpoint) const; // used only in tests
+    void _debug_print_trie();
+    uint256 GetFingerprint();
 
     bool GetCoin(const COutPoint &outpoint, Coin &coin) const override;
     bool _HaveCoin(const COutPoint &outpoint) const;
