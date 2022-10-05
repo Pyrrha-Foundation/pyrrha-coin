@@ -52,16 +52,30 @@ void test_fingerprint_spend(CCoinsViewDB *coindb_cashdrive, std::string outpoint
     assert(res == true);
 }
 
-// 0000000000000000000000000000000000000000000000000000000000000000
+// null key fingerprint = 0000000000000000000000000000000000000000000000000000000000000000
+
+// root node = 7124bd808b1f83ec040d4c601468a613fd663d40e1c7fc73450c19de63d63ff3
 
 // left side
+//                                root node
+//                              /
+//                           13
+//                         /     \
+//                      19        07
+//                    /   |     /     \
+//               0bc..  399..  0F      09
+//                            / \     /   \
+//                          1D 508.. 69d.. 15
+//                        /  |             / \
+//                   47e..   4f8..     738..  78d..
+
 // 19 = 9ad962084a1ef50328321beda15af65419fbd3eaa2dc5403146e50fdd79fa79f
 
-// 1d = a733006c55a59e7fb3d66ed9ea18cb0408f3203aec19cc54090e9c5a6a96c37e
+// 1D = a733006c55a59e7fb3d66ed9ea18cb0408f3203aec19cc54090e9c5a6a96c37e
 
 // 15 = f3a355480d1c3c29a86955593ca40c4f93346db74c9d07f97ba44f0d2e344109
 
-// 0f = f32f72503ad41d87caae7f0bf4010bd76ee308faffe478ea4bbf0f5a617bedcb
+// 0F = f32f72503ad41d87caae7f0bf4010bd76ee308faffe478ea4bbf0f5a617bedcb
 
 // 09 = da5788c597ec6fe857aa0e3e5925f12c28fa5e0fc4fecfcfe7c3c31b481849b7
 
@@ -73,21 +87,32 @@ void test_fingerprint_spend(CCoinsViewDB *coindb_cashdrive, std::string outpoint
 
 
 // right side
+//                         root node
+//                                  \
+//                                  05
+//                                /    \
+//                              0D      eb7...
+//                            /    \
+//                          1B       17
+//                        /   \     /   \
+//                   841.. 85c..  944..  0B
+//                                      /  \
+//                                    11   b8e..
+//                                  /   \
+//                                b29..  b2b..
 
-// 1b = 5f80b9a29ea0adda1b5e5d82db06b286a409c4e89a2707a824734f152931e0cb
+// 1B = 5f80b9a29ea0adda1b5e5d82db06b286a409c4e89a2707a824734f152931e0cb
 
 // 11 = 3df8b82bb22d5cf85351c8ff9e7131452cbf58fb577aefec01e3de4e8cbaa2da
 
-// 0b = 7e3024b8464a546e5f4aa86f45ec4d650c92ea5a5e6beb375a1ad86577c3bbf1
+// 0B = 7e3024b8464a546e5f4aa86f45ec4d650c92ea5a5e6beb375a1ad86577c3bbf1
 
 // 17 = 4552e2c74b13cd0f1b3c1fe6bbb8e9a3c95f57ef22fddd14358c646ffff0f706
 
-// 0d = a753de9143f6af0b08b68dc3856c341a7ed44493bb6d9842a45c8953d05d478c
+// 0D = a753de9143f6af0b08b68dc3856c341a7ed44493bb6d9842a45c8953d05d478c
 
 // 05 = 615358032dc9339b301f93d51c8b6c6841cae06447cabb55fbd428c960bb2f16
 
-
-// root = 7124bd808b1f83ec040d4c601468a613fd663d40e1c7fc73450c19de63d63ff3
 
 // test the fingerprint against the expected fingerprint of the nexa chain as of block 15
 void test_fingerprint(CCoinsViewDB *coindb_cashdrive)
