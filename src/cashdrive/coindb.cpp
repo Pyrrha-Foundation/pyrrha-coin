@@ -1183,6 +1183,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 if (cashdrive_debug)
                 {
                     LOGA("Spend(): back up to root, breaking \n");
+                    LOGA("Spend(): Updating fingerprint in root case \n");
                 }
                 // we must update the fingerprint for the root before breaking
                 parent_value = _UpdateFingerprint(parent_key);
@@ -1218,7 +1219,8 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                     LOGA("Spend(): has 3 children, breaking \n");
                 }
                 // has both children, we are done
-                break;
+                // we intentionally do nothing to continue looping to
+                // update the fingerprint all the way up to the root
             }
             else if (children == 0)
             {
@@ -1334,6 +1336,10 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 }
             }
             std::memcpy(parent_key, parent_parent_key, UINT256_NUM_BYTES);
+            if (cashdrive_debug)
+            {
+                LOGA("Spend(): Updating fingerprint in loop \n");
+            }
             parent_value = _UpdateFingerprint(parent_key);
         }
     }

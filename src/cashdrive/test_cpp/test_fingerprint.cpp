@@ -51,7 +51,7 @@ void test_fingerprint_spend(CCoinsViewDB *coindb_cashdrive, std::string outpoint
     bool res = coindb_cashdrive->Spend(outpoint);
     assert(res == true);
 }
-
+/*
 // null key fingerprint = 0000000000000000000000000000000000000000000000000000000000000000
 
 // root node = 7124bd808b1f83ec040d4c601468a613fd663d40e1c7fc73450c19de63d63ff3
@@ -112,7 +112,7 @@ void test_fingerprint_spend(CCoinsViewDB *coindb_cashdrive, std::string outpoint
 // 0D = a753de9143f6af0b08b68dc3856c341a7ed44493bb6d9842a45c8953d05d478c
 
 // 05 = 615358032dc9339b301f93d51c8b6c6841cae06447cabb55fbd428c960bb2f16
-
+*/
 
 // test the fingerprint against the expected fingerprint of the nexa chain as of block 15
 void test_fingerprint(CCoinsViewDB *coindb_cashdrive)
@@ -150,11 +150,23 @@ void test_fingerprint(CCoinsViewDB *coindb_cashdrive)
 
     printf("add fingerprint test passed \n");
 
-    // TODO: sprinkle a couple of asserts in the spends to check that the fingerprint is still what is expected
-
     // clean up by spending everything that was added
     test_fingerprint_spend(coindb_cashdrive, "0bce6204dd548d7ebd3a21f4fad0f949d716230b5a3f069e342eeb62f252ef8d");
+
+    // 19 should have been removed. 13 left child is now 399..
+    // rehash 13 and the root and check the fingerprint
+    // 13 hash should now be e33373a1101880b56e8bdc49c929e25955d75170ade9fc06ee55c48d7e05c474
+    result_fingerprint = coindb_cashdrive->GetFingerprint();
+    expected_fingerprint = uint256S_keep_endian("717f97db1ce330df0e14846eb2bcdf5aad5f2431d50d585cd41d4c070a1419f9");
+    assert(result_fingerprint == expected_fingerprint);
+
     test_fingerprint_spend(coindb_cashdrive, "399c4b87dd82b0a9837815ad67da1d527b0a49bec95459198fd53ddae1197d16");
+
+    // 13 is now gone and 07 should be the left of the root
+    result_fingerprint = coindb_cashdrive->GetFingerprint();
+    expected_fingerprint = uint256S_keep_endian("01f117319be78d96bf4bae240419ebf70110e222d5a6e23b180224dcaee30e9a");
+    assert(result_fingerprint == expected_fingerprint);
+
     test_fingerprint_spend(coindb_cashdrive, "47ecef8aff3e35e34274445147943c5e61664a9f729d76775da645010b60bbe3");
     test_fingerprint_spend(coindb_cashdrive, "4f8ef884b4e438a7c7e433a6b57bfbe813133654cd817699fc4f49d3ef07ee8e");
     test_fingerprint_spend(coindb_cashdrive, "5880784329bb383058109bb769bfb8a01fc33cc8432136ae07ed83a5ec3f3d1a");
