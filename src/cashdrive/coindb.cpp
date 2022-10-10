@@ -748,32 +748,6 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
             }
             continue;
         }
-        // traversing down in either direction requires the next node to be duplicated for this root group
-        // need to make a copy for the current root group
-        if (next_value.root_group != current_root_group)
-        {
-            // the parent will always be in the correct root group
-            std::pair<CoinEntryKey, CoinEntryValue> entry_copy = _copy_entry_with_new_parent(next_value, parent_key, parent_value);
-            if (isLeft == true)
-            {
-                std::memcpy(parent_value.key_left, entry_copy.first.key, UINT256_NUM_BYTES);
-            }
-            else
-            {
-                std::memcpy(parent_value.key_right, entry_copy.first.key, UINT256_NUM_BYTES);
-            }
-            CDBBatch batch(db);
-            batch.Write(entry_copy.first, entry_copy.second);
-            batch.Write(CoinEntryKey(parent_key), parent_value);
-            db.WriteBatch(batch);
-            std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
-            next_value = entry_copy.second;
-            if (cashdrive_debug)
-            {
-                LOGA("Mint(): copied entry with new parent\n");
-            }
-            assert(next_value.root_group == current_root_group);
-        }
         if (next_value.key_bits == 0)
         {
             if (cashdrive_debug)
@@ -807,12 +781,62 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
         }
         // next is an interior node
         int32_t res = _compare_key_bits(value.key, next_value.key, next_value.key_bits);
-        if (res == 0) // the keybits in the key and next key were the same
+        if (res != 0) // the keybits in the key and next key were NOT the same
+        {
+            if (cashdrive_debug)
+            {
+                LOGA("Mint(): res != 0 \n");
+            }
+            // create a new interior node for a parent and write it to the db
+            std::pair<CoinEntryKey, CoinEntryValue> new_parent_node = _make_new_interior_node(parent_key, parent_value, next_key, next_value, value.key);
+            // update values we are tracking
+            std::memcpy(next_key, new_parent_node.first.key, UINT256_NUM_BYTES);
+            next_value = new_parent_node.second;
+            std::memcpy(parent_key, next_value.key_parent, UINT256_NUM_BYTES);
+            if (!db.Read(CoinEntryKey(parent_key), parent_value))
+            {
+                // this is a critical error, if they key we are reading from is not
+                // invalid, then the entry should not be missing
+                assert(false);
+            }
+            if (cashdrive_debug)
+            {
+                LOGA("Mint(): made new interior node, cycling \n");
+            }
+        }
+        else // (res == 0) // the keybits in the key and next key were the same
         {
             if (cashdrive_debug)
             {
                 LOGA("Mint(): res == 0\n");
             }
+
+            // whichever branch we go down, we need to be in the same root group
+            if (next_value.root_group != current_root_group)
+            {
+                // the parent will always be in the correct root group
+                std::pair<CoinEntryKey, CoinEntryValue> entry_copy = _copy_entry_with_new_parent(next_value, parent_key, parent_value);
+                if (isLeft == true)
+                {
+                    std::memcpy(parent_value.key_left, entry_copy.first.key, UINT256_NUM_BYTES);
+                }
+                else
+                {
+                    std::memcpy(parent_value.key_right, entry_copy.first.key, UINT256_NUM_BYTES);
+                }
+                CDBBatch batch(db);
+                batch.Write(entry_copy.first, entry_copy.second);
+                batch.Write(CoinEntryKey(parent_key), parent_value);
+                db.WriteBatch(batch);
+                std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
+                next_value = entry_copy.second;
+                if (cashdrive_debug)
+                {
+                    LOGA("Mint(): copied entry with new parent\n");
+                }
+                assert(next_value.root_group == current_root_group);
+            }
+
             // after the key bits interior node keys are all 0,
             // we only need to check the bit of new node key that is
             // interior node keybits + 1 to determine which way we go.
@@ -877,26 +901,6 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
             }
             continue;
         }
-        if (cashdrive_debug)
-        {
-            LOGA("Mint(): res != 0 \n");
-        }
-        // create a new interior node for a parent and write it to the db
-        std::pair<CoinEntryKey, CoinEntryValue> new_parent_node = _make_new_interior_node(parent_key, parent_value, next_key, next_value, value.key);
-        // update values we are tracking
-        std::memcpy(next_key, new_parent_node.first.key, UINT256_NUM_BYTES);
-        next_value = new_parent_node.second;
-        std::memcpy(parent_key, next_value.key_parent, UINT256_NUM_BYTES);
-        if (!db.Read(CoinEntryKey(parent_key), parent_value))
-        {
-            // this is a critical error, if they key we are reading from is not
-            // invalid, then the entry should not be missing
-            assert(false);
-        }
-        if (cashdrive_debug)
-        {
-            LOGA("Mint(): made new interior node, cycling \n");
-        }
     }
     // if we are here, next is null. and we need to add data to parent
     if (isLeft)
@@ -931,7 +935,9 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     while (std::memcmp(parent_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
     {
         parent_value = _UpdateFingerprint(parent_key);
+        assert(value.root_group == parent_value.root_group);
         std::memcpy(parent_key, parent_value.key_parent, UINT256_NUM_BYTES);
+        value = parent_value;
     }
     return true;
 }
@@ -1195,6 +1201,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 // invalid, then the entry should not be missing
                 assert(false);
             }
+            assert(parent_value.root_group == parent_parent_value.root_group);
             int32_t children = 0;
             if (std::memcmp(parent_value.key_left, INVALID_KEY, UINT256_NUM_BYTES) != 0)
             {

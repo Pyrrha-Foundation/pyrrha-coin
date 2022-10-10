@@ -272,7 +272,6 @@ private:
         const uint256_t &new_parent_key,
         const CoinEntryValue &new_parent_value);
 
-    void _MakeNewRoot();
     void _IncrementLastKeyUsed();
     void _WriteLastKeyUsed();
     CoinEntryValue _FindCoin(const COutPoint &outpoint) const;
@@ -287,6 +286,7 @@ public:
         COverrideOptions *overridecache = nullptr,
         std::string path = "chainstate");
 
+    void _MakeNewRoot();
     CoinEntryValue _GetRootValue() const;
     CoinEntryValue _GetValueByKey(const uint256_t &key) const; // used only in tests
     CoinEntryValue _GetValueByOutpoint(const COutPoint &outpoint) const; // used only in tests

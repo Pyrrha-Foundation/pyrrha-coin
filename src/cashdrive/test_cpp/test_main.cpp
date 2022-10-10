@@ -21,14 +21,10 @@ BOOST_AUTO_TEST_CASE(TEST_ALL_CASHDRIVE)
     test_spends(coindb_cashdrive);
     // test fingerprint
     test_fingerprint(coindb_cashdrive);
-    // destroy the (empty) trie
-    //BitwiseTrie_destroy(coindb_cashdrive);
-    // make a new trie
-    //coindb_cashdrive = test_create();
-    // build a trie again
-    //test_adds(coindb_cashdrive);
+    // trie should be empty, build a trie again
+    test_adds(coindb_cashdrive);
     // start a new root and change the trie.
-    //test_second_root(coindb_cashdrive);
+    test_second_root(coindb_cashdrive);
     // trim the trie to the last root
     //test_trim(coindb_cashdrive);
     // destroy the (populated) trie
