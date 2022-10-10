@@ -1578,8 +1578,6 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins,
     size_t spent_coins = 0;
 
     LOG(COINDB, "starting committing process\n");
-    // a new root is generated every block. because we flush every block we can generate the new root here
-    _MakeNewRoot();
     // typedef std::unordered_map<COutPoint, CCoinsCacheEntry, SaltedOutpointHasher> CCoinsMap;
     for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();)
     {

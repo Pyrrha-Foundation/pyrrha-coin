@@ -2824,6 +2824,12 @@ void UpdateTip(CBlockIndex *pindexNew)
     const CChainParams &chainParams = Params();
     chainActive.SetTip(pindexNew);
 
+    // a new root is generated every block. because we flush every block we can generate the new root here
+    if (pcoinsdbview != nullptr)
+    {
+        pcoinsdbview->_MakeNewRoot();
+    }
+
     // If the chain tip has changed previously rejected transactions
     // might be now valid, e.g. due to a nLockTime'd tx becoming valid,
     // or a double-spend. Reset the rejects filter and give those
