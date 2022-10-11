@@ -61,10 +61,6 @@ struct CoinEntryKey
 {
     char key_prefix;
     uint256_t key;
-    CoinEntryKey(const uint256 value) : key_prefix(DB_COIN)
-    {
-        value.GetRaw(key);
-    }
     CoinEntryKey(const uint256_t &value) : key_prefix(DB_COIN)
     {
         std::memcpy(key, value, UINT256_NUM_BYTES);
