@@ -423,6 +423,10 @@ void CCoinsViewDB::_IncrementLastKeyUsed()
     {
         i++;
     }
+    if (cashdrive_debug)
+    {
+        LOGA("_IncrementLastKeyUsed(): KEY INCREMENTED TO %s \n", uint256t_ToString(next_db_key_available).c_str());
+    }
 }
 
 void CCoinsViewDB::_WriteLastKeyUsed()
@@ -715,6 +719,10 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     uint256_t next_key;
     std::memcpy(next_key, current_root_key, UINT256_NUM_BYTES);
     CoinEntryValue next_value;
+    if (cashdrive_debug)
+    {
+        LOGA("MINT(): Begin\n");
+    }
     while (std::memcmp(next_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
     {
         if (!db.Read(CoinEntryKey(next_key), next_value))
@@ -725,7 +733,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
         }
         if (cashdrive_debug)
         {
-            LOGA("MINT(): next_key: %s, next_value: %s \n", uint256t_ToString(next_value.key).c_str(), next_value.ToString().c_str());
+            LOGA("MINT(): next_key: %s, next_value: %s \n", uint256t_ToString(next_key).c_str(), next_value.ToString().c_str());
         }
         // if next is a leaf node...
         if (next_value.key_bits == 256)
