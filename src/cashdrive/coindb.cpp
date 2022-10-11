@@ -315,9 +315,13 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
         }
         // parent has been updated, write the changes to the db
         batch.Write(CoinEntryKey(parent_key), parent_value);
-        std::memcpy(interior_value.key_parent, replacing_value.key_parent, UINT256_NUM_BYTES);
+        std::memcpy(interior_value.key_parent, parent_key, UINT256_NUM_BYTES);
     }
-    std::memcpy(replacing_value.key_parent, interior_key.key, UINT256_NUM_BYTES);
+    // only update the replacing parent key with this key if it is in the same root group
+    if (replacing_value.root_group == interior_value.root_group)
+    {
+        std::memcpy(replacing_value.key_parent, interior_key.key, UINT256_NUM_BYTES);
+    }
     // replacing value has been updated, write the changes to the db
     batch.Write(CoinEntryKey(replacing_key), replacing_value);
     // before we return, write the new interior node
