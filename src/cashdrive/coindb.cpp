@@ -582,7 +582,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
         }
         if (cashdrive_debug)
         {
-            LOGA("Find(): key = %s, next_value.key = %s, next_value.key_bits = %u \n", uint256t_ToString(key).c_str(), uint256t_ToString(next_value.key).c_str(), next_value.key_bits);
+            LOGA("Find(): key = %s, next_value = %s\n", uint256t_ToString(key).c_str(), next_value.ToString().c_str());
         }
         int res = _compare_key_bits(key, next_value.key, next_value.key_bits);
         if (res == 0)
@@ -634,7 +634,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
                 std::memcpy(next_key, next_value.key_left, UINT256_NUM_BYTES);
                 if (cashdrive_debug)
                 {
-                    LOGA("Find(): res == 0, res <= 0, going left \n");
+                    LOGA("Find(): res == 0, res <= 0, going left to key %s \n", uint256t_ToString(next_key).c_str());
                 }
                 continue;
             }
@@ -643,7 +643,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
                 std::memcpy(next_key, next_value.key_right, UINT256_NUM_BYTES);
                 if (cashdrive_debug)
                 {
-                    LOGA("Find(): res == 0, res > 0, going right \n");
+                    LOGA("Find(): res == 0, res > 0, going right to key %s \n", uint256t_ToString(next_key).c_str());
                 }
                 continue;
             }
@@ -658,7 +658,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
             std::memcpy(next_key, next_value.key_left, UINT256_NUM_BYTES);
             if (cashdrive_debug)
             {
-                LOGA("Find(): res < 0, going left \n");
+                LOGA("Find(): res < 0, going left to key %s \n", uint256t_ToString(next_key).c_str());
             }
             continue;
         }
@@ -667,7 +667,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
             std::memcpy(next_key, next_value.key_right, UINT256_NUM_BYTES);
             if (cashdrive_debug)
             {
-                LOGA("Find(): res > 0, going right \n");
+                LOGA("Find(): res > 0, going right to key %s \n", uint256t_ToString(next_key).c_str());
             }
             continue;
         }
