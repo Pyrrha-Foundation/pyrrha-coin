@@ -142,6 +142,8 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     CoinEntryValue interior_value;
     interior_value.SetNull();
     std::memcpy(interior_value.key, key, UINT256_NUM_BYTES);
+    // parents should always be in the current root group
+    assert(parent_value.root_group == current_root_group);
     interior_value.root_group = parent_value.root_group;
     // calculate key_bits
     uint32_t i = 0;
