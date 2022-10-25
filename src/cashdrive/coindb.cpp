@@ -127,6 +127,17 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
         uint256 next_db_key_available256;
         db.Read(DB_LAST_KEY_USED, next_db_key_available256);
         next_db_key_available256.GetRaw(next_db_key_available);
+        // we loaded the last used key, increment it to avoid key reuse
+        int32_t i = 0;
+        uint32_t* pn = (uint32_t*)next_db_key_available;
+        while (++pn[i] == 0 && i < 7)
+        {
+            i++;
+        }
+        if (cashdrive_debug)
+        {
+            LOGA("_IncrementLastKeyUsed(): KEY INCREMENTED TO %s \n", uint256t_ToString(next_db_key_available).c_str());
+        }
     }
 }
 
@@ -538,6 +549,10 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
         {
             assert(false);
         }
+        if (cashdrive_debug)
+        {
+            LOGA("\n\nFind(): key = %s, next_key = %s, next_value = %s\n", uint256t_ToString(key).c_str(), uint256t_ToString(next_key).c_str(), next_value.ToString().c_str());
+        }
         // special root case
         if (next_value.key_bits == 0)
         {
@@ -547,7 +562,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
                 std::memcpy(next_key, next_value.key_right, UINT256_NUM_BYTES);
                 if (cashdrive_debug)
                 {
-                    LOGA("Find(): root case, going right \n");
+                    LOGA("Find(): root case (key %s), going right to key %s \n", uint256t_ToString(current_root_key).c_str(), uint256t_ToString(next_key).c_str());
                 }
                 continue;
             }
@@ -557,7 +572,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
                 std::memcpy(next_key, next_value.key_left, UINT256_NUM_BYTES);
                 if (cashdrive_debug)
                 {
-                    LOGA("Find(): root case, going left \n");
+                    LOGA("Find(): root case (key %s), going left to key %s \n", uint256t_ToString(current_root_key).c_str(), uint256t_ToString(next_key).c_str());
                 }
                 continue;
             }
@@ -581,10 +596,6 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
                 }
                 return next_value;
             }
-        }
-        if (cashdrive_debug)
-        {
-            LOGA("Find(): key = %s, next_value = %s\n", uint256t_ToString(key).c_str(), next_value.ToString().c_str());
         }
         int res = _compare_key_bits(key, next_value.key, next_value.key_bits);
         if (res == 0)
@@ -923,7 +934,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
         std::memcpy(parent_value.key_left, key.key, UINT256_NUM_BYTES);
         if (cashdrive_debug)
         {
-            LOGA("Mint(): added new node on parent left \n");
+            LOGA("Mint(): added new node on parent left with key %s and value %s \n", uint256t_ToString(key.key).c_str(), value.ToString().c_str());
         }
     }
     else // right
@@ -932,7 +943,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
         std::memcpy(parent_value.key_right, key.key, UINT256_NUM_BYTES);
         if (cashdrive_debug)
         {
-            LOGA("Mint(): added new node on parent right \n");
+            LOGA("Mint(): added new node on parent right with key %s and value %s \n", uint256t_ToString(key.key).c_str(), value.ToString().c_str());
         }
     }
     CDBBatch batch(db);
