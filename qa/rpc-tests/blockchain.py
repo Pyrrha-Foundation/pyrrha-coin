@@ -160,8 +160,9 @@ class BlockchainTest(BitcoinTestFramework):
         assert_equal(res['height'], 200)
         assert_equal(res['txouts'], 200)
         size = res["disk_size"]
-        assert (size > 6400)
-        assert (size < 64000)
+        # remove size assertions with cashdrive because we keep historical views - Griffith
+        #assert (size > 6400)
+        #assert (size < 64000)
         assert_equal(res['bestblock'], node.getblockhash(200))
         assert_equal(len(res['bestblock']), 64)
         assert_equal(len(res['hash_serialized']), 64)

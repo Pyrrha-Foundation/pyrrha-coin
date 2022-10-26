@@ -219,17 +219,26 @@ public:
     ~CCoinsViewDBCursor() {}
     bool GetKey(COutPoint &key) const
     {
-        // intentionally left blank
-        // this functiton should not be used
-        // but is required by the abstract base class
+        uint256_t _key;
+        if (GetKey(_key))
+        {
+            key = COutPoint(uint256(_key));
+            return true;
+        }
         return false;
     }
     bool GetKey(uint256_t &key) const;
     bool GetValue(Coin &coin) const
     {
-        // intentionally left blank
-        // this functiton should not be used
-        // but is required by the abstract base class
+        CoinEntryValue value;
+        if (GetValue(value))
+        {
+            if (value.key_bits == 256)
+            {
+                coin = value.value;
+            }
+            return true;
+        }
         return false;
     }
     bool GetValue(CoinEntryValue &coin) const;
@@ -307,6 +316,7 @@ public:
         const uint64_t nBestCoinHeight,
         size_t &nChildCachedCoinsUsage) override;
     CCoinsViewCursor *Cursor() const override;
+    CCoinsViewDBCursor *DBCursor() const;
 
     size_t EstimateSize() const override;
 

@@ -1678,6 +1678,27 @@ CCoinsViewCursor *CCoinsViewDB::Cursor() const
     return i;
 }
 
+CCoinsViewDBCursor *CCoinsViewDB::DBCursor() const
+{
+    CCoinsViewDBCursor *i = new CCoinsViewDBCursor(const_cast<CDBWrapper *>(&db)->NewIterator(), GetBestBlock());
+    /* It seems that there are no "const iterators" for LevelDB.  Since we
+       only need read operations on it, use a const-cast to get around
+       that restriction.  */
+    i->pcursor->Seek(DB_COIN);
+    // Cache key of first record
+    if (i->pcursor->Valid())
+    {
+        CoinEntryKey entry(i->keyTmp.second);
+        i->pcursor->GetKey(entry);
+        i->keyTmp.first = entry.key_prefix;
+    }
+    else
+    {
+        i->keyTmp.first = 0; // Make sure Valid() and GetKey() return false
+    }
+    return i;
+}
+
 size_t CCoinsViewDB::EstimateSize() const
 {
     READLOCK(cs_utxo);
