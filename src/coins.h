@@ -64,6 +64,14 @@ public:
     {
     }
 
+    friend bool operator==(const Coin &a, const Coin &b)
+    {
+        // Empty Coin objects are always equal.
+        if (a.IsSpent() && b.IsSpent())
+            return true;
+        return a.fCoinBase == b.fCoinBase && a.nHeight == b.nHeight && a.out == b.out;
+    }
+
     int64_t height() const { return nHeight; };
 
     void Clear()
@@ -79,7 +87,7 @@ public:
     template <typename Stream>
     void Serialize(Stream &s) const
     {
-        assert(!IsSpent());
+        // assert(!IsSpent());
         uint32_t code = nHeight * 2 + fCoinBase;
         ::Serialize(s, VARINT(code));
         ::Serialize(s, CTxOutCompressor(REF(out)));
@@ -426,5 +434,8 @@ SpendCoins(...); AddCoins(...);
 */
 void UpdateCoins(const CTransaction &tx, CCoinsViewCache &inputs, CTxUndo &txundo, int nHeight);
 void UpdateCoins(const CTransaction &tx, CCoinsViewCache &inputs, int nHeight);
+
+static const Coin emptyCoin;
+
 #endif
 #endif // NEXA_COINS_H

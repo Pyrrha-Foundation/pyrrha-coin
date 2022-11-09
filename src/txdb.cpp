@@ -13,13 +13,6 @@
 #include "uint256.h"
 #include "validation/validation.h"
 
-#include <stdint.h>
-
-CCoinsViewDB *pcoinsdbview = nullptr;
-
-using namespace std;
-
-static const char DB_COIN = 'C';
 static const char DB_BLOCK_FILES = 'f';
 static const char DB_TXINDEX = 't';
 static const char DB_TXIDEM_INDEX = 'i';
@@ -27,253 +20,19 @@ static const char DB_OUTPOINT_INDEX = 'p';
 static const char DB_TXINDEX_BLOCK = 'T';
 static const char DB_BLOCK_INDEX = 'b';
 
-static const char DB_BEST_BLOCK = 'B';
+const char DB_BEST_BLOCK = 'B';
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
 
-
-namespace
-{
-struct CoinEntry
-{
-    COutPoint *outpoint;
-    char key;
-    CoinEntry(const COutPoint *ptr) : outpoint(const_cast<COutPoint *>(ptr)), key(DB_COIN) {}
-    template <typename Stream>
-    void Serialize(Stream &s) const
-    {
-        s << key;
-        s << outpoint->hash;
-    }
-
-    template <typename Stream>
-    void Unserialize(Stream &s)
-    {
-        s >> key;
-        s >> outpoint->hash;
-    }
-};
-} // namespace
-
-
-CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
-    bool fMemory,
-    bool fWipe,
-    bool fObfuscate,
-    COverrideOptions *overridecache)
-    : db(GetDataDir() / "chainstate", nCacheSize, fMemory, fWipe, fObfuscate, overridecache)
-{
-}
-
-bool CCoinsViewDB::GetCoin(const COutPoint &outpoint, Coin &coin) const
-{
-    READLOCK(cs_utxo);
-    return db.Read(CoinEntry(&outpoint), coin);
-}
-
-bool CCoinsViewDB::HaveCoin(const COutPoint &outpoint) const
-{
-    READLOCK(cs_utxo);
-    return db.Exists(CoinEntry(&outpoint));
-}
-
-uint256 CCoinsViewDB::GetBestBlock() const
-{
-    READLOCK(cs_utxo);
-    return _GetBestBlock();
-}
-
-uint256 CCoinsViewDB::_GetBestBlock() const
-{
-    AssertLockHeld(cs_utxo);
-    uint256 hashBestChain;
-    std::string strmode = std::to_string(static_cast<int32_t>(BLOCK_DB_MODE));
-    if (pblockdb)
-    {
-        // just use the int that is the db mode as its key for the best block it has
-        if (!db.Read(strmode, hashBestChain))
-            return uint256();
-    }
-    else
-    {
-        if (!db.Read(DB_BEST_BLOCK, hashBestChain))
-            return uint256();
-    }
-    return hashBestChain;
-}
-
-uint256 CCoinsViewDB::GetBestBlock(BlockDBMode mode) const
-{
-    READLOCK(cs_utxo);
-    return _GetBestBlock(mode);
-}
-
-uint256 CCoinsViewDB::_GetBestBlock(BlockDBMode mode) const
-{
-    AssertLockHeld(cs_utxo);
-    uint256 hashBestChain;
-    // if override isnt end, override the fetch to get the best block of a specific mode
-    if (mode != END_STORAGE_OPTIONS)
-    {
-        std::string strmode = std::to_string(static_cast<int32_t>(mode));
-        if (mode == SEQUENTIAL_BLOCK_FILES)
-        {
-            if (!db.Read(DB_BEST_BLOCK, hashBestChain))
-                return uint256();
-        }
-        else
-        {
-            if (!db.Read(strmode, hashBestChain))
-                return uint256();
-        }
-    }
-    return hashBestChain;
-}
-
-void CCoinsViewDB::WriteBestBlock(const uint256 &hashBlock)
-{
-    WRITELOCK(cs_utxo);
-    _WriteBestBlock(hashBlock);
-}
-
-void CCoinsViewDB::_WriteBestBlock(const uint256 &hashBlock)
-{
-    AssertWriteLockHeld(cs_utxo);
-    std::string strmode = std::to_string(static_cast<int32_t>(BLOCK_DB_MODE));
-    if (!hashBlock.IsNull())
-    {
-        if (pblockdb)
-        {
-            // just use the int that is the db mode as its key for the best block it has
-            db.Write(strmode, hashBlock);
-        }
-        else // sequential files doesnt use the int of its mode for backwards compatibility reasons
-        {
-            db.Write(DB_BEST_BLOCK, hashBlock);
-        }
-    }
-}
-
-void CCoinsViewDB::WriteBestBlock(const uint256 &hashBlock, BlockDBMode mode)
-{
-    WRITELOCK(cs_utxo);
-    _WriteBestBlock(hashBlock);
-}
-
-void CCoinsViewDB::_WriteBestBlock(const uint256 &hashBlock, BlockDBMode mode)
-{
-    AssertWriteLockHeld(cs_utxo);
-    if (mode != END_STORAGE_OPTIONS)
-    {
-        std::string strmode = std::to_string(static_cast<int32_t>(mode));
-        if (mode == SEQUENTIAL_BLOCK_FILES)
-        {
-            db.Write(DB_BEST_BLOCK, hashBlock);
-        }
-        else
-        {
-            db.Write(strmode, hashBlock);
-        }
-    }
-}
-
-bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins,
-    const uint256 &hashBlock,
-    const uint64_t nBestCoinHeight,
-    size_t &nChildCachedCoinsUsage)
-{
-    WRITELOCK(cs_utxo);
-    CDBBatch batch(db);
-    size_t count = 0;
-    size_t changed = 0;
-    size_t nBatchWrites = 0;
-    size_t batch_size = nMaxDBBatchSize;
-    size_t spent_coins = 0;
-
-    LOG(COINDB, "starting committing process\n");
-    for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();)
-    {
-        if (it->second.flags & CCoinsCacheEntry::DIRTY)
-        {
-            CoinEntry entry(&it->first);
-            size_t nUsage = it->second.coin.DynamicMemoryUsage();
-            if (it->second.coin.IsSpent())
-            {
-                batch.Erase(entry);
-                spent_coins++;
-
-                // Update the usage of the child cache before deleting the entry in the child cache
-                nChildCachedCoinsUsage -= nUsage;
-                it = mapCoins.erase(it);
-            }
-            else
-            {
-                batch.Write(entry, it->second.coin);
-
-                // Only delete valid coins from the cache when we're nearly syncd.  During IBD, and also
-                // if BlockOnly mode is turned on, these coins will be used, whereas, once the chain is
-                // syncd we only need the coins that have come from accepting txns into the memory pool.
-                if (IsChainNearlySyncd() && !fImporting && !fReindex && !fBlocksOnly &&
-                    (nCoinCacheMaxSize < DEFAULT_HIGH_PERF_MEM_CUTOFF))
-                {
-                    // Update the usage of the child cache before deleting the entry in the child cache
-                    nChildCachedCoinsUsage -= nUsage;
-                    it = mapCoins.erase(it);
-                }
-                else
-                {
-                    it->second.flags = 0;
-                    it++;
-                }
-            }
-            changed++;
-
-            // In order to prevent the spikes in memory usage that used to happen when we prepared large as
-            // was possible, we instead break up the batches such that the performance gains for writing to
-            // leveldb are still realized but the memory spikes are not seen.
-            if (batch.SizeEstimate() > batch_size)
-            {
-                db.WriteBatch(batch);
-                batch.Clear();
-                nBatchWrites++;
-            }
-        }
-        else
-            it++;
-        count++;
-    }
-    if (!hashBlock.IsNull())
-        _WriteBestBlock(hashBlock);
-
-    bool ret = db.WriteBatch(batch);
-    LOG(COINDB,
-        "Committing %u changed transactions (out of %u) to coin database with %u batch writes and %u spent coins...\n",
-        (unsigned int)changed, (unsigned int)count, (unsigned int)nBatchWrites, (unsigned int)spent_coins);
-
-    return ret;
-}
-
-size_t CCoinsViewDB::EstimateSize() const
-{
-    READLOCK(cs_utxo);
-    return db.EstimateSize(DB_COIN, (char)(DB_COIN + 1));
-}
-
-size_t CCoinsViewDB::TotalWriteBufferSize() const
-{
-    READLOCK(cs_utxo);
-    return db.TotalWriteBufferSize();
-}
-
-CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, string folder, bool fMemory, bool fWipe)
+CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, std::string folder, bool fMemory, bool fWipe)
     : CDBWrapper(GetDataDir() / folder.c_str() / "index", nCacheSize, fMemory, fWipe)
 {
 }
 
 bool CBlockTreeDB::ReadBlockFileInfo(int nFile, CBlockFileInfo &info)
 {
-    return Read(make_pair(DB_BLOCK_FILES, nFile), info);
+    return Read(std::make_pair(DB_BLOCK_FILES, nFile), info);
 }
 
 bool CBlockTreeDB::WriteReindexing(bool fReindexing)
@@ -291,54 +50,6 @@ bool CBlockTreeDB::ReadReindexing(bool &fReindexing)
 }
 
 bool CBlockTreeDB::ReadLastBlockFile(int &nFile) { return Read(DB_LAST_BLOCK, nFile); }
-CCoinsViewCursor *CCoinsViewDB::Cursor() const
-{
-    CCoinsViewDBCursor *i = new CCoinsViewDBCursor(const_cast<CDBWrapper *>(&db)->NewIterator(), GetBestBlock());
-    /* It seems that there are no "const iterators" for LevelDB.  Since we
-       only need read operations on it, use a const-cast to get around
-       that restriction.  */
-    i->pcursor->Seek(DB_COIN);
-    // Cache key of first record
-    if (i->pcursor->Valid())
-    {
-        CoinEntry entry(&i->keyTmp.second);
-        i->pcursor->GetKey(entry);
-        i->keyTmp.first = entry.key;
-    }
-    else
-    {
-        i->keyTmp.first = 0; // Make sure Valid() and GetKey() return false
-    }
-    return i;
-}
-
-bool CCoinsViewDBCursor::GetKey(COutPoint &key) const
-{
-    // Return cached key
-    if (keyTmp.first == DB_COIN)
-    {
-        key = keyTmp.second;
-        return true;
-    }
-    return false;
-}
-
-bool CCoinsViewDBCursor::GetValue(Coin &coin) const { return pcursor->GetValue(coin); }
-unsigned int CCoinsViewDBCursor::GetValueSize() const { return pcursor->GetValueSize(); }
-bool CCoinsViewDBCursor::Valid() const { return keyTmp.first == DB_COIN; }
-void CCoinsViewDBCursor::Next()
-{
-    pcursor->Next();
-    CoinEntry entry(&keyTmp.second);
-    if (!pcursor->Valid() || !pcursor->GetKey(entry))
-    {
-        keyTmp.first = 0; // Invalidate cached key after last record so that Valid() and GetKey() return false
-    }
-    else
-    {
-        keyTmp.first = entry.key;
-    }
-}
 
 bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo *> > &fileInfo,
     int nLastFile,
@@ -348,7 +59,7 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
     for (std::vector<std::pair<int, const CBlockFileInfo *> >::const_iterator it = fileInfo.begin();
          it != fileInfo.end(); it++)
     {
-        batch.Write(make_pair(DB_BLOCK_FILES, it->first), *it->second);
+        batch.Write(std::make_pair(DB_BLOCK_FILES, it->first), *it->second);
     }
     if (!pblockdb)
     {
@@ -356,7 +67,7 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
     }
     for (std::vector<const CBlockIndex *>::const_iterator it = blockinfo.begin(); it != blockinfo.end(); it++)
     {
-        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), CDiskBlockIndex(*it));
+        batch.Write(std::make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), CDiskBlockIndex(*it));
     }
     return WriteBatch(batch, true);
 }
@@ -378,7 +89,7 @@ bool CBlockTreeDB::ReadFlag(const std::string &name, bool &fValue)
 bool CBlockTreeDB::FindBlockIndex(uint256 blockhash, CDiskBlockIndex *pindex)
 {
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
     // Load mapBlockIndex
     while (pcursor->Valid())
     {
@@ -423,7 +134,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 {
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
 
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
 
     // Load mapBlockIndex
     while (pcursor->Valid())
@@ -472,7 +183,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 bool CBlockTreeDB::GetSortedHashIndex(std::vector<std::pair<int, CDiskBlockIndex> > &hashesByHeight)
 {
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
     // Load mapBlockIndex
     while (pcursor->Valid())
     {

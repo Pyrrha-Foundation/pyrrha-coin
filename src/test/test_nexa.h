@@ -5,6 +5,7 @@
 #ifndef NEXA_TEST_NEXA_H
 #define NEXA_TEST_NEXA_H
 
+#include "cashdrive/coindb.h"
 #include "chainparamsbase.h"
 #include "fs.h"
 #include "key.h"

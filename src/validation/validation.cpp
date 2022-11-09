@@ -2826,6 +2826,7 @@ void UpdateTip(CBlockIndex *pindexNew)
 {
     DbgAssert(txProcessingCorral.region() == CORRAL_TX_PAUSE, LOGA("Updating tip during tx processing"));
     const CChainParams &chainParams = Params();
+
     chainActive.SetTip(pindexNew);
 
     // If the chain tip has changed previously rejected transactions
@@ -3076,8 +3077,12 @@ bool ConnectTip(CValidationState &state,
         mempool.clear();
         orphanpool.clear();
     }
-    // Update chainActive & related variables.
-    UpdateTip(pindexNew);
+
+    // a new root is generated every block. because we flush every block we can generate the new root here
+    if (pcoinsdbview != nullptr)
+    {
+        pcoinsdbview->_MakeNewRoot();
+    }
 
     // Write the chain state to disk, if necessary. This should be done after UpdateTip to make sure the tip
     // is set correctly when calling FlushStateToDisk(); this is because the automatic -dbcache adjustment
@@ -3086,11 +3091,14 @@ bool ConnectTip(CValidationState &state,
     int64_t nTime4 = GetStopwatchMicros();
     nTimeFlush += nTime4 - nTime3;
     LOG(BENCH, "  - Flush: %.2fms [%.2fs]\n", (nTime4 - nTime3) * 0.001, nTimeFlush * 0.000001);
-    if (!FlushStateToDisk(state, FLUSH_STATE_IF_NEEDED))
+    if (!FlushStateToDisk(state, FLUSH_STATE_ALWAYS))
         return false;
     int64_t nTime5 = GetStopwatchMicros();
     nTimeChainState += nTime5 - nTime4;
     LOG(BENCH, "  - Writing chainstate: %.2fms [%.2fs]\n", (nTime5 - nTime4) * 0.001, nTimeChainState * 0.000001);
+
+    // Update chainActive & related variables.
+    UpdateTip(pindexNew);
 
     // Tell wallet about transactions that went from mempool
     // to conflicted:

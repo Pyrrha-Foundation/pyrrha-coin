@@ -129,6 +129,7 @@ BITCOIN_CORE_H = \
   capd/capd.h \
   cashaddr.h \
   cashaddrenc.h \
+  cashdrive/coindb.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -289,6 +290,7 @@ libnexa_server_a_SOURCES = \
   bloom.cpp \
   capd/capd.cpp \
   capd/capd_rpc.cpp \
+  cashdrive/coindb.cpp \
   chain.cpp \
   checkpoints.cpp \
   connmgr.cpp \

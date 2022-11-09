@@ -960,9 +960,9 @@ static void ApplyStats(CCoinsStats &stats, CHashWriter &ss, const COutPoint &out
 }
 
 //! Calculate statistics about the unspent transaction output set
-static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
+static bool GetUTXOStats(CCoinsViewDB *view, CCoinsStats &stats)
 {
-    std::unique_ptr<CCoinsViewCursor> pcursor(view->Cursor());
+    std::unique_ptr<CCoinsViewDBCursor> pcursor(view->DBCursor());
     DbgAssert(pcursor, throw std::runtime_error(__func__));
 
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
@@ -978,10 +978,14 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
     {
         boost::this_thread::interruption_point();
         COutPoint key;
-        Coin coin;
+        CoinEntryValue coin;
         if (pcursor->GetKey(key) && pcursor->GetValue(coin))
         {
-            ApplyStats(stats, ss, key, coin);
+            // not an interior node
+            if (coin.key_bits == 256)
+            {
+                ApplyStats(stats, ss, key, coin.value);
+            }
         }
         else
         {

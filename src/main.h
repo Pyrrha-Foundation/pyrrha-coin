@@ -13,6 +13,7 @@
 #endif
 
 #include "amount.h"
+#include "cashdrive/coindb.h"
 #include "chain.h"
 #include "coins.h"
 #include "consensus/consensus.h"
