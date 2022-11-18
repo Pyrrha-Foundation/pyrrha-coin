@@ -7,16 +7,7 @@
 #ifndef NEXA_CASHDRIVE_COINDB_H
 #define NEXA_CASHDRIVE_COINDB_H
 
-#include "blockstorage/dbabstract.h"
-#include "chain.h"
-#include "coins.h"
-#include "dbwrapper.h"
-
-#include <map>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
+#include "coindbcursor.h"
 
 static const char DB_COIN = 'C';
 static const char DB_CASHDRIVE_COIN = 'c';
@@ -205,52 +196,6 @@ struct CoinEntryValue
 
 static const uint256_t INVALID_KEY = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 static const CoinEntryValue INVALID_ENTRY;
-
-/** Specialization of CCoinsViewCursor to iterate over a CCoinsViewDB */
-class CCoinsViewDBCursor : public CCoinsViewCursor
-{
-private:
-    CCoinsViewDBCursor(CDBIterator *pcursorIn, const uint256 &hashBlockIn)
-        : CCoinsViewCursor(hashBlockIn), pcursor(pcursorIn)
-    {
-    }
-    std::unique_ptr<CDBIterator> pcursor;
-    std::pair<char, uint256_t> keyTmp;
-
-    friend class CCoinsViewDB;
-
-public:
-    ~CCoinsViewDBCursor() {}
-    bool GetKey(COutPoint &key) const
-    {
-        uint256_t _key;
-        if (GetKey(_key))
-        {
-            key = COutPoint(uint256(_key));
-            return true;
-        }
-        return false;
-    }
-    bool GetKey(uint256_t &key) const;
-    bool GetValue(Coin &coin) const
-    {
-        CoinEntryValue value;
-        if (GetValue(value))
-        {
-            if (value.key_bits == 256)
-            {
-                coin = value.value;
-            }
-            return true;
-        }
-        return false;
-    }
-    bool GetValue(CoinEntryValue &coin) const;
-    unsigned int GetValueSize() const;
-
-    bool Valid() const;
-    void Next();
-};
 
 struct CRootKey
 {

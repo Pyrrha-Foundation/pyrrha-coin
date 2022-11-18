@@ -130,6 +130,7 @@ BITCOIN_CORE_H = \
   cashaddr.h \
   cashaddrenc.h \
   cashdrive/coindb.h \
+  cashdrive/coindbcursor.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -291,6 +292,7 @@ libnexa_server_a_SOURCES = \
   capd/capd.cpp \
   capd/capd_rpc.cpp \
   cashdrive/coindb.cpp \
+  cashdrive/coindbcursor.cpp \
   chain.cpp \
   checkpoints.cpp \
   connmgr.cpp \

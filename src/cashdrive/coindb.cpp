@@ -65,32 +65,6 @@ static int _compare_key_bits(const uint256_t a, const uint256_t b, const uint32_
     return std::memcmp(a_keybits, b_keybits, UINT256_NUM_BYTES);
 }
 
-bool CCoinsViewDBCursor::GetValue(CoinEntryValue &coin) const
-{
-    return pcursor->GetValue(coin);
-}
-unsigned int CCoinsViewDBCursor::GetValueSize() const
-{
-    return pcursor->GetValueSize();
-}
-bool CCoinsViewDBCursor::Valid() const
-{
-    return keyTmp.first == DB_COIN;
-}
-void CCoinsViewDBCursor::Next()
-{
-    pcursor->Next();
-    CoinEntryKey entry(keyTmp.second);
-    if (!pcursor->Valid() || !pcursor->GetKey(entry))
-    {
-        keyTmp.first = 0; // Invalidate cached key after last record so that Valid() and GetKey() return false
-    }
-    else
-    {
-        keyTmp.first = entry.key_prefix;
-    }
-}
-
 CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
     bool fMemory,
     bool fWipe,
@@ -376,17 +350,6 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_copy_entry_with_new_paren
     copy_value.root_group = new_parent_value.root_group;
     std::pair<CoinEntryKey, CoinEntryValue> copy_entry = std::make_pair(copy_key, copy_value);
     return copy_entry;
-}
-
-bool CCoinsViewDBCursor::GetKey(uint256_t &key) const
-{
-    // Return cached key
-    if (keyTmp.first == DB_COIN)
-    {
-        std::memcpy(key, keyTmp.second, UINT256_NUM_BYTES);
-        return true;
-    }
-    return false;
 }
 
 CoinEntryValue CCoinsViewDB::_GetRootValue() const
