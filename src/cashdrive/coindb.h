@@ -325,11 +325,8 @@ struct CRootMetaData
 /** CCoinsView backed by the coin database (chainstate/) */
 
 // TODO
-// the key is an incremental 256 bit hexidecimal number, starts at 0, never resets.
-// need to store the keys of the root hashes somewhere to differentiate views
-// the root group is the block height, if not the block height needs to be stored in root nodes
-// the value of the current root group should be stored somewhere for easy access.
-// flush after every block?
+// solve the uint256_t <-> uint256 problem by reworking uint256_t
+// with the current usage there is a lot of unnecessary memcpy calls
 
 static const uint64_t roots_to_keep = 100;
 

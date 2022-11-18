@@ -177,13 +177,14 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     interior_value.root_group = parent_value.root_group;
     // calculate key_bits
     uint32_t i = 0;
+    // find first byte that is not the same between the key and the replacing value key
     while(std::memcmp(&key[i], &replacing_value.key[i], 1) == 0)
     {
         ++i;
     }
     interior_value.key_bits = 8 * i;
     // byte i is the differing byte, check the bits
-    // do not check the last bit because this is an interior node
+    // do not check the last bit because this is an interior node (max bits to check is 255)
     uint8_t bin_number = BIN_00000000;
     uint8_t wild_bit_mask = BIN_00000000;
     if ((BIN_10000000 & key[i]) != (BIN_10000000 & replacing_value.key[i]))
@@ -441,7 +442,7 @@ void CCoinsViewDB::_MakeNewRoot(const uint64_t &nBlockHeight)
     CoinEntryValue current_root_value = _GetRootValue();
 
     // make a root entry for this last root we are committing
-    // with the necessay metadata
+    // with the necessary metadata
     CRootMetaData root_data(current_root_key);
     std::memcpy(root_data.key, current_root_key, UINT256_NUM_BYTES);
     root_data.nBlockHeight = this->current_block_height;
@@ -449,7 +450,7 @@ void CCoinsViewDB::_MakeNewRoot(const uint64_t &nBlockHeight)
     root_data.vSpentLeafNodeKeys = this->vRootSpentLeafKeys;
     db.Write(CRootKey(nBlockHeight), root_data);
     db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
-
+    // clear root metadata for next root
     this->vRootInternalKeys.clear();
     this->vRootSpentLeafKeys.clear();
     this->current_block_height = nBlockHeight;
@@ -514,6 +515,7 @@ CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
         {
             nCase = 2;
         }
+        // both children missing (root with no children)
         else if (std::memcmp(parent_value.key_left, INVALID_KEY, UINT256_NUM_BYTES) == 0 &&
             std::memcmp(parent_value.key_right, INVALID_KEY, UINT256_NUM_BYTES) == 0)
         {
@@ -868,6 +870,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
                 _AddToRootCache(entry_copy.first);
                 batch.Write(CoinEntryKey(parent_key), parent_value);
                 db.WriteBatch(batch);
+                // assign next to the copied values
                 std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
                 next_value = entry_copy.second;
                 if (cashdrive_debug)
@@ -1054,10 +1057,12 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             std::pair<CoinEntryKey, CoinEntryValue> entry_copy = _copy_entry_with_new_parent(next_value, parent_key, parent_value);
             if (isLeft == true)
             {
+                // updating parent left
                 std::memcpy(parent_value.key_left, entry_copy.first.key, UINT256_NUM_BYTES);
             }
             else
             {
+                // updating parent right
                 std::memcpy(parent_value.key_right, entry_copy.first.key, UINT256_NUM_BYTES);
             }
             CDBBatch batch(db);
@@ -1074,6 +1079,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
         {
             if ((outpoint_key[0] & BIN_10000000) == BIN_10000000)
             {
+                // first bit is 1, go right
                 std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
                 parent_value = next_value;
                 std::memcpy(next_key, next_value.key_right, UINT256_NUM_BYTES);
@@ -1086,6 +1092,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             }
             else
             {
+                // first bit is 0, go left
                 std::memcpy(parent_key, next_key, UINT256_NUM_BYTES);
                 parent_value = next_value;
                 std::memcpy(next_key, next_value.key_left, UINT256_NUM_BYTES);
@@ -1197,7 +1204,8 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             continue;
         }
     }
-    // if we removed something go back up to the root and trim intermediate nodes with less than 2 children
+    // if we removed something go back up to the root and disconect interior nodes with less than 2 children
+    // and reshuffle the trie so all interior nodes have 2 children
     if (removed == true)
     {
         if (cashdrive_debug)
