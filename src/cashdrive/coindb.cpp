@@ -104,6 +104,7 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
     {
         // this is the first time cashdrive has been used, set the first root
         current_root_group = 0;
+        current_block_height = 0;
         std::memset(next_db_key_available, 0, UINT256_NUM_BYTES);
         next_db_key_available[0] = 1; // key is 1 for the first root, key 0 is the invalid key
         std::memcpy(current_root_key, next_db_key_available, UINT256_NUM_BYTES);
@@ -123,6 +124,7 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
         CoinEntryValue root_value;
         _Read(current_root_key, root_value);
         current_root_group = root_value.root_group;
+        current_block_height = current_root_group;
         uint256 next_db_key_available256;
         db.Read(DB_LAST_KEY_USED, next_db_key_available256);
         next_db_key_available256.GetRaw(next_db_key_available);
@@ -136,6 +138,24 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
         if (cashdrive_debug)
         {
             LOGA("_IncrementLastKeyUsed(): KEY INCREMENTED TO %s \n", uint256t_ToString(next_db_key_available).c_str());
+        }
+        // we need to populate the cache for the last $roots_to_keep roots for trimming later, this is very expensive
+        for (uint32_t i = 0; i < roots_to_keep; ++i)
+        {
+            if (i >= current_block_height)
+            {
+                // no more roots to read
+                break;
+            }
+            CRootMetaData root_data;
+            if (!db.Read(CRootKey(current_block_height - i), root_data))
+            {
+                // this is a critical error, if they key we are reading from is not
+                // invalid, then the entry should not be missing
+                assert(false);
+            }
+            // get the trie node set for the root
+            cached_trie_node_info.emplace(uint256(root_data.key), _get_trie_node_set(root_data.key));
         }
     }
 }
@@ -429,13 +449,14 @@ void CCoinsViewDB::_MakeNewRoot(const uint64_t &nBlockHeight)
     root_data.vSpentLeafNodeKeys = this->vRootSpentLeafKeys;
     db.Write(CRootKey(nBlockHeight), root_data);
     db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
-    cached_trie_node_info.emplace(uint256(current_root_key), _get_trie_node_set());
 
     this->vRootInternalKeys.clear();
     this->vRootSpentLeafKeys.clear();
     this->current_block_height = nBlockHeight;
     current_root_value.root_group += 1;
     current_root_group = current_root_value.root_group;
+    // the height should be the current root group
+    assert(current_root_group == nBlockHeight);
     std::memcpy(current_root_key, next_db_key_available, UINT256_NUM_BYTES);
     _IncrementLastKeyUsed();
     // new roots start as copies of the previous root with an incremented root group
@@ -1377,17 +1398,19 @@ uint256 CCoinsViewDB::GetFingerprint()
     return uint256(_GetRootValue().fingerprint);
 }
 
-std::set<uint256> CCoinsViewDB::_get_trie_node_set()
+std::set<uint256> CCoinsViewDB::_get_trie_node_set(const uint256_t &root_key)
 {
     std::set<uint256> ret;
 
     std::pair<CoinEntryKey, CoinEntryValue> invalid_node = std::make_pair(CoinEntryKey(INVALID_KEY), INVALID_ENTRY);
     // LOGA("\n\n\n PRINT TRIE BEGIN \n");
     TrieStack* stack = NULL;
-    // traverse the entire trie's current root, print key values and keybits
-    CoinEntryValue root_value = _GetRootValue();
+    // traverse the entire trie from the given root
+    CoinEntryValue root_value = _GetValueByKey(root_key);
+    // root can not be null
+    assert(root_value != INVALID_ENTRY);
     // LOGA("root_value = %s \n", root_value.ToString().c_str());
-    std::pair<CoinEntryKey, CoinEntryValue> node = std::make_pair(CoinEntryKey(current_root_key), root_value);
+    std::pair<CoinEntryKey, CoinEntryValue> node = std::make_pair(CoinEntryKey(root_key), root_value);
     while (true)
     {
         if (node.second != INVALID_ENTRY)

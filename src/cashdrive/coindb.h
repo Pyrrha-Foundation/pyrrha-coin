@@ -385,7 +385,7 @@ public:
     CoinEntryValue _GetRootValue() const;
     CoinEntryValue _GetValueByKey(const uint256_t &key) const; // used only in tests
     CoinEntryValue _GetValueByOutpoint(const COutPoint &outpoint) const; // used only in tests
-    std::set<uint256> _get_trie_node_set();
+    std::set<uint256> _get_trie_node_set(const uint256_t &root_key);
     uint256 GetFingerprint();
     void _Trim();
 
