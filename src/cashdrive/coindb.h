@@ -340,7 +340,7 @@ private:
     uint32_t current_root_group;
     uint256_t next_db_key_available;
     // cached node key info for $roots_to_keep roots to avoid costly trie scans at trim time
-    // root key, nodes under that key (including the root itself)
+    // root key, nodes under that key (NOT including the root itself)
     std::map<uint256, std::set<uint256> > cached_trie_node_info;
 
     // for current root metadata
@@ -366,6 +366,9 @@ private:
     void _WriteLastKeyUsed();
     CoinEntryValue _FindCoin(const COutPoint &outpoint) const;
     CoinEntryValue _UpdateFingerprint(const uint256_t &parent_key);
+
+    // helper function to add to the current trie being created in the cache
+    void _AddToRootCache(const uint256_t &key);
 
     // wraps db.read and the assert check
     void _Read(const uint256_t &key, CoinEntryValue &value);

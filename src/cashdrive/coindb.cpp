@@ -336,6 +336,7 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     // before we return, write the new interior node
     // write the new node
     batch.Write(interior_key, interior_value);
+    _AddToRootCache(interior_key);
     db.WriteBatch(batch);
     this->vRootInternalKeys.emplace_back(uint256(interior_key.key));
     return std::make_pair(interior_key, interior_value);
@@ -526,6 +527,11 @@ CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
     }
     db.Write(CoinEntryKey(parent_key), parent_value);
     return parent_value;
+}
+
+void CCoinsViewDB::_AddToRootCache(const uint256_t &key)
+{
+    cached_trie_node_info[uint256(current_root_key)].second.emplace(uint256(key));
 }
 
 void CCoinsViewDB::_Read(const uint256_t &key, CoinEntryValue &value)
@@ -838,6 +844,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
                 }
                 CDBBatch batch(db);
                 batch.Write(entry_copy.first, entry_copy.second);
+                _AddToRootCache(entry_copy.first);
                 batch.Write(CoinEntryKey(parent_key), parent_value);
                 db.WriteBatch(batch);
                 std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
@@ -942,6 +949,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     value.root_group = parent_value.root_group;
     // value has been created, write it to the db
     batch.Write(key, value);
+    _AddToRootCache(key);
     db.WriteBatch(batch);
     // update fingerprint
     while (std::memcmp(parent_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
@@ -1014,6 +1022,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             removed = true;
             // parent was updated, write the changes to the DB
             db.Write(CoinEntryKey(parent_key), parent_value);
+            _AddToRootCache(next_key);
             this->vRootSpentLeafKeys.emplace_back(uint256(next_key));
             break;
         }
@@ -1032,6 +1041,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             }
             CDBBatch batch(db);
             batch.Write(entry_copy.first, entry_copy.second);
+            _AddToRootCache(entry_copy.first);
             batch.Write(CoinEntryKey(parent_key), parent_value);
             db.WriteBatch(batch);
             std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);
