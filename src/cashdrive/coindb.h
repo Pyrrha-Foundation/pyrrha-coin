@@ -13,6 +13,7 @@
 #include "dbwrapper.h"
 
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -65,6 +66,9 @@ struct CoinEntryKey
     {
         std::memcpy(key, value, UINT256_NUM_BYTES);
     }
+
+    CoinEntryKey() = delete;
+
     template <typename Stream>
     void Serialize(Stream &s) const
     {
@@ -248,6 +252,76 @@ public:
     void Next();
 };
 
+struct CRootKey
+{
+    char key_prefix;
+    uint64_t key;
+
+    CRootKey() : key_prefix(DB_ROOT_KEY)
+    {
+        key = 0;
+    }
+
+    CRootKey(const uint64_t &nBlockHeight) : key_prefix(DB_ROOT_KEY)
+    {
+        key = nBlockHeight;
+    }
+
+    template <typename Stream>
+    void Serialize(Stream &s) const
+    {
+        s << key_prefix;
+        s << key;
+    }
+    template <typename Stream>
+    void Unserialize(Stream &s)
+    {
+        s >> key_prefix;
+        s >> key;
+    }
+};
+
+struct CRootMetaData
+{
+    uint256_t key; // the root key in the coin db
+    uint64_t nBlockHeight;
+    // track internal node keys because they will be potentially erased on trim
+    // do not need leaf node adds because they will exist until they are spent.
+    // track the spends to erase right away
+    std::vector<uint256> vInternalNodeKeys;
+    std::vector<uint256> vSpentLeafNodeKeys;
+
+    CRootMetaData()
+    {
+        std::memset(key, 0, UINT256_NUM_BYTES);
+    }
+
+    CRootMetaData(const uint256_t &value)
+    {
+        std::memcpy(key, value, UINT256_NUM_BYTES);
+    }
+
+    template <typename Stream>
+    void Serialize(Stream &s) const
+    {
+        uint256 key256(key);
+        s << key256;
+        s << nBlockHeight;
+        s << vInternalNodeKeys;
+        s << vSpentLeafNodeKeys;
+    }
+    template <typename Stream>
+    void Unserialize(Stream &s)
+    {
+        uint256 key256;
+        s >> key256;
+        key256.GetRaw(key);
+        s >> nBlockHeight;
+        s >> vInternalNodeKeys;
+        s >> vSpentLeafNodeKeys;
+    }
+};
+
 /** CCoinsView backed by the coin database (chainstate/) */
 
 // TODO
@@ -257,12 +331,22 @@ public:
 // the value of the current root group should be stored somewhere for easy access.
 // flush after every block?
 
+static const uint64_t roots_to_keep = 100;
+
 class CCoinsViewDB : public CCoinsView
 {
 private:
     uint256_t current_root_key;
     uint32_t current_root_group;
     uint256_t next_db_key_available;
+    // cached node key info for $roots_to_keep roots to avoid costly trie scans at trim time
+    // root key, nodes under that key (including the root itself)
+    std::map<uint256, std::set<uint256> > cached_trie_node_info;
+
+    // for current root metadata
+    uint64_t current_block_height;
+    std::vector<uint256> vRootInternalKeys;
+    std::vector<uint256> vRootSpentLeafKeys;
 
 protected:
     CDBWrapper db;
@@ -273,6 +357,7 @@ private:
         const uint256_t &replacing_key,
         CoinEntryValue& replacing_value,
         const uint256_t &key);
+
     std::pair<CoinEntryKey, CoinEntryValue> _copy_entry_with_new_parent(const CoinEntryValue &value,
         const uint256_t &new_parent_key,
         const CoinEntryValue &new_parent_value);
@@ -291,12 +376,14 @@ public:
         COverrideOptions *overridecache = nullptr,
         std::string path = "chainstate");
 
-    void _MakeNewRoot();
+    void _MakeNewRoot(const uint64_t &nBlockHeight);
     CoinEntryValue _GetRootValue() const;
     CoinEntryValue _GetValueByKey(const uint256_t &key) const; // used only in tests
     CoinEntryValue _GetValueByOutpoint(const COutPoint &outpoint) const; // used only in tests
-    void _debug_print_trie();
+    std::set<uint256> _get_trie_node_set();
     uint256 GetFingerprint();
+    void _Trim();
+
 
     bool GetCoin(const COutPoint &outpoint, Coin &coin) const override;
     bool _HaveCoin(const COutPoint &outpoint) const;

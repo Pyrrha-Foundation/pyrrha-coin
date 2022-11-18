@@ -109,7 +109,6 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
         std::memcpy(current_root_key, next_db_key_available, UINT256_NUM_BYTES);
         _IncrementLastKeyUsed(); // key is 2 for the next key needed
         assert(std::memcmp(current_root_key, UINT256_ZERO, UINT256_NUM_BYTES) != 0);
-        db.Write(DB_ROOT_KEY, uint256(current_root_key));
         db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
         CoinEntryValue initial_root_value;
         initial_root_value.SetNull();
@@ -341,6 +340,7 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     // write the new node
     batch.Write(interior_key, interior_value);
     db.WriteBatch(batch);
+    this->vRootInternalKeys.emplace_back(uint256(interior_key.key));
     return std::make_pair(interior_key, interior_value);
 }
 
@@ -418,15 +418,28 @@ bool CCoinsViewDB::GetCoin(const COutPoint &outpoint, Coin &coin) const
     return false;
 }
 
-void CCoinsViewDB::_MakeNewRoot()
+void CCoinsViewDB::_MakeNewRoot(const uint64_t &nBlockHeight)
 {
     CoinEntryValue current_root_value = _GetRootValue();
+
+    // make a root entry for this last root we are committing
+    // with the necessay metadata
+    CRootMetaData root_data(current_root_key);
+    std::memcpy(root_data.key, current_root_key, UINT256_NUM_BYTES);
+    root_data.nBlockHeight = this->current_block_height;
+    root_data.vInternalNodeKeys = this->vRootInternalKeys;
+    root_data.vSpentLeafNodeKeys = this->vRootSpentLeafKeys;
+    db.Write(CRootKey(nBlockHeight), root_data);
+    db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
+    cached_trie_node_info.emplace(uint256(current_root_key), _get_trie_node_set());
+
+    this->vRootInternalKeys.clear();
+    this->vRootSpentLeafKeys.clear();
+    this->current_block_height = nBlockHeight;
     current_root_value.root_group += 1;
     current_root_group = current_root_value.root_group;
     std::memcpy(current_root_key, next_db_key_available, UINT256_NUM_BYTES);
     _IncrementLastKeyUsed();
-    db.Write(DB_ROOT_KEY, uint256(current_root_key));
-    db.Write(DB_LAST_ROOT_KEY, uint256(current_root_key));
     // new roots start as copies of the previous root with an incremented root group
     db.Write(CoinEntryKey(current_root_key), current_root_value);
 }
@@ -1035,6 +1048,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             removed = true;
             // parent was updated, write the changes to the DB
             db.Write(CoinEntryKey(parent_key), parent_value);
+            this->vRootSpentLeafKeys.emplace_back(uint256(next_key));
             break;
         }
         // update every node we touch if they are not in the current root_group
@@ -1417,10 +1431,12 @@ uint256 CCoinsViewDB::GetFingerprint()
     return uint256(_GetRootValue().fingerprint);
 }
 
-void CCoinsViewDB::_debug_print_trie()
+std::set<uint256> CCoinsViewDB::_get_trie_node_set()
 {
+    std::set<uint256> ret;
+
     std::pair<CoinEntryKey, CoinEntryValue> invalid_node = std::make_pair(CoinEntryKey(INVALID_KEY), INVALID_ENTRY);
-    LOGA("\n\n\n PRINT TRIE BEGIN \n");
+    // LOGA("\n\n\n PRINT TRIE BEGIN \n");
     TrieStack* stack = NULL;
     // traverse the entire trie's current root, print key values and keybits
     CoinEntryValue root_value = _GetRootValue();
@@ -1435,12 +1451,12 @@ void CCoinsViewDB::_debug_print_trie()
             //LOGA("left_key = %s \n", uint256t_ToString(node.second.key_left));
             if (!db.Read(CoinEntryKey(node.second.key_left), left_value))
             {
-                LOGA("node set to invalid (1) \n");
+                // LOGA("node set to invalid (1) \n");
                 node = invalid_node;
             }
             else
             {
-                LOGA("going left \n");
+                // LOGA("going left \n");
                 node = std::make_pair(CoinEntryKey(node.second.key_left), std::move(left_value));
                 //LOGA("node now has key %s, value %s \n", uint256t_ToString(node.first.key).c_str(), node.second.ToString().c_str());
             }
@@ -1449,23 +1465,26 @@ void CCoinsViewDB::_debug_print_trie()
         {
             if (_TrieStack_empty(stack) == false)
             {
-                LOGA("going up \n");
+                // LOGA("going up \n");
                 node = _TrieStack_pop(&stack);
+                ret.emplace(uint256(node.first.key));
+                /*
                 if (node.second.key_bits == 256)
                 {
                     //LOGA(">>>>node has key %s, value %s \n", uint256t_ToString(node.first.key).c_str(), node.second.ToString().c_str());
-                    LOGA(">>>>node has key %s\n", uint256t_ToString(node.second.key).c_str());
+                    // LOGA(">>>>node has key %s\n", uint256t_ToString(node.second.key).c_str());
                 }
+                */
                 CoinEntryValue right_value;
                 //LOGA("right_key = %s \n", uint256t_ToString(node.second.key_right));
                 if (!db.Read(CoinEntryKey(node.second.key_right), right_value))
                 {
-                    LOGA("node set to invalid (2) \n");
+                    // LOGA("node set to invalid (2) \n");
                     node = invalid_node;
                 }
                 else
                 {
-                    LOGA("going right \n");
+                    // LOGA("going right \n");
                     node = std::make_pair(CoinEntryKey(node.second.key_right), std::move(right_value));
                     //LOGA("node now has key %s, value %s \n", uint256t_ToString(node.first.key).c_str(), node.second.ToString().c_str());
                 }
@@ -1473,11 +1492,84 @@ void CCoinsViewDB::_debug_print_trie()
             else
             {
                 break;
-                LOGA("PRINT TRIE BREAK \n\n\n");
+                // LOGA("PRINT TRIE BREAK \n\n\n");
             }
         }
     }
-    LOGA("PRINT TRIE END \n\n\n");
+    return ret;
+    // LOGA("PRINT TRIE END \n\n\n");
+}
+
+void CCoinsViewDB::_Trim()
+{
+    if (current_block_height < 200)
+    {
+        // Do not start trimming until height 200 (aribtrary value)
+        return;
+    }
+    const uint64_t height_to_trim = current_block_height - (roots_to_keep + 1);
+    std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+    pcursor->Seek(CRootKey(height_to_trim));
+    // Load mapBlockIndex
+    while (pcursor->Valid())
+    {
+        CRootKey key;
+        if (pcursor->GetKey(key) && key.key_prefix == DB_ROOT_KEY)
+        {
+            if (key.key == height_to_trim)
+            {
+                CRootMetaData value;
+                if (pcursor->GetValue(value))
+                {
+                    // erase the leaf nodes spent in this root immediately, they can not exist in a future root
+                    for (const uint256 &leaf_node : value.vSpentLeafNodeKeys)
+                    {
+                        db.Erase(leaf_node);
+                    }
+                    // remove the root being erased from the cached entries
+                    cached_trie_node_info.erase(uint256(value.key));
+                    // for each internal node in the root being erased, check all cached tries and remove it from
+                    // the DB if it does not exist in any of them
+                    // this is VERY expensive, worst case is M * (100OLog(n)) but not as expensive as if it were not cached in memory
+                    // where M is the number of internal nodes in the trie being deleted and N is the number of nodes in each of the 100
+                    // tries being checked for the internal node
+                    bool found = false;
+                    for (const uint256 &internal_node : value.vInternalNodeKeys)
+                    {
+                        found = false;
+                        for (auto &trie : cached_trie_node_info)
+                        {
+                            if (trie.second.count(internal_node) != 0)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found == true)
+                        {
+                            continue;
+                        }
+                        // internal_node was not found in any future trie, it can be removed from the DB
+                        db.Erase(internal_node);
+                    }
+                    return;
+                }
+                else
+                {
+                    LOGA("CCoinsViewDB::_Trim(): failed to read value");
+                    return;
+                }
+            }
+            else
+            {
+                pcursor->Next();
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
 }
 
 bool CCoinsViewDB::_HaveCoin(const COutPoint &outpoint) const

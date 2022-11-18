@@ -12,7 +12,7 @@ void _test_create_second_root(CCoinsViewDB *coindb_cashdrive)
 {
     assert(coindb_cashdrive->_GetRootValue().root_group == 0);
     // create a new root
-    coindb_cashdrive->_MakeNewRoot();
+    coindb_cashdrive->_MakeNewRoot(1);
     assert(coindb_cashdrive->_GetRootValue().root_group == 1);
     printf("second_root create new root test passed \n");
 }

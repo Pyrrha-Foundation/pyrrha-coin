@@ -3077,7 +3077,7 @@ bool ConnectTip(CValidationState &state,
     // a new root is generated every block. because we flush every block we can generate the new root here
     if (pcoinsdbview != nullptr)
     {
-        pcoinsdbview->_MakeNewRoot();
+        pcoinsdbview->_MakeNewRoot(pindexNew->height());
     }
 
     // Write the chain state to disk, if necessary. This should be done after UpdateTip to make sure the tip
