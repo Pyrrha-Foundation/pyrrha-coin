@@ -367,6 +367,8 @@ private:
     CoinEntryValue _FindCoin(const COutPoint &outpoint) const;
     CoinEntryValue _UpdateFingerprint(const uint256_t &parent_key);
 
+    // wraps db.read and the assert check
+    void _Read(const uint256_t &key, CoinEntryValue &value);
 
 public:
     CCoinsViewDB(size_t nCacheSize,

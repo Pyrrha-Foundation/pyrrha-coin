@@ -121,7 +121,7 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
         current_root_key256.GetRaw(current_root_key);
         // we were able to read the root key
         CoinEntryValue root_value;
-        db.Read(CoinEntryKey(current_root_key), root_value);
+        _Read(current_root_key, root_value);
         current_root_group = root_value.root_group;
         uint256 next_db_key_available256;
         db.Read(DB_LAST_KEY_USED, next_db_key_available256);
@@ -251,10 +251,7 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     {
         CoinEntryValue current_root_value;
         current_root_value.SetNull();
-        if (!db.Read(CoinEntryKey(current_root_key), current_root_value))
-        {
-            assert(false);
-        }
+        _Read(current_root_key, current_root_value);
         // the parent is a root node but we do not know which one, grab the current root node
         if ((interior_value.key[0] & BIN_10000000) == BIN_10000000)
         {
@@ -477,10 +474,7 @@ CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
 {
 
     CoinEntryValue parent_value;
-    if (!db.Read(CoinEntryKey(parent_key), parent_value))
-    {
-        assert(false);
-    }
+    _Read(parent_key, parent_value);
     // root case check, root is only non leaf node where it is possible to only
     // have one child
     int nCase = 0;
@@ -507,18 +501,12 @@ CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
     CoinEntryValue left_value;
     if (nCase != 1 && nCase != 3)
     {
-        if (!db.Read(CoinEntryKey(parent_value.key_left), left_value))
-        {
-            assert(false);
-        }
+        _Read(parent_value.key_left, left_value);
     }
     CoinEntryValue right_value;
     if (nCase != 2 && nCase != 3)
     {
-        if (!db.Read(CoinEntryKey(parent_value.key_right), right_value))
-        {
-            assert(false);
-        }
+        _Read(parent_value.key_right, right_value);
     }
     if (nCase == 0)
     {
@@ -540,6 +528,15 @@ CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
     return parent_value;
 }
 
+void CCoinsViewDB::_Read(const uint256_t &key, CoinEntryValue &value)
+{
+    if (!db.Read(CoinEntryKey(key), value))
+    {
+        // this is a critical error, if they key we are reading from is not
+        // invalid, then the entry should not be missing
+        assert(false);
+    }
+}
 
 // use the find algorithm from bitwise_trie to go from current root to what should be outpoint
 // in the trie if it exists
@@ -558,10 +555,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
     std::memcpy(next_key, current_root_key, UINT256_NUM_BYTES);
     while (std::memcmp(next_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
     {
-        if (!db.Read(CoinEntryKey(next_key), next_value))
-        {
-            assert(false);
-        }
+        _Read(next_key, next_value);
         if (cashdrive_debug)
         {
             LOGA("\n\nFind(): key = %s, next_key = %s, next_value = %s\n", uint256t_ToString(key).c_str(), uint256t_ToString(next_key).c_str(), next_value.ToString().c_str());
@@ -740,12 +734,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     uint256_t parent_key;
     std::memcpy(parent_key, current_root_key, UINT256_NUM_BYTES);
     CoinEntryValue parent_value;
-    if (!db.Read(CoinEntryKey(parent_key), parent_value))
-    {
-        // this is a critical error, if they key we are reading from is not
-        // invalid, then the entry should not be missing
-        assert(false);
-    }
+    _Read(parent_key, parent_value);
     uint256_t next_key;
     std::memcpy(next_key, current_root_key, UINT256_NUM_BYTES);
     CoinEntryValue next_value;
@@ -755,12 +744,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     }
     while (std::memcmp(next_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
     {
-        if (!db.Read(CoinEntryKey(next_key), next_value))
-        {
-            // this is a critical error, if they key we are reading from is not
-            // invalid, then the entry should not be missing
-            assert(false);
-        }
+        _Read(next_key, next_value);
         if (cashdrive_debug)
         {
             LOGA("MINT(): next_key: %s, next_value: %s \n", uint256t_ToString(next_key).c_str(), next_value.ToString().c_str());
@@ -774,12 +758,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
             std::memcpy(next_key, new_parent_node.first.key, UINT256_NUM_BYTES);
             next_value = new_parent_node.second;
             std::memcpy(parent_key, new_parent_node.second.key_parent, UINT256_NUM_BYTES);
-            if (!db.Read(CoinEntryKey(parent_key), parent_value))
-            {
-                // this is a critical error, if they key we are reading from is not
-                // invalid, then the entry should not be missing
-                assert(false);
-            }
+            _Read(parent_key, parent_value);
             if (cashdrive_debug)
             {
                 LOGA("Mint(): leaf node case, making new interior node and cycling \n");
@@ -831,12 +810,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
             std::memcpy(next_key, new_parent_node.first.key, UINT256_NUM_BYTES);
             next_value = new_parent_node.second;
             std::memcpy(parent_key, next_value.key_parent, UINT256_NUM_BYTES);
-            if (!db.Read(CoinEntryKey(parent_key), parent_value))
-            {
-                // this is a critical error, if they key we are reading from is not
-                // invalid, then the entry should not be missing
-                assert(false);
-            }
+            _Read(parent_key, parent_value);
             if (cashdrive_debug)
             {
                 LOGA("Mint(): made new interior node, cycling \n");
@@ -1003,10 +977,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
     uint256_t parent_key;
     std::memcpy(parent_key, current_root_key, UINT256_NUM_BYTES);
     CoinEntryValue parent_value;
-    if (!db.Read(CoinEntryKey(parent_key), parent_value))
-    {
-        assert(false);
-    }
+    _Read(parent_key, parent_value);
     uint256_t next_key;
     std::memcpy(next_key, current_root_key, UINT256_NUM_BYTES);
     CoinEntryValue next_value;
@@ -1014,12 +985,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
     int res;
     while (std::memcmp(next_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
     {
-        if (!db.Read(CoinEntryKey(next_key), next_value))
-        {
-            // this is a critical error, if they key we are reading from is not
-            // invalid, then the entry should not be missing
-            assert(false);
-        }
+        _Read(next_key, next_value);
         // is next the node we are looking for?
         if (next_value.key_bits == 256)
         {
@@ -1214,12 +1180,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
         parent_parent_value.SetNull();
         while (std::memcmp(parent_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
         {
-            if (!db.Read(CoinEntryKey(parent_key), parent_value))
-            {
-                // this is a critical error, if they key we are reading from is not
-                // invalid, then the entry should not be missing
-                assert(false);
-            }
+            _Read(parent_key, parent_value);
             std::memcpy(parent_parent_key, parent_value.key_parent, UINT256_NUM_BYTES);
             if (std::memcmp(parent_parent_key, INVALID_KEY, UINT256_NUM_BYTES) == 0)
             {
@@ -1234,12 +1195,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 parent_value = _UpdateFingerprint(parent_key);
                 break;
             }
-            if (!db.Read(CoinEntryKey(parent_parent_key), parent_parent_value))
-            {
-                // this is a critical error, if they key we are reading from is not
-                // invalid, then the entry should not be missing
-                assert(false);
-            }
+            _Read(parent_parent_key, parent_parent_value);
             assert(parent_value.root_group == parent_parent_value.root_group);
             int32_t children = 0;
             if (std::memcmp(parent_value.key_left, INVALID_KEY, UINT256_NUM_BYTES) != 0)
@@ -1300,12 +1256,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                     }
                     std::memcpy(parent_parent_value.key_left, parent_value.key_left, UINT256_NUM_BYTES);
                     CoinEntryValue parent_left_value;
-                    if (!db.Read(CoinEntryKey(parent_value.key_left), parent_left_value))
-                    {
-                        // this is a critical error, if they key we are reading from is not
-                        // invalid, then the entry should not be missing
-                        assert(false);
-                    }
+                    _Read(parent_value.key_left, parent_left_value);
                     std::memcpy(parent_left_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
                     CDBBatch batch(db);
                     // parent_left_value was updated, write the changes to the db
@@ -1322,12 +1273,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                     }
                     std::memcpy(parent_parent_value.key_right, parent_value.key_left, UINT256_NUM_BYTES);
                     CoinEntryValue parent_left_value;
-                    if (!db.Read(CoinEntryKey(parent_value.key_left), parent_left_value))
-                    {
-                        // this is a critical error, if they key we are reading from is not
-                        // invalid, then the entry should not be missing
-                        assert(false);
-                    }
+                    _Read(parent_value.key_left, parent_left_value);
                     std::memcpy(parent_left_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
                     CDBBatch batch(db);
                     // parent_left_value was updated, write the changes to the db
@@ -1348,12 +1294,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 {
                     std::memcpy(parent_parent_value.key_left, parent_value.key_right, UINT256_NUM_BYTES);
                     CoinEntryValue parent_right_value;
-                    if (!db.Read(CoinEntryKey(parent_value.key_right), parent_right_value))
-                    {
-                        // this is a critical error, if they key we are reading from is not
-                        // invalid, then the entry should not be missing
-                        assert(false);
-                    }
+                    _Read(parent_value.key_right, parent_right_value);
                     std::memcpy(parent_right_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
                     CDBBatch batch(db);
                     // parent_right_value was updated, write the changes to the db
@@ -1366,12 +1307,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
                 {
                     std::memcpy(parent_parent_value.key_right, parent_value.key_right, UINT256_NUM_BYTES);
                     CoinEntryValue parent_right_value;
-                    if (!db.Read(CoinEntryKey(parent_value.key_right), parent_right_value))
-                    {
-                        // this is a critical error, if they key we are reading from is not
-                        // invalid, then the entry should not be missing
-                        assert(false);
-                    }
+                    _Read(parent_value.key_right, parent_right_value);
                     std::memcpy(parent_right_value.key_parent, parent_parent_key, UINT256_NUM_BYTES);
                     CDBBatch batch(db);
                     // parent_right_value was updated, write the changes to the db
