@@ -46,7 +46,7 @@ std::atomic<bool> lockdataDestructed{false};
 LockData lockdata;
 #endif
 
-#ifdef MINER_OPENCL
+#ifdef MINER_OPENCL 
 #include <stdexcept>
 
 #include "CL/cl.h"
@@ -347,7 +347,9 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
 #ifdef MINER_OPENCL
     uint256 target;
     target.SetHex(hashTarget.GetHex());
+#ifdef GPU_VERIFY_STEPS
     printf( "target: %s\tstartNonce: %u\n", target.GetHex().c_str(), g_nonces[extra] );
+#endif
     clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferTarget[ extra ], CL_TRUE, 0, 32, &target.begin()[ 0 ], 0, nullptr, nullptr );
 
     std::vector<uint32_t> hash;
