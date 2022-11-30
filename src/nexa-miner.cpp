@@ -98,6 +98,7 @@ cl_program          g_program[MAX_GPUS];
 cl_kernel           g_kernels[MAX_GPUS][kernel_count];
 
 uint32_t            g_nonces[MAX_GPUS];
+uint16_t            g_noncesExtra[MAX_GPUS];
 
 #define SET_KERNEL_ARG_GPU( _gpuId, _kernel, _id, _size, _arg ) \
 	if ( ( ret = clSetKernelArg( g_kernels[ _gpuId ][ _kernel ], _id, _size, _arg ) ) != CL_SUCCESS )\
@@ -359,6 +360,7 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
     ((uint8_t*)&hash[8])[0] = 8;
     // unique per gpu
     ((uint8_t*)&hash[8])[1] = extra + 1;
+    *(uint16_t*)(&((uint8_t*)&hash[8])[2]) = g_noncesExtra[ extra ]; // extra nonce
 
     clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferInput[ extra ], CL_TRUE, 0, 11 * sizeof(cl_uint), &hash[ 0 ], 0, nullptr, nullptr );
 
@@ -444,6 +446,7 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
             {
                 nonce[0] = extra + 1;
                 ((uint32_t*)&nonce[4])[0] = startNonce + nonces[ i + 1 ];
+                *((uint16_t*)&((uint32_t*)&nonce[4])[1]) = g_noncesExtra[ extra ];
 
                 miningHash = GetMiningHash(headerCommitment, nonce);
                 if (CheckProofOfWork(miningHash, nBits, conp))
@@ -456,6 +459,10 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
                     return found;
                 }
             }
+
+            // increment extra nonce if needed
+            if ( g_nonces[ extra ] + g_rawIntensity < g_nonces[ extra ] )
+                g_noncesExtra[ extra ]++;
 
             g_nonces[ extra ] += g_rawIntensity;
             ntries -= (int)g_rawIntensity;
@@ -873,6 +880,7 @@ int CpuMiner(int threadNum)
         throw std::runtime_error( "OpenCL: failed on clGetPlatformIDs" );
     }
 
+    int offset = 0;
     for ( int platform = 0; platform < numPlatforms; platform++ )
     {
         char buf[128];
@@ -892,6 +900,12 @@ int CpuMiner(int threadNum)
             throw std::runtime_error( "OpenCL: failed on clGetDeviceIDs" );
         }
 
+        if ( threadNum - offset >= numDevices )
+        {
+            offset += numDevices;
+            continue;
+        }
+
         cl_device_id *devices = new cl_device_id[ numDevices ];
         ret = clGetDeviceIDs( platforms[ platform ], CL_DEVICE_TYPE_GPU, numDevices, devices, nullptr );
         if ( ret != CL_SUCCESS )
@@ -899,7 +913,7 @@ int CpuMiner(int threadNum)
             throw std::runtime_error( "OpenCL: failed on clGetDeviceIDs" );
         }
 
-        g_deviceId[ threadNum ] = devices[ threadNum ];
+        g_deviceId[ threadNum ] = devices[ threadNum - offset ];
 
         char ver[128] = { 0 };
 		if ( clGetDeviceInfo( g_deviceId[ threadNum ], CL_DRIVER_VERSION, sizeof(ver), ver, nullptr ) == CL_SUCCESS )
@@ -1251,35 +1265,6 @@ int CpuMiner(int threadNum)
 
 int main(int argc, char *argv[])
 {
-#ifdef MINER_OPENCL
-    size_t windows = (256 / g_curveBits) + 1;
-	size_t window_size = (1 << (g_curveBits - 1));
-	size_t precomp_size = 64UL * windows * window_size;
-
-	g_secp256k1_gej_temp = (void*)malloc( 128 * window_size );
-    if ( !g_secp256k1_gej_temp )
-    {
-        printf( "ERROR: low mem!" );
-        return 0;
-    }
-	g_secp256k1_z_ratio = (void*)malloc( 4 * 10 * window_size );
-    if ( !g_secp256k1_z_ratio )
-    {
-        printf( "ERROR: low mem!" );
-        return 0;
-    }
-	g_secp256k1_precompute_20 = (void*)malloc( precomp_size );
-    if ( !g_secp256k1_precompute_20 )
-    {
-        printf( "ERROR: low mem!" );
-        return 0;
-    }
-					
-    printf( "CPU: start precompute\n" );
-	secp256k1_ecmult_big_create( g_curveBits, (secp256k1_gej*)g_secp256k1_gej_temp, (uint32_t*)g_secp256k1_z_ratio, (secp256k1_ge_storage*)g_secp256k1_precompute_20 );
-    printf( "CPU: finish precompute\n" );
-#endif
-
     int ret = EXIT_FAILURE;
 
     Secp256k1Init secp;
@@ -1320,6 +1305,10 @@ int main(int argc, char *argv[])
         nThreads = MAX_GPUS;
         printf("%s: Number of gpu's reduced to the maximum allowed value: %d.\n", now().c_str(), nThreads);
     }
+
+    int nIntensity = GetArg("-intensity", 18);
+    printf( "Set intensity to %i\n", nIntensity );
+    g_rawIntensity = 1 << nIntensity;
 #else
     int nThreads = GetArg("-cpus", 1);
     if (nThreads > 256)
@@ -1329,7 +1318,38 @@ int main(int argc, char *argv[])
     }
 #endif
     std::vector<std::thread> minerThreads;
+#ifdef MINER_OPENCL
+    printf("%s: Running %d gpus.\n", now().c_str(), nThreads);
+
+    size_t windows = (256 / g_curveBits) + 1;
+	size_t window_size = (1 << (g_curveBits - 1));
+	size_t precomp_size = 64UL * windows * window_size;
+
+	g_secp256k1_gej_temp = (void*)malloc( 128 * window_size );
+    if ( !g_secp256k1_gej_temp )
+    {
+        printf( "ERROR: low mem!" );
+        return 0;
+    }
+	g_secp256k1_z_ratio = (void*)malloc( 4 * 10 * window_size );
+    if ( !g_secp256k1_z_ratio )
+    {
+        printf( "ERROR: low mem!" );
+        return 0;
+    }
+	g_secp256k1_precompute_20 = (void*)malloc( precomp_size );
+    if ( !g_secp256k1_precompute_20 )
+    {
+        printf( "ERROR: low mem!" );
+        return 0;
+    }
+					
+    printf( "CPU: start precompute\n" );
+	secp256k1_ecmult_big_create( g_curveBits, (secp256k1_gej*)g_secp256k1_gej_temp, (uint32_t*)g_secp256k1_z_ratio, (secp256k1_ge_storage*)g_secp256k1_precompute_20 );
+    printf( "CPU: finish precompute\n" );
+#else
     printf("%s: Running %d threads.\n", now().c_str(), nThreads);
+#endif
     minerThreads.resize(nThreads);
     for (int i = 0; i < nThreads; i++)
         minerThreads[i] = std::thread(MinerThread, i);
