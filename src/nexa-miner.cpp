@@ -46,7 +46,6 @@ std::atomic<bool> lockdataDestructed{false};
 LockData lockdata;
 #endif
 
-#define MINER_OPENCL
 #ifdef MINER_OPENCL
 #include <stdexcept>
 
