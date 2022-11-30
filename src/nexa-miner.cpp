@@ -1028,8 +1028,14 @@ int CpuMiner(int threadNum)
 			}
 		}
         printf( "GPU #%i: finish fill precompute\n", threadNum );
+        std::ifstream clFile0("./help_sha256.cl");
+        std::ifstream clFile1("./secp256k1.cl");
+        std::stringstream sourceCode;
+        sourceCode << clFile0.rdbuf() << "\n\n" << clFile1.rdbuf();
+        clFile0.close();
+        clFile1.close();
 
-        const char *source = "#include \"secp256k1.cl\"";
+        const char *source = sourceCode.str().c_str();
         size_t sourceLen = strlen( source );
         g_program[ threadNum ] = clCreateProgramWithSource( g_deviceContext[ threadNum ], 1, &source, &sourceLen, &ret );
         if ( g_isNvidia[ threadNum ] )

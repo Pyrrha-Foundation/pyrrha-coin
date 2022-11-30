@@ -1,3 +1,14 @@
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
+
+#define get_local_id( x ) ( (uint)get_local_id( x ) )
+#define get_global_id( x ) ( (uint)get_global_id( x ) )
+#define get_global_offset( x ) ( (uint)get_global_offset( x ) )
+
+#define ROTL32( x, n ) rotate( (uint)( x ), (uint)( n ) )
+#define ROTR32( x, n ) rotate( (uint)( x ), (uint)( 32 - ( n ) ) )
+#define SHR( x, n ) ( ( x ) >> ( n ) )
+#define SWAP4( x ) as_uint( as_uchar4( x ).wzyx )
+
 #define SWAP32(a)	(as_uint(as_uchar4(a).wzyx))
 #define SWAP64(x)	as_ulong(as_uchar8(x).s32107654)  /// hmm...
 
