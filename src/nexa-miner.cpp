@@ -71,6 +71,8 @@ void *g_secp256k1_z_ratio = nullptr;
     #define MAX_GPUS 16
 #endif
 
+std::stringstream g_sourceCode;
+
 enum _kernel
 {
     kernel_sha256_64 = 0,
@@ -1028,14 +1030,8 @@ int CpuMiner(int threadNum)
 			}
 		}
         printf( "GPU #%i: finish fill precompute\n", threadNum );
-        std::ifstream clFile0("./help_sha256.cl");
-        std::ifstream clFile1("./secp256k1.cl");
-        std::stringstream sourceCode;
-        sourceCode << clFile0.rdbuf() << "\n\n" << clFile1.rdbuf();
-        clFile0.close();
-        clFile1.close();
 
-        const char *source = sourceCode.str().c_str();
+        const char *source = g_sourceCode.str().c_str();
         size_t sourceLen = strlen( source );
         g_program[ threadNum ] = clCreateProgramWithSource( g_deviceContext[ threadNum ], 1, &source, &sourceLen, &ret );
         if ( g_isNvidia[ threadNum ] )
@@ -1079,6 +1075,7 @@ int CpuMiner(int threadNum)
         g_kernels[ threadNum ][ kernel_checkhash_64 ] = clCreateKernel( g_program[ threadNum ], "checkhash_64", &ret );
 
         delete []devices;
+        break;
     }
 #endif
 
@@ -1321,6 +1318,12 @@ int main(int argc, char *argv[])
     std::vector<std::thread> minerThreads;
 #ifdef MINER_OPENCL
     printf("%s: Running %d gpus.\n", now().c_str(), nThreads);
+
+    std::ifstream clFile0("./helper_sha256.cl", std::ios::binary);
+    std::ifstream clFile1("./secp256k1.cl", std::ios::binary);
+    g_sourceCode << clFile0.rdbuf() << "\n\n" << clFile1.rdbuf();
+    clFile0.close();
+    clFile1.close();
 
     size_t windows = (256 / g_curveBits) + 1;
 	size_t window_size = (1 << (g_curveBits - 1));
