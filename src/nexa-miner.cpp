@@ -135,8 +135,8 @@ cl_int multiRunJob64( uint32_t gpuId, _kernel kernel, cl_mem inputBuffer, cl_mem
     SET_KERNEL_ARG_GPU( gpuId, kernel, 3, sizeof(cl_uint), &maxIntensity );
 
     size_t offset = startNonce;
-    size_t intensity = g_rawIntensity;
     size_t workSize = 64;
+    size_t intensity = ( g_rawIntensity / workSize + 1 ) * workSize;
 	if ( ( ret = clEnqueueNDRangeKernel( g_deviceCommandQueue[ gpuId ], g_kernels[ gpuId ][ kernel ], 1, offset ? &offset : nullptr, &intensity, &workSize, 0, nullptr, nullptr ) ) != CL_SUCCESS )
 	{
         std::stringstream errMsg;
@@ -158,8 +158,8 @@ cl_int multiCheckHash( uint32_t gpuId, cl_mem buffer )
     uint32_t maxIntensity = g_rawIntensity;
     SET_KERNEL_ARG_GPU( gpuId, kernel_checkhash_64, 3, sizeof(cl_uint), &maxIntensity );
 
-    size_t intensity = g_rawIntensity;
     size_t workSize = 64;
+    size_t intensity = ( g_rawIntensity / workSize + 1 ) * workSize;
 	if ( ( ret = clEnqueueNDRangeKernel( g_deviceCommandQueue[ gpuId ], g_kernels[ gpuId ][ kernel_checkhash_64 ], 1, nullptr, &intensity, &workSize, 0, nullptr, &eventFinish ) ) != CL_SUCCESS )
 	{
         std::stringstream errMsg;
@@ -375,106 +375,95 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
 
     uint32_t startNonce = g_nonces[extra];
 
-    while (!found)
+    uint256 miningHash;
+
+    cl_int ret = 0;
+
+    SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
+    SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 6, sizeof(cl_uint), &g_curveBits );
+
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 6, sizeof(cl_uint), &g_curveBits );
+
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pubkey ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pubkey2 ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 6, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 7, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 8, sizeof(cl_uint), &g_curveBits );
+
+    multiRunJob64( extra, kernel_sha256_40, g_bufferInput[ extra ], g_bufferHash[ extra ], startNonce );
+#ifdef GPU_VERIFY_STEPS
     {
-        // Search
-        while (!found)
-        {
-            uint256 miningHash;
-
-            cl_int ret = 0;
-
-            SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
-            SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
-            SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 6, sizeof(cl_uint), &g_curveBits );
-
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 6, sizeof(cl_uint), &g_curveBits );
-
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pubkey ] );
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pubkey2 ] );
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 6, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 7, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
-            SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 8, sizeof(cl_uint), &g_curveBits );
-
-            multiRunJob64( extra, kernel_sha256_40, g_bufferInput[ extra ], g_bufferHash[ extra ], startNonce );
-#ifdef GPU_VERIFY_STEPS
-            {
-                uint32_t verify[16];
-                clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferHash[ extra ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
-                memcpy( miningHash.begin(), verify, 32 );
-                printf( "hash sha256 gpu: %s\n", miningHash.GetHex().c_str() );
-            }
-#endif
-
-            multiRunJob64( extra, kernel_sha256_32, g_bufferHash[ extra ], g_bufferHash[ extra ] );
-
-#ifdef GPU_VERIFY_STEPS
-            {
-                uint32_t verify[16];
-                clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferHash[ extra ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
-                memcpy( miningHash.begin(), verify, 32 );
-                printf( "hash mid256 gpu: %s\n", miningHash.GetHex().c_str() );
-            }
-#endif
-
-            multiRunJob64( extra, kernel_secp256k1_64, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_pubkey ] );
-
-            multiRunJob64( extra, kernel_nexapow_start, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_pubkey2 ] );
-
-            multiRunJob64( extra, kernel_nexapow, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_hashOut ] );
-
-            multiRunJob64( extra, kernel_sha256_64, g_bufferExtra[ extra ][ secp256k1_hashOut ], g_bufferExtra[ extra ][ secp256k1_hashOut ] );
-
-#ifdef GPU_VERIFY_STEPS
-            {
-                uint32_t verify[16];
-                clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferExtra[ extra ][ secp256k1_hashOut ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
-                memcpy( miningHash.begin(), verify, 32 );
-                printf( "hash final gpu: %s\n", miningHash.GetHex().c_str() );
-            }
-#endif
-
-            multiCheckHash( extra, g_bufferExtra[ extra ][ secp256k1_hashOut ] );
-
-            uint64_t nonces[32];
-            clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, 32 * sizeof(cl_ulong), &nonces[ 0 ], 0, nullptr, nullptr );
-            clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, sizeof(cl_ulong), &zero, 0, nullptr, nullptr );
-
-            for ( uint64_t i = 0; i < ( nonces[ 0 ] <= 16 ? nonces[ 0 ] : 16 ); i++ )
-            {
-                nonce[0] = extra + 1;
-                ((uint32_t*)&nonce[4])[0] = startNonce + nonces[ i + 1 ];
-                *((uint16_t*)&((uint32_t*)&nonce[4])[1]) = g_noncesExtra[ extra ];
-
-                miningHash = GetMiningHash(headerCommitment, nonce);
-                if (CheckProofOfWork(miningHash, nBits, conp))
-                {
-                    g_nonces[ extra ] = 0;
-                    // Found a solution
-                    found = true;
-                    printf("%s: proof-of-work found  \n  mining puzzle solution: %s  \ntarget: %s\n", now().c_str(),
-                        miningHash.GetHex().c_str(), hashTarget.GetHex().c_str());
-                    return found;
-                }
-            }
-
-            // increment extra nonce if needed
-            if ( g_nonces[ extra ] + g_rawIntensity < g_nonces[ extra ] )
-                g_noncesExtra[ extra ]++;
-
-            g_nonces[ extra ] += g_rawIntensity;
-            ntries -= (int)g_rawIntensity;
-            if (ntries < 1)
-            {
-                return false; // Give up leave
-            }
-        }
+        uint32_t verify[16];
+        clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferHash[ extra ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
+        memcpy( miningHash.begin(), verify, 32 );
+        printf( "hash sha256 gpu: %s\n", miningHash.GetHex().c_str() );
     }
 #endif
 
-    return found;
+    multiRunJob64( extra, kernel_sha256_32, g_bufferHash[ extra ], g_bufferHash[ extra ] );
+
+#ifdef GPU_VERIFY_STEPS
+    {
+        uint32_t verify[16];
+        clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferHash[ extra ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
+        memcpy( miningHash.begin(), verify, 32 );
+        printf( "hash mid256 gpu: %s\n", miningHash.GetHex().c_str() );
+    }
+#endif
+
+    multiRunJob64( extra, kernel_secp256k1_64, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_pubkey ] );
+
+    multiRunJob64( extra, kernel_nexapow_start, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_pubkey2 ] );
+
+    multiRunJob64( extra, kernel_nexapow, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_hashOut ] );
+
+    multiRunJob64( extra, kernel_sha256_64, g_bufferExtra[ extra ][ secp256k1_hashOut ], g_bufferExtra[ extra ][ secp256k1_hashOut ] );
+
+#ifdef GPU_VERIFY_STEPS
+    {
+        uint32_t verify[16];
+        clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferExtra[ extra ][ secp256k1_hashOut ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
+        memcpy( miningHash.begin(), verify, 32 );
+        printf( "hash final gpu: %s\n", miningHash.GetHex().c_str() );
+    }
+#endif
+
+    multiCheckHash( extra, g_bufferExtra[ extra ][ secp256k1_hashOut ] );
+
+    uint64_t nonces[32];
+    clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, 32 * sizeof(cl_ulong), &nonces[ 0 ], 0, nullptr, nullptr );
+    clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, sizeof(cl_ulong), &zero, 0, nullptr, nullptr );
+
+    for ( uint64_t i = 0; i < ( nonces[ 0 ] <= 16 ? nonces[ 0 ] : 16 ); i++ )
+    {
+        nonce[0] = extra + 1;
+        ((uint32_t*)&nonce[4])[0] = startNonce + nonces[ i + 1 ];
+        *((uint16_t*)&nonce[1]) = g_noncesExtra[ extra ];
+        printf( "GPU #%i: found solution for nonce %d with extra nonce %d\n", extra, startNonce + nonces[ i + 1 ], g_noncesExtra[ extra ] );
+
+        miningHash = GetMiningHash(headerCommitment, nonce);
+        if (CheckProofOfWork(miningHash, nBits, conp))
+        {
+            //g_nonces[ extra ] = 0;
+            // Found a solution
+            found = true;
+            printf("%s: proof-of-work found  \n  mining puzzle solution: %s  \ntarget: %s\n", now().c_str(),
+                miningHash.GetHex().c_str(), hashTarget.GetHex().c_str());
+            return found;
+        }
+    }
+
+    // increment extra nonce if needed
+    if ( g_nonces[ extra ] + g_rawIntensity < g_nonces[ extra ] )
+        g_noncesExtra[ extra ]++;
+
+    g_nonces[ extra ] += g_rawIntensity;
+#endif
+
+    return false; // Give up leave
 }
 
 static double GetDifficulty(uint32_t nBits)
@@ -619,8 +608,13 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
     if (!found)
     {
         const float elapsed = GetTimeMillis() - start;
+#ifdef MINER_OPENCL
+        printf("GPU #%i: Checked %d possibilities in %5.1f secs, %3.3f MH/s\n", threadNum, rightnow.c_str(), checked, elapsed / 1000,
+            (checked / 1e6) / (elapsed / 1e3));
+#else
         printf("%s: Checked %d possibilities in %5.1f secs, %3.3f MH/s\n", rightnow.c_str(), checked, elapsed / 1000,
             (checked / 1e6) / (elapsed / 1e3));
+#endif
         return ret;
     }
 
@@ -895,9 +889,10 @@ int CpuMiner(int threadNum)
 
         cl_uint numDevices;
         ret = clGetDeviceIDs( platforms[ platform ], CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices );
-        if ( ret != CL_SUCCESS )
+        if ( ret != CL_SUCCESS || numDevices == 0 )
         {
-            throw std::runtime_error( "OpenCL: failed on clGetDeviceIDs" );
+            printf( "OpenCL: no devices, skip" );
+            continue;
         }
 
         if ( threadNum - offset >= numDevices )

@@ -2856,6 +2856,9 @@ __kernel void sha256_40( __global uint *input, __global uint *hashOutput, __glob
 	out[ 5 ] = SWAP4( outbuf2[ 5 ] );
 	out[ 6 ] = SWAP4( outbuf2[ 6 ] );
 	out[ 7 ] = SWAP4( outbuf2[ 7 ] );
+
+	#pragma unroll
+	for ( int i = 8; i < 24; ++i ) out[ i ] = 0;
 }
 
 __kernel void sha256_32( __global uint *input, __global uint *hashOutput, __global uint *nonceBranch, uint intensity )
@@ -2900,14 +2903,14 @@ bool isHashBelowTarget( __global uint *hash, __global const uint *target )
 	if ( hash[ 4 ] > target[ 4 ] ) return false;
 	if ( hash[ 4 ] < target[ 4 ] ) return true;
 
-	//if ( hash[ 3 ] > target[ 3 ] ) return false;
-	//if ( hash[ 3 ] < target[ 3 ] ) return true;
-	//if ( hash[ 2 ] > target[ 2 ] ) return false;
-	//if ( hash[ 2 ] < target[ 2 ] ) return true;
+	if ( hash[ 3 ] > target[ 3 ] ) return false;
+	if ( hash[ 3 ] < target[ 3 ] ) return true;
+	if ( hash[ 2 ] > target[ 2 ] ) return false;
+	if ( hash[ 2 ] < target[ 2 ] ) return true;
 
-	//if ( hash[ 1 ] > target[ 1 ] ) return false;
-	//if ( hash[ 1 ] < target[ 1 ] ) return true;
-	//if ( hash[ 0 ] > target[ 0 ] ) return false;
+	if ( hash[ 1 ] > target[ 1 ] ) return false;
+	if ( hash[ 1 ] < target[ 1 ] ) return true;
+	if ( hash[ 0 ] > target[ 0 ] ) return false;
 
 	return true;
 }
