@@ -71,8 +71,6 @@ void *g_secp256k1_z_ratio = nullptr;
     #define MAX_GPUS 16
 #endif
 
-std::stringstream g_sourceCode;
-
 enum _kernel
 {
     kernel_sha256_64 = 0,
@@ -1031,9 +1029,13 @@ int CpuMiner(int threadNum)
 		}
         printf( "GPU #%i: finish fill precompute\n", threadNum );
 
-        const char *source = g_sourceCode.str().c_str();
-        size_t sourceLen = strlen( source );
-        g_program[ threadNum ] = clCreateProgramWithSource( g_deviceContext[ threadNum ], 1, &source, &sourceLen, &ret );
+        // AMD OpenCL compiler sucks for RDNA+... so lets make it work via some hack
+        char src[MAX_PATH], cwd[MAX_PATH];
+        getcwd(cwd,sizeof(cwd));
+        sprintf(src,"#include \"%s/secp256k1.cl\"", cwd);
+        const char *source = src;
+
+        g_program[ threadNum ] = clCreateProgramWithSource( g_deviceContext[ threadNum ], 1, &source, nullptr, &ret );
         if ( g_isNvidia[ threadNum ] )
         {
             ret = clBuildProgram( g_program[ threadNum ], 1, &g_deviceId[ threadNum ], "-DOPENCL -DNVIDIA -cl-nv-cstd=CL2.0 -nv-m64", nullptr, nullptr );
@@ -1065,6 +1067,8 @@ int CpuMiner(int threadNum)
 
             throw std::runtime_error("");
         }
+
+        printf( "GPU #%i: kernel compiled\n" );
 
         g_kernels[ threadNum ][ kernel_nexapow ] = clCreateKernel( g_program[ threadNum ], "nexapow", &ret );
         g_kernels[ threadNum ][ kernel_nexapow_start ] = clCreateKernel( g_program[ threadNum ], "nexapow_start", &ret );
@@ -1318,12 +1322,6 @@ int main(int argc, char *argv[])
     std::vector<std::thread> minerThreads;
 #ifdef MINER_OPENCL
     printf("%s: Running %d gpus.\n", now().c_str(), nThreads);
-
-    std::ifstream clFile0("./helper_sha256.cl", std::ios::binary);
-    std::ifstream clFile1("./secp256k1.cl", std::ios::binary);
-    g_sourceCode << clFile0.rdbuf() << "\n\n" << clFile1.rdbuf();
-    clFile0.close();
-    clFile1.close();
 
     size_t windows = (256 / g_curveBits) + 1;
 	size_t window_size = (1 << (g_curveBits - 1));
