@@ -523,7 +523,7 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
         nonce[0] = extra + 1;
         ((uint32_t*)&nonce[4])[0] = startNonce + nonces[ i + 1 ];
         *((uint16_t*)&nonce[1]) = g_noncesExtra[ extra ];
-        printf( "GPU #%i: found solution for nonce %d with extra nonce %d\n", extra, startNonce + nonces[ i + 1 ], g_noncesExtra[ extra ] );
+        printf( "GPU #%i: found solution for nonce %u with extra nonce %u\n", extra, startNonce + nonces[ i + 1 ], g_noncesExtra[ extra ] );
 
         miningHash = GetMiningHash(headerCommitment, nonce);
         if (CheckProofOfWork(miningHash, nBits, conp))
@@ -545,6 +545,52 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
 #endif
 
     return false; // Give up leave
+#else
+    /* Eventually when hashing performance improved dramatically we may need to start with 6 bytes.
+
+    // Note that since I have a coinbase that is unique to my hashing effort, my hashing won't duplicate a competitor's
+    // efforts.  And a new candidate is generated every 30 seconds, so my hashing won't conflict with my earlier self.
+    // So it does not matter that we all start with few nonce bits.
+    if (nonce.size() < 6) nonce.resize(6);
+
+    //uint32_t startCount = randFunc();
+    nonce[4] = extra & 255;
+    nonce[5] = (extra >> 8) & 255;
+    */
+
+    if (nonce.size() < 4)
+        nonce.resize(4);
+
+    nonce[3] = extra & 255;
+
+    while (!found)
+    {
+        // Search
+        while (!found)
+        {
+            ++count;
+            nonce[0] = count & 255;
+            nonce[1] = (count >> 8) & 255;
+            nonce[2] = (count >> 16) & 255;
+
+            uint256 miningHash = GetMiningHash(headerCommitment, nonce);
+            if (CheckProofOfWork(miningHash, nBits, conp))
+            {
+                // Found a solution
+                found = true;
+                printf("%s: proof-of-work found  \n  mining puzzle solution: %s  \ntarget: %s\n", now().c_str(),
+                    miningHash.GetHex().c_str(), hashTarget.GetHex().c_str());
+                break;
+            }
+            if (ntries-- < 1)
+            {
+                return false; // Give up leave
+            }
+        }
+    }
+
+    return found;
+#endif
 }
 
 static double GetDifficulty(uint32_t nBits)
@@ -655,8 +701,8 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
 
     int64_t start = GetTimeMillis();
     std::vector<unsigned char> nonce;
-    int ChunkAmt = 10000;
-    int checked = 0;
+    uint32_t ChunkAmt = 10000;
+    uint32_t checked = 0;
     uint32_t startCount = 1;
     if (!deterministicStartCount)
         startCount = randFunc();
@@ -690,10 +736,10 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
     {
         const float elapsed = GetTimeMillis() - start;
 #ifdef MINER_OPENCL
-        printf("GPU #%i: Checked %d possibilities in %5.1f secs, %3.3f MH/s\n", threadNum, rightnow.c_str(), checked, elapsed / 1000,
+        printf("GPU #%i: Checked %u possibilities in %5.1f secs, %3.3f MH/s\n", threadNum, rightnow.c_str(), checked, elapsed / 1000,
             (checked / 1e6) / (elapsed / 1e3));
 #else
-        printf("%s: Checked %d possibilities in %5.1f secs, %3.3f MH/s\n", rightnow.c_str(), checked, elapsed / 1000,
+        printf("%s: Checked %u possibilities in %5.1f secs, %3.3f MH/s\n", rightnow.c_str(), checked, elapsed / 1000,
             (checked / 1e6) / (elapsed / 1e3));
 #endif
         return ret;
