@@ -6,8 +6,6 @@
 #include "nexa-config.h"
 #endif
 
-#define MINER_OPENCL
-
 #include "allowed_args.h"
 #include "arith_uint256.h"
 #include "chainparams.h"
