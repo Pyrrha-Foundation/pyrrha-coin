@@ -314,8 +314,13 @@ public:
         addHeader(_("Mining options:"))
             .addArg("blockversion=<n>", ::AllowedArgs::requiredInt,
                 _("Set the block version number. For testing only. Value must be an integer"))
+#ifdef MINER_OPENCL
+            .addArg("gpus=<n>", ::AllowedArgs::requiredInt,
+                _("Number of gpus to use for mining (default: 1). Value must be an integer"))
+#else
             .addArg("cpus=<n>", ::AllowedArgs::requiredInt,
                 _("Number of cpus to use for mining (default: 1). Value must be an integer"))
+#endif
             .addArg("duration=<n>", ::AllowedArgs::requiredInt,
                 _("Number of seconds to mine a particular block candidate (default: 30). Value must be an integer"))
             .addArg("nblocks=<n>", ::AllowedArgs::requiredInt,
@@ -432,7 +437,12 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
 #ifdef GPU_VERIFY_STEPS
     printf( "target: %s\tstartNonce: %u\n", target.GetHex().c_str(), g_nonces[extra] );
 #endif
-    clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferTarget[ extra ], CL_TRUE, 0, 32, &target.begin()[ 0 ], 0, nullptr, nullptr );
+    cl_int ret = clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferTarget[ extra ], CL_TRUE, 0, 32, &target.begin()[ 0 ], 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to set target, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
 
     std::vector<uint32_t> hash;
     hash.resize(11);
@@ -443,10 +453,20 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
     ((uint8_t*)&hash[8])[1] = extra + 1;
     *(uint16_t*)(&((uint8_t*)&hash[8])[2]) = g_noncesExtra[ extra ]; // extra nonce
 
-    clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferInput[ extra ], CL_TRUE, 0, 11 * sizeof(cl_uint), &hash[ 0 ], 0, nullptr, nullptr );
+    ret = clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferInput[ extra ], CL_TRUE, 0, 11 * sizeof(cl_uint), &hash[ 0 ], 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to set input, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
 
     cl_ulong zero = 0;
-    clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, sizeof(cl_ulong), &zero, 0, nullptr, nullptr );
+    ret = clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, sizeof(cl_ulong), &zero, 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to reset output buffer, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
 
     if (nonce.size() < 8)
         nonce.resize(8);
@@ -515,8 +535,12 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
     multiCheckHash( extra, g_bufferExtra[ extra ][ secp256k1_hashOut ] );
 
     uint64_t nonces[32];
-    clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, 32 * sizeof(cl_ulong), &nonces[ 0 ], 0, nullptr, nullptr );
-    clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, sizeof(cl_ulong), &zero, 0, nullptr, nullptr );
+    ret = clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, 32 * sizeof(cl_ulong), &nonces[ 0 ], 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to read result, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
 
     for ( uint64_t i = 0; i < ( nonces[ 0 ] <= 16 ? nonces[ 0 ] : 16 ); i++ )
     {
@@ -542,7 +566,6 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
         g_noncesExtra[ extra ]++;
 
     g_nonces[ extra ] += g_rawIntensity;
-#endif
 
     return false; // Give up leave
 #else
@@ -1196,7 +1219,7 @@ int CpuMiner(int threadNum)
             throw std::runtime_error("");
         }
 
-        printf( "GPU #%i: kernel compiled\n" );
+        printf( "GPU #%i: kernel compiled\n", threadNum );
 
         g_kernels[ threadNum ][ kernel_nexapow ] = clCreateKernel( g_program[ threadNum ], "nexapow", &ret );
         if (ret != CL_SUCCESS)
