@@ -478,8 +478,6 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
 
     uint256 miningHash;
 
-    cl_int ret = 0;
-
     SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
     SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
     SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 6, sizeof(cl_uint), &g_curveBits );
