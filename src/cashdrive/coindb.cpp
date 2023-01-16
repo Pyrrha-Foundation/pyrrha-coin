@@ -114,15 +114,15 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
             LOGA("_IncrementLastKeyUsed(): KEY INCREMENTED TO %s \n", uint256t_ToString(next_db_key_available).c_str());
         }
         // we need to populate the cache for the last $roots_to_keep roots for trimming later, this is very expensive
-        for (uint32_t i = 0; i < roots_to_keep; ++i)
+        for (uint32_t j = 0; j < roots_to_keep; ++j)
         {
-            if (i >= current_block_height)
+            if (j >= current_block_height)
             {
                 // no more roots to read
                 break;
             }
             CRootMetaData root_data;
-            if (!db.Read(CRootKey(current_block_height - i), root_data))
+            if (!db.Read(CRootKey(current_block_height - j), root_data))
             {
                 // this is a critical error, if they key we are reading from is not
                 // invalid, then the entry should not be missing
@@ -331,7 +331,7 @@ std::pair<CoinEntryKey, CoinEntryValue> CCoinsViewDB::_make_new_interior_node(co
     // before we return, write the new interior node
     // write the new node
     batch.Write(interior_key, interior_value);
-    _AddToRootCache(interior_key);
+    _AddToRootCache(interior_key.key);
     db.WriteBatch(batch);
     this->vRootInternalKeys.emplace_back(uint256(interior_key.key));
     return std::make_pair(interior_key, interior_value);
@@ -517,10 +517,10 @@ CoinEntryValue CCoinsViewDB::_UpdateFingerprint(const uint256_t &parent_key)
 
 void CCoinsViewDB::_AddToRootCache(const uint256_t &key)
 {
-    cached_trie_node_info[uint256(current_root_key)].second.emplace(uint256(key));
+    cached_trie_node_info[uint256(current_root_key)].emplace(uint256(key));
 }
 
-void CCoinsViewDB::_Read(const uint256_t &key, CoinEntryValue &value)
+void CCoinsViewDB::_Read(const uint256_t &key, CoinEntryValue &value) const
 {
     if (!db.Read(CoinEntryKey(key), value))
     {
@@ -830,7 +830,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
                 }
                 CDBBatch batch(db);
                 batch.Write(entry_copy.first, entry_copy.second);
-                _AddToRootCache(entry_copy.first);
+                _AddToRootCache(entry_copy.first.key);
                 batch.Write(CoinEntryKey(parent_key), parent_value);
                 db.WriteBatch(batch);
                 // assign next to the copied values
@@ -936,7 +936,7 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     value.root_group = parent_value.root_group;
     // value has been created, write it to the db
     batch.Write(key, value);
-    _AddToRootCache(key);
+    _AddToRootCache(key.key);
     db.WriteBatch(batch);
     // update fingerprint
     while (std::memcmp(parent_key, INVALID_KEY, UINT256_NUM_BYTES) != 0)
@@ -1030,7 +1030,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
             }
             CDBBatch batch(db);
             batch.Write(entry_copy.first, entry_copy.second);
-            _AddToRootCache(entry_copy.first);
+            _AddToRootCache(entry_copy.first.key);
             batch.Write(CoinEntryKey(parent_key), parent_value);
             db.WriteBatch(batch);
             std::memcpy(next_key, entry_copy.first.key, UINT256_NUM_BYTES);

@@ -313,7 +313,7 @@ private:
     void _AddToRootCache(const uint256_t &key);
 
     // wraps db.read and the assert check
-    void _Read(const uint256_t &key, CoinEntryValue &value);
+    void _Read(const uint256_t &key, CoinEntryValue &value) const;
 
 public:
     CCoinsViewDB(size_t nCacheSize,
