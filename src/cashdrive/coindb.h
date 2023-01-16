@@ -64,16 +64,13 @@ struct CoinEntryKey
     void Serialize(Stream &s) const
     {
         s << key_prefix;
-        uint256 key256(key);
-        s << key256;
+        s << FLATDATA(key);
     }
     template <typename Stream>
     void Unserialize(Stream &s)
     {
         s >> key_prefix;
-        uint256 key256;
-        s >> key256;
-        key256.GetRaw(key);
+        s >> FLATDATA(key);
     }
 };
 
@@ -158,16 +155,11 @@ struct CoinEntryValue
     {
         s << key_bits;
         s << root_group;
-        uint256 fingerprint256(fingerprint);
-        uint256 key_parent256(key_parent);
-        uint256 key_left256(key_left);
-        uint256 key_right256(key_right);
-        uint256 key256(key);
-        s << fingerprint256;
-        s << key_parent256;
-        s << key_left256;
-        s << key_right256;
-        s << key256;
+        s << FLATDATA(fingerprint);
+        s << FLATDATA(key_parent);
+        s << FLATDATA(key_left);
+        s << FLATDATA(key_right);
+        s << FLATDATA(key);
         s << value;
     }
     template <typename Stream>
@@ -175,21 +167,11 @@ struct CoinEntryValue
     {
         s >> key_bits;
         s >> root_group;
-        uint256 fingerprint256;
-        s >> fingerprint256;
-        fingerprint256.GetRaw(fingerprint);
-        uint256 key_parent256;
-        s >> key_parent256;
-        key_parent256.GetRaw(key_parent);
-        uint256 key_left256;
-        s >> key_left256;
-        key_left256.GetRaw(key_left);
-        uint256 key_right256;
-        s >> key_right256;
-        key_right256.GetRaw(key_right);
-        uint256 key256;
-        s >> key256;
-        key256.GetRaw(key);
+        s >> FLATDATA(fingerprint);
+        s >> FLATDATA(key_parent);
+        s >> FLATDATA(key_left);
+        s >> FLATDATA(key_right);
+        s >> FLATDATA(key);
         s >> value;
     }
 };
@@ -249,8 +231,7 @@ struct CRootMetaData
     template <typename Stream>
     void Serialize(Stream &s) const
     {
-        uint256 key256(key);
-        s << key256;
+        s << FLATDATA(key);
         s << nBlockHeight;
         s << vInternalNodeKeys;
         s << vSpentLeafNodeKeys;
@@ -258,9 +239,7 @@ struct CRootMetaData
     template <typename Stream>
     void Unserialize(Stream &s)
     {
-        uint256 key256;
-        s >> key256;
-        key256.GetRaw(key);
+        s >> FLATDATA(key);
         s >> nBlockHeight;
         s >> vInternalNodeKeys;
         s >> vSpentLeafNodeKeys;
