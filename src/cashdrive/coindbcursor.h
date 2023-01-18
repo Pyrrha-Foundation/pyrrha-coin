@@ -18,6 +18,18 @@
 #include <utility>
 #include <vector>
 
+typedef uint8_t uint256_t[32];
+
+inline std::string uint256t_ToString(const uint256_t &data)
+{
+    char psz[65];
+    for (unsigned int i = 0; i < 32; i++)
+    {
+        sprintf(psz + (i * 2), "%02x", data[i]);
+    }
+    return std::string(psz, psz + 64);
+}
+
 class CoinEntryValue;
 
 /** Specialization of CCoinsViewCursor to iterate over a CCoinsViewDB */

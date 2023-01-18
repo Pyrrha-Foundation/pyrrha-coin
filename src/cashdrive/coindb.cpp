@@ -14,6 +14,11 @@ CCoinsViewDB *pcoinsdbview = nullptr;
 
 static const bool cashdrive_debug = false;
 
+static inline void uint256_to_raw(const uint256 &a, uint256_t b)
+{
+    std::memcpy(b, a.begin(), 32);
+}
+
 static int _compare_key_bits(const uint256_t a, const uint256_t b, const uint32_t b_key_bits)
 {
     const uint32_t bytes_to_check = b_key_bits / 8;
@@ -93,7 +98,7 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
     }
     else
     {
-        current_root_key256.GetRaw(current_root_key);
+        uint256_to_raw(current_root_key256, current_root_key);
         // we were able to read the root key
         CoinEntryValue root_value;
         _Read(current_root_key, root_value);
@@ -101,7 +106,7 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize,
         current_block_height = current_root_group;
         uint256 next_db_key_available256;
         db.Read(DB_LAST_KEY_USED, next_db_key_available256);
-        next_db_key_available256.GetRaw(next_db_key_available);
+        uint256_to_raw(next_db_key_available256, next_db_key_available);
         // we loaded the last used key, increment it to avoid key reuse
         int32_t i = 0;
         uint32_t* pn = (uint32_t*)next_db_key_available;
@@ -536,7 +541,7 @@ void CCoinsViewDB::_Read(const uint256_t &key, CoinEntryValue &value) const
 CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
 {
     uint256_t key;
-    outpoint.hash.GetRaw(key);
+    uint256_to_raw(outpoint.hash, key);
     if (cashdrive_debug)
     {
         LOGA("Find(): key = %s \n", uint256t_ToString(key).c_str());
@@ -576,6 +581,7 @@ CoinEntryValue CCoinsViewDB::_FindCoin(const COutPoint &outpoint) const
                 continue;
             }
         }
+        // leaf node
         if (next_value.key_bits == 256)
         {
             if (std::memcmp(key, next_value.key, UINT256_NUM_BYTES) != 0)
@@ -715,10 +721,10 @@ bool CCoinsViewDB::Mint(const COutPoint &outpoint, const Coin &coin)
     // value
     CoinEntryValue value;
     value.SetNull();
-    outpoint.hash.GetRaw(value.key);
+    uint256_to_raw(outpoint.hash, value.key);
     // the key is also the fingerprint for a leaf node as a shortcut for calculating
     // the fingerprint of the parent node
-    outpoint.hash.GetRaw(value.fingerprint);
+    uint256_to_raw(outpoint.hash, value.fingerprint);
     value.value = coin;
     value.key_bits = 256;
     bool isLeft = false;
@@ -965,7 +971,7 @@ bool CCoinsViewDB::Spend(const COutPoint &outpoint)
         return false;
     }
     uint256_t outpoint_key;
-    outpoint.hash.GetRaw(outpoint_key);
+    uint256_to_raw(outpoint.hash, outpoint_key);
     // run the find algorithm again but update the nodes we touch
     bool isLeft = false;
     // compare the key of the node being added against the existing nodes starting with the root
