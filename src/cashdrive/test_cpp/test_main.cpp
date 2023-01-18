@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(TEST_ALL_CASHDRIVE)
     // start a new root and change the trie.
     test_second_root(coindb_cashdrive);
     // trim the trie to the last root
-    //test_trim(coindb_cashdrive);
+    test_trim(coindb_cashdrive);
     // destroy the (populated) trie
     //BitwiseTrie_destroy(coindb_cashdrive);
     printf("\nALL CASHDRIVE TESTS PASSED \n");
