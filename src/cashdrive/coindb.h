@@ -20,7 +20,6 @@ static const char DB_LAST_KEY_USED = 'K';
 static constexpr uint32_t UINT256_NUM_BYTES = 32;
 
 static constexpr uint256_t UINT256_ZERO = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-static constexpr uint256_t UINT256_MAX = {255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255};
 
 static constexpr uint8_t BIN_00000000 = 0;
 static constexpr uint8_t BIN_00000001 = 1;
