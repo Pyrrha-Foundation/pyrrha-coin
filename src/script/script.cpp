@@ -9,6 +9,9 @@
 
 #include <algorithm>
 
+//! Maximum number of bytes pushable to the stack
+unsigned int MAX_SCRIPT_ELEMENT_SIZE = 520;
+
 using namespace std;
 
 const char *GetOpName(opcodetype opcode)

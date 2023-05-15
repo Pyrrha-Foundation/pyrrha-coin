@@ -49,17 +49,21 @@ static bool MatchPayToPubkey(const CScript &script, valtype &pubkey)
     // Standard tx, sender provides pubkey, receiver adds signature
     // Template: "CScript() << OP_PUBKEY << OP_CHECKSIG"
 
-    if (script.size() == CPubKey::PUBLIC_KEY_SIZE + 2 && script[0] == CPubKey::PUBLIC_KEY_SIZE &&
-        script.back() == OP_CHECKSIG)
+    bool fFalcon = (script.size() >= CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE);
+    unsigned int nPubkeySize = (fFalcon ? CPubKey::FALCON_PUBLIC_KEY_SIZE : CPubKey::PUBLIC_KEY_SIZE);
+    unsigned int nCompressedPubkeySize =
+        (fFalcon ? CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE : CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+
+    if (script.size() == nPubkeySize + 2 && script[0] == nPubkeySize && script.back() == OP_CHECKSIG)
     {
-        pubkey = valtype(script.begin() + 1, script.begin() + CPubKey::PUBLIC_KEY_SIZE + 1);
+        pubkey = valtype(script.begin() + 1, script.begin() + nPubkeySize + 1);
         return CPubKey::ValidSize(pubkey);
     }
 
-    if (script.size() == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE + 2 && script[0] == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE &&
+    if (script.size() == nCompressedPubkeySize + 2 && script[0] == nCompressedPubkeySize &&
         script.back() == OP_CHECKSIG)
     {
-        pubkey = valtype(script.begin() + 1, script.begin() + CPubKey::COMPRESSED_PUBLIC_KEY_SIZE + 1);
+        pubkey = valtype(script.begin() + 1, script.begin() + nCompressedPubkeySize + 1);
         return CPubKey::ValidSize(pubkey);
     }
     return false;
@@ -160,6 +164,7 @@ static bool MatchMultisig(const CScript &script, unsigned int &required, std::ve
         return false;
     }
     required = CScript::DecodeOP_N(opcode);
+
     while (script.GetOp(it, opcode, data) && CPubKey::ValidSize(data))
     {
         if (opcode < 0 || opcode > OP_PUSHDATA4 || !CheckMinimalPush(data, opcode))

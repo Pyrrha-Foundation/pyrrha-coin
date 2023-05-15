@@ -265,7 +265,7 @@ UniValue consolidate(const UniValue &params, bool fHelp)
                 nValue += coin.GetValue();
                 count++;
                 nTotalCoinsChosen++;
-                if (count >= MAX_TX_NUM_VIN || nTotalCoinsChosen >= numUtxos ||
+                if (count >= GetMaxVinForConsolidation() || nTotalCoinsChosen >= numUtxos ||
                     (nTotalAvailable - count) < numUtxosToLeave)
                 {
                     fDone = true;
@@ -856,6 +856,7 @@ UniValue signmessage(const UniValue &params, bool fHelp)
     std::string error = "";
     if (!SignMessage(params, signature, error))
     {
+        printf("ERROR : %s\n", error.c_str());
         throw JSONRPCError(RPC_TYPE_ERROR, error);
     }
     else

@@ -13,17 +13,53 @@ from test_framework.util import *
 
 class TxnDoubleSpendTest(BitcoinTestFramework):
 
-    def setup_network(self):
-        # Start with split network:
-        return super(TxnDoubleSpendTest, self).setup_network(True)
+    def add_options(self, parser):
+        parser.add_option("--addrType", dest="addrType", default="p2pkt", action="store",
+                          help="Choose p2pkt or p2pkh address types to use with the wallet")
+        parser.add_option("--enableFalcon", dest="enableFalcon", default="1", action="store",
+                          help="Choose whether to enable the falcon wallet")
 
+    def setup_chain(self,bitcoinConfDict=None, wallets=None):
+        logging.info("Initializing test directory "+self.options.tmpdir)
+        initialize_chain_clean(self.options.tmpdir, 4, bitcoinConfDict, wallets)
+
+    def setup_network(self):
+
+        self.node_args = [['-usehd=0', '-test.falcon=' + self.options.enableFalcon], ['-usehd=0', '-test.falcon=' + self.options.enableFalcon], ['-usehd=0', '-test.falcon=' + self.options.enableFalcon], ['-usehd=0', '-test.falcon=' + self.options.enableFalcon]]
+        self.nodes = start_nodes(4, self.options.tmpdir, self.node_args)
+        interconnect_nodes(self.nodes)
+
+        self.is_network_split=False
+        self.nodes[0].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[1].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[2].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[3].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[0].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[1].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[2].generate(25)
+        sync_blocks(self.nodes)
+        self.nodes[3].generate(25)
+        sync_blocks(self.nodes)
+
+        # Start with split network:
+        disconnect_all(self.nodes[0])
+        disconnect_all(self.nodes[1])
+        disconnect_all(self.nodes[2])
+        disconnect_all(self.nodes[3])
+        self.is_network_split=True
+ 
     def run_test(self):
         # All nodes should start with 25 mined blocks:
         starting_balance = COINBASE_REWARD*25
-        for i in range(4):
+        for i in range(3):
             assert_equal(self.nodes[i].getbalance(), starting_balance)
             assert_equal(self.nodes[i].getbalance("*"), starting_balance)
-            self.nodes[i].getnewaddress("p2pkh", "")  # bug workaround, coins generated assigned to first getnewaddress!
 
         balance = self.nodes[1].getwalletinfo()["balance"]
         unconfirmed_balance = self.nodes[1].getwalletinfo()["unconfirmed_balance"]
@@ -32,7 +68,7 @@ class TxnDoubleSpendTest(BitcoinTestFramework):
         startHeight = self.nodes[2].getblockcount()
 
         # Coins are sent to node1_address
-        node1_address = self.nodes[1].getnewaddress("p2pkh", "from0")
+        node1_address = self.nodes[1].getnewaddress(self.options.addrType, "from0")
 
         # First: use raw transaction API to send NEXA to node1_address,
         # but don't broadcast:
@@ -48,7 +84,7 @@ class TxnDoubleSpendTest(BitcoinTestFramework):
         rawtx_input_1["outpoint"] = unspent[1]["outpoint"]
         rawtx_input_1["amount"] = unspent[1]["amount"]
         inputs = [rawtx_input_0, rawtx_input_1]
-        change_address = self.nodes[0].getnewaddress("p2pkt")
+        change_address = self.nodes[0].getnewaddress(self.options.addrType)
         outputs = {}
         outputs[change_address] = Decimal("10000000.0") + doublespend_fee
         outputs[node1_address] = doublespend_amt

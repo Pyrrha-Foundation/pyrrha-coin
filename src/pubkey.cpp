@@ -5,8 +5,10 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "pubkey.h"
+#include "support/allocators/secure.h"
 #include "utilstrencodings.h"
 
+#include "falcon512/api.h"
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 #include <secp256k1_schnorr.h>
@@ -264,27 +266,68 @@ bool CPubKey::VerifySchnorr(const uint256 &hash, const std::vector<uint8_t> &vch
     return secp256k1_schnorr_verify(secp256k1_context_verify, &vchSig[0], hash.begin(), &pubkey);
 }
 
+bool CPubKey::VerifyFalcon(const uint256 &hash, const std::vector<uint8_t> &vchSig) const
+{
+    if (!IsValid())
+        return false;
+
+    int ret = PQCLEAN_FALCON512_CLEAN_crypto_sign_verify(vchSig.data(), vchSig.size(), hash.begin(), 32, begin());
+    if (ret != 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
 bool CPubKey::RecoverCompact(const uint256 &hash, const std::vector<uint8_t> &vchSig)
 {
-    if (vchSig.size() != COMPACT_SIGNATURE_SIZE)
-        return false;
-    int recid = (vchSig[0] - 27) & 3;
-    bool fComp = ((vchSig[0] - 27) & 4) != 0;
-    secp256k1_pubkey pubkey;
-    secp256k1_ecdsa_recoverable_signature sig;
-    if (!secp256k1_ecdsa_recoverable_signature_parse_compact(secp256k1_context_verify, &sig, &vchSig[1], recid))
+    fFalcon = false;
+    if (vchSig.size() > SIGNATURE_SIZE + PUBLIC_KEY_SIZE)
+        fFalcon = true;
+
+    if (fFalcon)
     {
-        return false;
+        uint32_t nLength = vchSig.size() - FALCON_PUBLIC_KEY_SIZE;
+        unsigned char *pch = (unsigned char *)begin();
+        memcpy(pch, vchSig.data() + nLength, FALCON_PUBLIC_KEY_SIZE);
+
+        int ret = PQCLEAN_FALCON512_CLEAN_crypto_sign_verify(vchSig.data(), nLength, hash.begin(), 32, pch);
+        if (ret != 0)
+        {
+            LOGA("Verify Falcon Key failed\n");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
-    if (!secp256k1_ecdsa_recover(secp256k1_context_verify, &pubkey, &sig, hash.begin()))
+    else
     {
-        return false;
+        if (vchSig.size() != COMPACT_SIGNATURE_SIZE)
+            return false;
+        int recid = (vchSig[0] - 27) & 3;
+        bool fComp = ((vchSig[0] - 27) & 4) != 0;
+        secp256k1_pubkey pubkey;
+        secp256k1_ecdsa_recoverable_signature sig;
+        if (!secp256k1_ecdsa_recoverable_signature_parse_compact(secp256k1_context_verify, &sig, &vchSig[1], recid))
+        {
+            return false;
+        }
+        if (!secp256k1_ecdsa_recover(secp256k1_context_verify, &pubkey, &sig, hash.begin()))
+        {
+            return false;
+        }
+        unsigned char pub[PUBLIC_KEY_SIZE];
+        size_t publen = PUBLIC_KEY_SIZE;
+        secp256k1_ec_pubkey_serialize(secp256k1_context_verify, pub, &publen, &pubkey,
+            fComp ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
+        Set(pub, pub + publen);
     }
-    unsigned char pub[PUBLIC_KEY_SIZE];
-    size_t publen = PUBLIC_KEY_SIZE;
-    secp256k1_ec_pubkey_serialize(
-        secp256k1_context_verify, pub, &publen, &pubkey, fComp ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
-    Set(pub, pub + publen);
+
     return true;
 }
 
@@ -292,28 +335,42 @@ bool CPubKey::IsFullyValid() const
 {
     if (!IsValid())
         return false;
-    secp256k1_pubkey pubkey;
-    return secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, &(*this)[0], size());
+
+    if (fFalcon)
+    {
+        return (vch_falcon[0] == 9 && size() == FALCON_PUBLIC_KEY_SIZE);
+    }
+    else
+    {
+        secp256k1_pubkey pubkey;
+        return secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, &(*this)[0], size());
+    }
 }
 
 bool CPubKey::Decompress()
 {
-    if (!IsValid())
-        return false;
-    secp256k1_pubkey pubkey;
-    if (!secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, &(*this)[0], size()))
+    assert(!fFalcon);
     {
-        return false;
+        if (!IsValid())
+            return false;
+        secp256k1_pubkey pubkey;
+        if (!secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, &(*this)[0], size()))
+        {
+            return false;
+        }
+        unsigned char pub[PUBLIC_KEY_SIZE];
+        size_t publen = PUBLIC_KEY_SIZE;
+        secp256k1_ec_pubkey_serialize(secp256k1_context_verify, pub, &publen, &pubkey, SECP256K1_EC_UNCOMPRESSED);
+        Set(pub, pub + publen);
     }
-    unsigned char pub[PUBLIC_KEY_SIZE];
-    size_t publen = PUBLIC_KEY_SIZE;
-    secp256k1_ec_pubkey_serialize(secp256k1_context_verify, pub, &publen, &pubkey, SECP256K1_EC_UNCOMPRESSED);
-    Set(pub, pub + publen);
     return true;
 }
 
 bool CPubKey::Derive(CPubKey &pubkeyChild, ChainCode &ccChild, unsigned int _nChild, const ChainCode &cc) const
 {
+    // must not be a falcon key
+    assert(!fFalcon);
+
     assert(IsValid());
     assert((_nChild >> 31) == 0);
     assert(size() == COMPRESSED_PUBLIC_KEY_SIZE);

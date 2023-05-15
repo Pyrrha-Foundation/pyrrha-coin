@@ -14,9 +14,6 @@
 class DoubleSpendProof
 {
 public:
-    //! limit for the size of a `pushData` vector below
-    static constexpr size_t MaxPushDataSize = MAX_SCRIPT_ELEMENT_SIZE;
-
     /** Creates an empty, invalid object */
     DoubleSpendProof();
 
@@ -109,7 +106,7 @@ public:
                 }
             }
             // Enforce script data must be within size limits
-            if (!pushData->empty() && pushData->front().size() > MaxPushDataSize)
+            if (!pushData->empty() && pushData->front().size() > MAX_SCRIPT_ELEMENT_SIZE)
                 throw std::ios_base::failure("DSProof script size limit exceeded");
         }
     }

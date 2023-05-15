@@ -425,6 +425,8 @@ def initialize_datadir(dirname, n, bitcoinConfDict=None, wallet=None, bins=None)
                 "rpcuser":rpc_u, "rpcpassword":rpc_p, "bindallorfail" : 1,
                 "wallet.payTxFee":1000,
                 "wallet.instant" : 0,
+                #"test.falcon" : 1,
+                #"usehd" : 0,
                 "relay.minRelayTxFee":0,
                 "relay.limitFreeRelay":15,
                 "electrum.port": electrum_rpc_port(n),
@@ -432,7 +434,7 @@ def initialize_datadir(dirname, n, bitcoinConfDict=None, wallet=None, bins=None)
                 "electrum.monitoring.port": electrum_monitoring_port(n)
                 }
 
-    # switch off default IPv6 listening port (for travis)
+    # switch off default IPv6 listening port (for gitlab)
     if UtilOptions.no_ipv6_rpc_listen:
         defaults.update({
             "rpcbind": "127.0.0.1",

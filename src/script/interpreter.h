@@ -23,6 +23,9 @@ class CScript;
 class CTransaction;
 class uint256;
 
+/** how many bytes do we add when determining the sig size from the first byte of a falcon signature */
+static const unsigned int FALCON_BASE_SIG_SIZE = 450;
+
 /** Signature types */
 enum
 {

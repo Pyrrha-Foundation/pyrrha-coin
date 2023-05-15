@@ -285,22 +285,42 @@ CTxDestination DecodeDestination(const std::string &str, const CChainParams &par
 void CBitcoinSecret::SetKey(const CKey &vchSecret)
 {
     assert(vchSecret.IsValid());
-    SetData(Params().Base58Prefix(CChainParams::SECRET_KEY), vchSecret.begin(), vchSecret.size());
-    if (vchSecret.IsCompressed())
-        vchData.push_back(1);
+
+    // If falcon then we need to append the pubkey
+    if (vchSecret.IsFalcon())
+    {
+        SetData(Params().Base58Prefix(CChainParams::SECRET_KEY), vchSecret.begin(), vchSecret.size());
+        vchData.insert(vchData.end(), vchSecret.pkbegin(), vchSecret.pkend());
+    }
+    else
+    {
+        SetData(Params().Base58Prefix(CChainParams::SECRET_KEY), vchSecret.begin(), vchSecret.size());
+        if (vchSecret.IsCompressed())
+            vchData.push_back(1);
+    }
 }
 
 CKey CBitcoinSecret::GetKey()
 {
-    CKey ret;
-    assert(vchData.size() >= 32);
-    ret.Set(vchData.begin(), vchData.begin() + 32, vchData.size() > 32 && vchData[32] == 1);
-    return ret;
+    CKey key;
+    bool fFalcon = (vchData.size() >= CKey::FALCON_PRIVATE_KEY_SIZE);
+    if (fFalcon)
+    {
+        CPubKey pubkey(vchData.begin() + CKey::FALCON_PRIVATE_KEY_SIZE, vchData.end());
+        key.Set(vchData.begin(), vchData.begin() + CKey::FALCON_PRIVATE_KEY_SIZE, pubkey, pubkey.IsCompressed());
+    }
+    else
+    {
+        key.Set(vchData.begin(), vchData.begin() + 32, vchData.size() > 32 && vchData[32] == 1);
+    }
+
+    return key;
 }
 
 bool CBitcoinSecret::IsValid(const CChainParams &chainParams) const
 {
-    bool fExpectedFormat = vchData.size() == 32 || (vchData.size() == 33 && vchData[32] == 1);
+    bool fExpectedFormat = vchData.size() == 32 || (vchData.size() == 33 && vchData[32] == 1) ||
+                           vchData.size() == CKey::FALCON_PRIVATE_KEY_SIZE + CKey::FALCON_PUBKEY_SIZE;
     bool fCorrectVersion = vchVersion == chainParams.Base58Prefix(CChainParams::SECRET_KEY);
     return fExpectedFormat && fCorrectVersion;
 }

@@ -541,6 +541,9 @@ CTweak<bool> tokenWhitelist("wallet.tokenWhitelist",
 
 #endif // ENABLE_WALLET
 
+// Should we get an estimate for how much fee we need to get into the next block */
+CTweak<bool> falconTweak("test.falcon", strprintf("Is the falcon wallet turned on (default: %s)", false), false);
+
 /** Number of blocks that can be requested at any given time from a single peer. */
 CTweak<uint64_t> maxBlocksInTransitPerPeer("net.maxBlocksInTransitPerPeer",
     "Number of blocks that can be requested at any given time from a single peer. 0 means use algorithm (default: 0)",

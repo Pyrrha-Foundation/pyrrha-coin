@@ -544,7 +544,17 @@ SigHashType GetSigHashType(const std::vector<unsigned char> &vchSig)
 
 void RemoveSigHashType(std::vector<unsigned char> &vchSig)
 {
-    vchSig.resize(64); // Schnorr signatures are 64 bytes
+    // Is this a likely schnorr sig?
+    if (vchSig.size() < FALCON_BASE_SIG_SIZE)
+    {
+        vchSig.resize(64); // Schnorr signatures are 64 bytes
+    }
+    else // falcon
+    {
+        unsigned int nSigSize = vchSig[0] + FALCON_BASE_SIG_SIZE;
+        vchSig.erase(vchSig.begin());
+        vchSig.resize(nSigSize);
+    }
 }
 
 SigHashType &SigHashType::fromSig(const std::vector<unsigned char> &sig)
@@ -552,7 +562,14 @@ SigHashType &SigHashType::fromSig(const std::vector<unsigned char> &sig)
     size_t sigsz = sig.size();
     if (sigsz < 64)
         return *this; // invalid
-    return fromBytes(sig, 64);
+
+    // Determine where the sighash is located.  For schnorr it will be after 64 bytes
+    // for falcon we have to find the location using the first byte of the signature which
+    // contains the signature size.
+    unsigned int nSigHashLocation = 64;
+    if (sigsz > FALCON_BASE_SIG_SIZE)
+        nSigHashLocation = sig[0] + FALCON_BASE_SIG_SIZE + 1;
+    return fromBytes(sig, nSigHashLocation);
 }
 
 SigHashType &SigHashType::fromBytes(const std::vector<unsigned char> &byteArray, int start)

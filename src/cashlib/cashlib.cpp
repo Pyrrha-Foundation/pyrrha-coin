@@ -34,6 +34,7 @@
 #include "util.h"
 #include "utilstrencodings.h"
 
+
 #if defined(ANDROID) // log sighash calculations
 #include <android/log.h>
 #define p(...) __android_log_print(ANDROID_LOG_DEBUG, "BU.sig", __VA_ARGS__)
@@ -425,11 +426,18 @@ void checkSigInit()
     }
 }
 
-CKey LoadKey(const unsigned char *src)
+CKey LoadKey(const unsigned char *src, bool fFalcon)
 {
     CKey secret;
     checkSigInit();
-    secret.Set(src, src + 32, true);
+    if (fFalcon)
+    {
+        secret.Set(src, src + CKey::FALCON_PRIVATE_KEY_SIZE, true);
+    }
+    else
+    {
+        secret.Set(src, src + 32, true);
+    }
     return secret;
 }
 
@@ -526,7 +534,9 @@ SLAPI int hd44DeriveChildKey(const unsigned char *secretSeed,
 SLAPI int GetPubKey(const unsigned char *keyData, unsigned char *result, unsigned int resultLen)
 {
     checkSigInit();
-    CKey key = LoadKey(keyData);
+
+    bool fFalcon = (resultLen >= CKey::FALCON_PUBKEY_SIZE);
+    CKey key = LoadKey(keyData, fFalcon);
     if (key.IsValid() == false)
     {
         return 0;
@@ -547,7 +557,7 @@ SLAPI int SignHashEDCSA(const unsigned char *data,
     unsigned int resultLen)
 {
     checkSigInit();
-    CKey key = LoadKey(secret);
+    CKey key = LoadKey(secret, false);
     uint256 hash;
     CSHA256().Write(data, datalen).Finalize(hash.begin());
     std::vector<uint8_t> sig;
@@ -655,7 +665,7 @@ SLAPI int SignTxECDSA(const unsigned char *txData,
         return 0;
 
     CScript priorScript(prevoutScript, prevoutScript + priorScriptLen);
-    CKey key = LoadKey(keyData);
+    CKey key = LoadKey(keyData, false);
 
     size_t nHashedOut = 0;
     uint256 sighash = SignatureHashBitcoinCash(priorScript, tx, inputIdx, sigHashType, inputAmount, &nHashedOut);
@@ -711,7 +721,7 @@ SLAPI int signBchTxOneInputUsingSchnorr(const unsigned char *txData,
     }
 
     CScript priorScript(prevoutScript, prevoutScript + priorScriptLen);
-    CKey key = LoadKey(keyData);
+    CKey key = LoadKey(keyData, false);
 
     size_t nHashedOut = 0;
     uint256 sighash = SignatureHashBitcoinCash(priorScript, tx, inputIdx, sigHashType, inputAmount, &nHashedOut);
@@ -777,7 +787,7 @@ SLAPI int signTxOneInputUsingSchnorr(const unsigned char *txData,
     }
 
     CScript priorScript(prevoutScript, prevoutScript + priorScriptLen);
-    CKey key = LoadKey(keyData);
+    CKey key = LoadKey(keyData, false);
 
     size_t nHashedOut = 0;
     uint256 sighash;
@@ -831,7 +841,7 @@ SLAPI int SignHashSchnorr(const unsigned char *hash, const unsigned char *keyDat
     std::vector<unsigned char> sig;
     checkSigInit();
 
-    CKey key = LoadKey(keyData);
+    CKey key = LoadKey(keyData, false);
 
     if (!key.SignSchnorr(sighash, sig))
     {
@@ -844,10 +854,114 @@ SLAPI int SignHashSchnorr(const unsigned char *hash, const unsigned char *keyDat
     return sigSize;
 }
 
-
 // These "C" functions are not needed in android, since java-naming-convention equivalents are defined
 #ifndef ANDROID
 
+/** Sign one input of a transaction
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+*/
+SLAPI int SignTxFalcon(unsigned char *txData,
+    int txbuflen,
+    unsigned int inputIdx,
+    int64_t inputAmount,
+    unsigned char *prevoutScript,
+    uint32_t priorScriptLen,
+    unsigned char *hashType,
+    unsigned int hashTypeLen,
+    unsigned char *keyData,
+    unsigned char *result,
+    unsigned int resultLen)
+{
+    checkSigInit();
+    CTransaction tx;
+    result[0] = 0;
+
+    std::vector<uint8_t> sigHashVec(hashType, hashType + hashTypeLen);
+    SigHashType sigHashType;
+    sigHashType.fromBytes(sigHashVec);
+    // p("SigHashType vec size: %d, %d, %s(%s): invalid: %d\n", sigHashVec.size(), hashTypeLen,
+    //    sigHashType.ToString().c_str(), sigHashType.HexStr().c_str(), sigHashType.isInvalid());
+
+    CDataStream ssData((char *)txData, (char *)txData + txbuflen, SER_NETWORK, PROTOCOL_VERSION);
+    try
+    {
+        ssData >> tx;
+    }
+    catch (const std::exception &)
+    {
+        return 0;
+    }
+
+    if (inputIdx >= tx.vin.size())
+    {
+        return 0;
+    }
+
+    CScript priorScript(prevoutScript, prevoutScript + priorScriptLen);
+    CKey key = LoadKey(keyData, true);
+
+    size_t nHashedOut = 0;
+    uint256 sighash;
+    if (!SignatureHashNexa(priorScript, tx, inputIdx, sigHashType, sighash, &nHashedOut))
+    {
+        return 0;
+    }
+    std::vector<unsigned char> sig;
+    if (!key.SignFalcon(sighash, sig))
+    {
+        return 0;
+    }
+    // CPubKey pub = key.GetPubKey();
+    // p("Sign Falcon: sig: %s, pubkey: %s sighash: %s\n", HexStr(sig).c_str(), HexStr(pub.begin(), pub.end()).c_str(),
+    //    sighash.GetHex().c_str());
+    sigHashType.appendToSig(sig);
+    unsigned int sigSize = sig.size();
+    if (sigSize > resultLen)
+        return 0;
+
+    // Now add the signature size (minus the base signature size of 600) to the back of the
+    // vector and rotate it to the front.
+    if (sigSize > 600)
+        return 0;
+    sig.push_back(sigSize - 600);
+    std::rotate(sig.begin(), sig.begin() + sig.size() - 1, sig.end());
+
+    std::copy(sig.begin(), sig.end(), result);
+    return sigSize;
+}
+
+/** Sign data via the Falcon512 signature algorithm.  hash must be 32 bytes.
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+
+    The returned signature will not have a sighashtype byte.
+*/
+SLAPI int SignHashFalcon(const unsigned char *hash,
+    unsigned char *keyData,
+    unsigned char *result,
+    unsigned int resultLen)
+{
+    uint256 sighash(hash);
+    std::vector<unsigned char> sig;
+    checkSigInit();
+
+    CKey key = LoadKey(keyData, true);
+
+    if (!key.SignFalcon(sighash, sig))
+    {
+        return 0;
+    }
+    unsigned int sigSize = sig.size();
+    if (sigSize > resultLen)
+        return 0;
+    std::copy(sig.begin(), sig.end(), result);
+    return sigSize;
+}
+
+// result must be 32 bytes
 SLAPI int signMessage(const unsigned char *message,
     unsigned int msgLen,
     const unsigned char *secret,
@@ -2032,7 +2146,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_signM
 
     checkSigInit();
 
-    CKey key = LoadKey((const unsigned char *)privkey.data);
+    CKey key = LoadKey((const unsigned char *)privkey.data, false);
 
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic << message.vec();
@@ -2363,7 +2477,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_getPu
         return nullptr;
     }
 
-    CKey k = LoadKey((const unsigned char *)data);
+    CKey k = LoadKey((const unsigned char *)data, false);
     if (!k.IsValid())
     {
         triggerJavaIllegalStateException(env, "invalid secret");

@@ -152,18 +152,23 @@ bool MatchGroupedPayToPubkey(const CScript &script, valtype &pubkey, CGroupToken
     if (!IsScriptGrouped(script, &pc, &grp)) return false;
     unsigned int offset = &pc[0] - &begin()[0];
 
-    if ((script.size() == offset + CPubKey::PUBLIC_KEY_SIZE + 2) && (script[0] == CPubKey::PUBLIC_KEY_SIZE) &&
+    bool fFalcon = (script.size() > PubKey::PUBLIC_KEY_SIZE + 2);
+    unsigned int nPubkeySize = (fFalcon ? CPubKey::FALCON_PUBLIC_KEY_SIZE : CPubKey::PUBLIC_KEY_SIZE);
+    unsigned int nCompressedPubkeySize = (fFalcon ? CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE :
+CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+
+    if ((script.size() == offset + nPubkeySize + 2) && (script[0] == nPubkeySize) &&
         (script.back() == OP_CHECKSIG))
     {
-        pubkey = valtype(pc + 1, pc + CPubKey::PUBLIC_KEY_SIZE + 1);
+        pubkey = valtype(pc + 1, pc + nPubkeySize + 1);
         return CPubKey::ValidSize(pubkey);
     }
 
-    if ((script.size() == offset + CPubKey::COMPRESSED_PUBLIC_KEY_SIZE + 2) &&
-        (script[0] == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE) &&
+    if ((script.size() == offset + nCompressedPubkeySize + 2) &&
+        (script[0] == nCompressedPubkeySize) &&
         (script.back() == OP_CHECKSIG))
     {
-        pubkey = valtype(pc + 1, pc + CPubKey::COMPRESSED_PUBLIC_KEY_SIZE + 1);
+        pubkey = valtype(pc + 1, pc + nCompressedPubkeySize + 1);
         return CPubKey::ValidSize(pubkey);
     }
     return false;

@@ -67,9 +67,10 @@ typedef enum ScriptError_t
     SCRIPT_ERR_SIG_NULLFAIL,
     SCRIPT_ERR_MULTISIG_NULLFAIL,
 
-    /* Schnorr */
+    /* Schnorr and Falcon */
     SCRIPT_ERR_SIG_BADLENGTH,
     SCRIPT_ERR_SIG_NONSCHNORR,
+    SCRIPT_ERR_SIG_NONFALCON,
     SCRIPT_ERR_MUST_USE_FORKID,
 
     /* softfork safeness */

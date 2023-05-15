@@ -182,6 +182,11 @@ struct CGroupedOutputEntry : public COutputEntry
     }
 };
 
+// Get the max vin allowed in a transaction. This is used
+// when we do consolidations because we have to make sure our
+// transaction size does not go over limit if we're using falcon signatures.
+unsigned int GetMaxVinForConsolidation();
+
 /** A transaction with a merkle branch linking it to the block chain. */
 class CMerkleTx : public CTransaction
 {

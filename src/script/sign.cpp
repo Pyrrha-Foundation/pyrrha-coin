@@ -60,9 +60,30 @@ bool TransactionSignatureCreator::CreateSig(std::vector<uint8_t> &vchSig,
     uint256 hash;
     if (!SignatureHashNexa(scriptCode, *txTo, nIn, sigHashType, hash))
         return false;
-    if (!key.SignSchnorr(hash, vchSig))
-        return false;
-    sigHashType.appendToSig(vchSig);
+    if (key.IsFalcon())
+    {
+        if (!key.SignFalcon(hash, vchSig))
+            return false;
+
+        // For falcon the signature sizes can vary in size slightly
+        // therefore we have to prefix the signature with the size of the signature
+        // so that we can later find the byte location of the sighashtype
+        assert(vchSig.size() > FALCON_BASE_SIG_SIZE);
+        uint8_t nSigSize = vchSig.size() - FALCON_BASE_SIG_SIZE;
+
+        sigHashType.appendToSig(vchSig);
+
+        // Now add the signature size to the back of the vector and rotate it to the front
+        vchSig.push_back(nSigSize);
+        std::rotate(vchSig.begin(), vchSig.begin() + vchSig.size() - 1, vchSig.end());
+        assert(vchSig[0] = nSigSize);
+    }
+    else
+    {
+        if (!key.SignSchnorr(hash, vchSig))
+            return false;
+        sigHashType.appendToSig(vchSig);
+    }
 
     // CPubKey pub = key.GetPubKey();
     p("Sign Schnorr: sig: %x, pubkey: %x sighash: %x\n", HexStr(vchSig), HexStr(pub.begin(), pub.end()), hash.GetHex());

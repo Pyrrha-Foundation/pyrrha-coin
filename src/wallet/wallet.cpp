@@ -77,6 +77,16 @@ struct CompareValueOnly
     }
 };
 
+unsigned int GetMaxVinForConsolidation()
+{
+    // When falcon is enabled and we do a consolidation the tx size
+    // will end up over the limit and cause the consolidation to fail.
+    if (falconTweak.Value())
+        return 60;
+    else
+        return MAX_TX_NUM_VIN;
+}
+
 std::string COutput::ToString() const
 {
     return strprintf("COutput(%s, %d) [%s]", tx->GetId().ToString(), i, FormatMoney(tx->vout[i].nValue));
@@ -228,13 +238,13 @@ CPubKey CWallet::GenerateNewKey()
     CKeyMetadata metadata(nCreationTime);
 
     // use HD key derivation if HD was enabled during wallet creation
-    if (IsHDEnabled())
+    if (IsHDEnabled() && !falconTweak.Value())
     {
         DeriveNewChildKey(metadata, secret);
     }
     else
     {
-        secret.MakeNewKey(fCompressed);
+        secret.MakeNewKey(fCompressed, falconTweak.Value());
     }
 
     // Compressed public keys were introduced in version 0.6.0
@@ -3301,7 +3311,7 @@ bool CWallet::CreateTransaction(vector<CRecipient> &vecSend,
                 _coinControl.Select(coin.GetOutPoint());
                 _nValue += coin.GetValue();
                 count++;
-                if (count >= MAX_TX_NUM_VIN)
+                if (count >= GetMaxVinForConsolidation())
                 {
                     fMaxVin = true;
                     break;
@@ -3705,7 +3715,6 @@ bool CWallet::CreateOneTransaction(const vector<CRecipient> &vecSend,
                     }
 
                     unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-
                     // Remove scriptSigs if we used dummy signatures for fee calculation
                     if (!sign)
                     {
@@ -4167,7 +4176,6 @@ void CWallet::ReserveKeyFromKeyPool(int64_t &nIndex, CKeyPool &keypool)
     keypool.vchPubKey = CPubKey();
     {
         LOCK(cs_wallet);
-
         if (!IsLocked())
             TopUpKeyPool();
 
@@ -4176,7 +4184,6 @@ void CWallet::ReserveKeyFromKeyPool(int64_t &nIndex, CKeyPool &keypool)
             return;
 
         CWalletDB walletdb(strWalletFile);
-
         nIndex = *(setKeyPool.begin());
         setKeyPool.erase(setKeyPool.begin());
         if (!walletdb.ReadPool(nIndex, keypool))
@@ -4736,8 +4743,12 @@ bool CWallet::ParameterInteraction()
 
     fSendFreeTransactions = GetBoolArg("-sendfreetransactions", DEFAULT_SEND_FREE_TRANSACTIONS);
 
+    if (GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET) && falconTweak.Value())
+        InitError(_("You can not have both falcon and HD enabled at the same time"));
+
     return true;
 }
+
 
 void CWallet::EraseFromRam(CWalletTxRef tx)
 {
@@ -4892,7 +4903,7 @@ bool InitLoadWallet()
     if (fFirstRun)
     {
         // Create new keyUser and set as default key
-        if (GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET) && !walletInstance->IsHDEnabled())
+        if (GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET) && !walletInstance->IsHDEnabled() && !falconTweak.Value())
         {
             // generate a new master key
             CKey key;

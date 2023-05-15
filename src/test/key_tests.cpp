@@ -7,12 +7,14 @@
 
 #include "base58.h"
 #include "dstencode.h"
+#include "falcon512/api_nexa.h"
 #include "script/script.h"
 #include "test/test_nexa.h"
 #include "uint256.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -317,6 +319,57 @@ BOOST_AUTO_TEST_CASE(key_test1)
     BOOST_CHECK(detsig == ParseHex("e7167ae0afbba6019b4c7fcfe6de79165d555e8295bd72da1b8aa"
                                    "1a5b54305880517cace1bcb0cb515e2eeaffd49f1e4dd49fd7282"
                                    "6b4b1573c84da49a38405d"));
+}
+
+static bool CompareArrays(uint8_t *arr1, uint8_t *arr2, uint16_t len)
+{
+    for (uint16_t i = 0; i < len; i++)
+    {
+        if (arr1[i] != arr2[i])
+            return false;
+    }
+    return true;
+}
+
+BOOST_AUTO_TEST_CASE(falcon_key_tests)
+{
+    // Validate deterministic key gen using both the same and also different seeds.
+    // If using the same seed then key gen should match.  If a different seed then
+    // they should not match.
+
+    // Same seed keys should match
+    unsigned char seed1[48];
+    memset(seed1, 1, sizeof seed1);
+    unsigned char key1[CKey::FALCON_PRIVATE_KEY_SIZE];
+    unsigned char pubkey1[CKey::FALCON_PUBKEY_SIZE];
+    int ret1 = falcon_create_deterministic_keypair(pubkey1, key1, seed1, sizeof seed1);
+    unsigned char key2[CKey::FALCON_PRIVATE_KEY_SIZE];
+    unsigned char pubkey2[CKey::FALCON_PUBKEY_SIZE];
+    int ret2 = falcon_create_deterministic_keypair(pubkey2, key2, seed1, sizeof seed1);
+    BOOST_CHECK(ret1 == 0);
+    BOOST_CHECK(ret2 == 0);
+    BOOST_CHECK(CompareArrays(key1, key2, sizeof key2));
+    BOOST_CHECK(CompareArrays(pubkey1, pubkey2, sizeof pubkey2));
+
+    unsigned char seed2[48];
+    memset(seed2, 2, sizeof seed2);
+    unsigned char key3[CKey::FALCON_PRIVATE_KEY_SIZE];
+    unsigned char pubkey3[CKey::FALCON_PUBKEY_SIZE];
+    int ret3 = falcon_create_deterministic_keypair(pubkey3, key3, seed2, sizeof seed2);
+    unsigned char key4[CKey::FALCON_PRIVATE_KEY_SIZE];
+    unsigned char pubkey4[CKey::FALCON_PUBKEY_SIZE];
+    int ret4 = falcon_create_deterministic_keypair(pubkey4, key4, seed2, sizeof seed2);
+    BOOST_CHECK(ret3 == 0);
+    BOOST_CHECK(ret4 == 0);
+    BOOST_CHECK(CompareArrays(key3, key4, sizeof key4));
+    BOOST_CHECK(CompareArrays(pubkey3, pubkey4, sizeof pubkey4));
+
+    // first and second set of key pairs should not match as they were derived
+    // using different seeds.
+    BOOST_CHECK(!CompareArrays(key1, key3, sizeof key3));
+    BOOST_CHECK(!CompareArrays(pubkey1, pubkey3, sizeof pubkey3));
+    BOOST_CHECK(!CompareArrays(key2, key4, sizeof key4));
+    BOOST_CHECK(!CompareArrays(pubkey2, pubkey4, sizeof pubkey4));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
