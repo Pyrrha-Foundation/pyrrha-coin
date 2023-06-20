@@ -54,7 +54,7 @@ cache: &global_cache_settings
           alias: docker
           command: ["--tls=false"]
     rules:
-        - if: $CI_PIPELINE_SOURCE == "schedule"
+        - if: ($CI_PIPELINE_SOURCE == "schedule" && $GITIAN == "True")
 
 
 gitian-binaries:
@@ -76,9 +76,9 @@ gitian-binaries:
             - ./gitian-builder/var/build.log
             - ./gitian-builder/var/build-script
     tags:
-      - gitian
+        - gitian
     rules:
-      - if: $CI_PIPELINE_SOURCE == "schedule"
+        - if: ($CI_PIPELINE_SOURCE == "schedule" && $GITIAN == "True")
 
 ######################################################
 ######## Ubuntu base settings
