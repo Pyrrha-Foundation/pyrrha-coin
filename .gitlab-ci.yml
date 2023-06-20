@@ -30,7 +30,6 @@ stages:
     - build_tests
     - qa_tests
     - benchmark_tests
-    - scheduled
 
 cache: &global_cache_settings
     paths:
@@ -40,7 +39,7 @@ cache: &global_cache_settings
 # Gitian binaries #
 ###################
 .docker_common:
-    stage: scheduled
+    stage: build
     # Environment based on workarounds in this issue:
     # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27300
     image: bchunlimited/nexa:ubuntu20.04
@@ -59,7 +58,7 @@ cache: &global_cache_settings
 
 
 gitian-binaries:
-    stage: scheduled
+    stage: build
     extends: .docker_common
     script:
         - apt-get update && apt-get -y --no-install-recommends --no-upgrade -qq install openssh-client apt-cacher-ng ruby docker.io
