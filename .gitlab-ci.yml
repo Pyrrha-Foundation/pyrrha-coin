@@ -76,7 +76,7 @@ gitian-binaries:
             - ./gitian-builder/var/build.log
             - ./gitian-builder/var/build-script
     tags:
-        - gitian
+        - scheduled
     rules:
         - if: ($CI_PIPELINE_SOURCE == "schedule" && $GITIAN == "True")
 
@@ -210,7 +210,7 @@ build-ubuntu-deps:
         paths:
             - depends/x86_64-unknown-linux-gnu
     rules:
-      - if: $CI_PIPELINE_SOURCE != "schedule"
+      - if: ($CI_PIPELINE_SOURCE != "schedule" || $EXTENDED_TESTS == "True")
 
 build-ubuntu:
     stage: build
@@ -240,7 +240,7 @@ build-ubuntu:
             - ./src/test-suite.log
             - ./build/src/.libs/libnexa.*
     rules:
-      - if: $CI_PIPELINE_SOURCE != "schedule"
+      - if: ($CI_PIPELINE_SOURCE != "schedule" || $EXTENDED_TESTS == "True")
 
 build-ubuntu-rostrum:
     extends: .ubuntu_base
@@ -319,6 +319,31 @@ test-ubuntu-qa:
             - ./build/ctorout.txt
     rules:
       - if: $CI_PIPELINE_SOURCE != "schedule"
+
+test-ubuntu-qa-extended:
+    stage: qa_tests
+    extends: .cache-ubuntu
+    needs: ["build-ubuntu"]
+    script:
+        - mkdir -p $CI_PROJECT_DIR/cores
+        - mkdir -p $CI_PROJECT_DIR/saved-cores
+        - echo $CI_PROJECT_DIR/cores/core.%e.%p.%h.%t | tee /proc/sys/kernel/core_pattern
+        - cd build;
+        - ./qa/pull-tester/rpc-tests.py --coverage --no-ipv6-rpc-listen --gitlab --extended-only
+    dependencies:
+        - build-ubuntu
+    artifacts:
+        when: on_failure
+        paths:
+            - ./qa/qa_tests/
+            - $CI_PROJECT_DIR/saved-cores
+            - ./build/src/nexad
+            - ./build/ctorout.txt
+    tags:
+        - scheduled
+    rules:
+        - if: ($CI_PIPELINE_SOURCE == "schedule" && $EXTENDED_TESTS == "True")
+
 
 test-ubuntu-benchmarks:
     extends: .ubuntu_base
