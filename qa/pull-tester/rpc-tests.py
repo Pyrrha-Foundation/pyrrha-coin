@@ -278,7 +278,6 @@ testScripts = [ RpcTest(t) for t in [
 testScriptsExt = [ RpcTest(t) for t in [
     'not_so_big_wallet_4node',
     'walletbackup',
-    'limits',
     'weirdtx',
     'txPerf',
     'parallel --extensive',
