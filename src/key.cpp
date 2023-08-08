@@ -480,41 +480,75 @@ bool CKey::Load(CPrivKey &privkey, CPubKey &vchPubKey, bool fSkipCheck = false)
     return VerifyPubKey(vchPubKey);
 }
 
-bool CKey::Derive(CKey &keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode &cc) const
+bool CKey::Derive(CKey &keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode &cc, bool _fFalcon) const
 {
-    assert(!fFalcon); // must not be a falcon key
-
-    assert(IsValid());
-    assert(IsCompressed());
-    unsigned char out[64];
-    LockObject(out);
-    if ((nChild >> 31) == 0)
+    if (_fFalcon)
     {
-        CPubKey pubkey = GetPubKey();
-        assert(pubkey.size() == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
-        BIP32Hash(cc, nChild, *pubkey.begin(), pubkey.begin() + 1, out);
+        assert(IsValid());
+        assert(IsCompressed());
+        assert(size() >= 32);
+
+        unsigned char out[64];
+        LockObject(out);
+        CPubKey thisPubKey = GetPubKey();
+        BIP32Hash(cc, nChild, *thisPubKey.begin(), begin(), size(), out);
+
+        uint8_t key[FALCON_PRIVATE_KEY_SIZE];
+        uint8_t pubkey[FALCON_PUBKEY_SIZE];
+        int ret = falcon_create_deterministic_keypair(pubkey, key, out, sizeof(out));
+        if (ret != 0)
+        {
+            keyChild.fValid = false;
+        }
+        else
+        {
+            keyChild.fValid = true;
+        }
+
+        memcpy(ccChild.begin(), out + 32, 32);
+        UnlockObject(out);
+
+        CPubKey pk(pubkey, pubkey + FALCON_PUBKEY_SIZE);
+        keyChild.Set(key, key + FALCON_PRIVATE_KEY_SIZE, pk, pk.IsCompressed());
+        keyChild.fCompressed = true;
+
+        return keyChild.fValid;
     }
     else
     {
-        assert(size() == 32);
-        BIP32Hash(cc, nChild, 0, begin(), out);
+        assert(IsValid());
+        assert(IsCompressed());
+        unsigned char out[64];
+        LockObject(out);
+        if ((nChild >> 31) == 0)
+        {
+            CPubKey pubkey = GetPubKey();
+            assert(pubkey.size() == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+            BIP32Hash(cc, nChild, *pubkey.begin(), pubkey.begin() + 1, 32, out);
+        }
+        else
+        {
+            assert(size() == 32);
+            BIP32Hash(cc, nChild, 0, begin(), 32, out);
+        }
+        memcpy(ccChild.begin(), out + 32, 32);
+        memcpy((unsigned char *)keyChild.begin(), begin(), 32);
+        bool ret = secp256k1_ec_privkey_tweak_add(secp256k1_context_sign, (unsigned char *)keyChild.begin(), out);
+        UnlockObject(out);
+        keyChild.fCompressed = true;
+        keyChild.fValid = ret;
+
+        return ret;
     }
-    memcpy(ccChild.begin(), out + 32, 32);
-    memcpy((unsigned char *)keyChild.begin(), begin(), 32);
-    bool ret = secp256k1_ec_privkey_tweak_add(secp256k1_context_sign, (unsigned char *)keyChild.begin(), out);
-    UnlockObject(out);
-    keyChild.fCompressed = true;
-    keyChild.fValid = ret;
-    return ret;
 }
 
-bool CExtKey::Derive(CExtKey &out, unsigned int _nChild) const
+bool CExtKey::Derive(CExtKey &out, unsigned int _nChild, bool _fFalcon) const
 {
     out.nDepth = nDepth + 1;
     CKeyID id = key.GetPubKey().GetID();
     memcpy(&out.vchFingerprint[0], &id, 4);
     out.nChild = _nChild;
-    return key.Derive(out.key, out.chaincode, _nChild, chaincode);
+    return key.Derive(out.key, out.chaincode, _nChild, chaincode, _fFalcon);
 }
 
 void CExtKey::SetMaster(const unsigned char *seed, unsigned int nSeedLen)

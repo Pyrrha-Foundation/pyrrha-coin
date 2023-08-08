@@ -368,14 +368,13 @@ bool CPubKey::Decompress()
 
 bool CPubKey::Derive(CPubKey &pubkeyChild, ChainCode &ccChild, unsigned int _nChild, const ChainCode &cc) const
 {
-    // must not be a falcon key
-    assert(!fFalcon);
+    assert(!fFalcon); // can not derive pubkeys for falcon512
 
     assert(IsValid());
     assert((_nChild >> 31) == 0);
     assert(size() == COMPRESSED_PUBLIC_KEY_SIZE);
     unsigned char out[64];
-    BIP32Hash(cc, _nChild, *begin(), begin() + 1, out);
+    BIP32Hash(cc, _nChild, *begin(), begin() + 1, 32, out);
     memcpy(ccChild.begin(), out + 32, 32);
     secp256k1_pubkey pubkey;
     if (!secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, &(*this)[0], size()))

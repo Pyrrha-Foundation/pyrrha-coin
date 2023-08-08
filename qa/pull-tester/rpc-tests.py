@@ -219,6 +219,7 @@ testScripts = [ RpcTest(t) for t in [
     'wallet --enableFalcon=1',
     'wallet_watchonly',
     'wallet_hd',
+    'wallet_hd --enableFalcon=1',
     'wallet_dump',
     'listtransactions',
     'receivedby',

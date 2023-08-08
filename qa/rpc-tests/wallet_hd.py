@@ -16,19 +16,25 @@ import logging
 import os
 import shutil
 
-
 class WalletHDTest(BitcoinTestFramework):
 
-    def __init__(self):
-        super().__init__()
-        self.num_nodes = 2
-        self.node_args = [['-usehd=0'], ['-usehd=1', '-keypool=0']]
+    def add_options(self, parser):
+        parser.add_option("--enableFalcon", dest="enableFalcon", default="0", action="store",
+                          help="Choose whether to enable the falcon wallet")
+
+    #def __init__(self):
+    #    super().__init__()
+        #self.num_nodes = 2
+       # self.node_args = [['-usehd=0', '-test.falcon=' + self.options.enableFalcon], ['-usehd=1', '-test.falcon=' + self.options.enableFalcon, '-keypool=0']]
 
     def setup_chain(self,bitcoinConfDict=None, wallets=None):
         logging.info ("Initializing test directory "+self.options.tmpdir)
         initialize_chain_clean(self.options.tmpdir, 2)
 
     def setup_network(self):
+        self.num_nodes = 2
+        self.node_args = [['-usehd=0', '-test.falcon=' + self.options.enableFalcon], ['-usehd=1', '-test.falcon=' + self.options.enableFalcon, '-keypool=0']]
+
         self.nodes = start_nodes(self.num_nodes, self.options.tmpdir, self.node_args)
         self.is_network_split = False
         connect_nodes_bi(self.nodes, 0, 1)
@@ -39,6 +45,14 @@ class WalletHDTest(BitcoinTestFramework):
         # Make sure we use hd, keep masterkeyid
         masterkeyid = self.nodes[1].getwalletinfo()['hdmasterkeyid']
         assert_equal(len(masterkeyid), 40)
+
+        # Check wallet type
+        walletType = "" 
+        if (self.options.enableFalcon == "1"):
+            walletType = "Falcon"
+        else:
+            walletType = "Standard"
+        assert_equal(self.nodes[1].getwalletinfo()['hdwallettype'], walletType);
 
         # Import a non-HD private key in the HD wallet
         non_hd_add = self.nodes[0].getnewaddress()
@@ -89,6 +103,25 @@ class WalletHDTest(BitcoinTestFramework):
         stop_node(self.nodes[1], 1)
         self.nodes[1] = start_node(1, self.options.tmpdir, self.node_args[1] + ['-rescan'])
         assert_equal(self.nodes[1].getbalance(), (num_hd_adds * 1000000) + 1000000)
+
+        # If the wallet was previously created as a falcon wallet then launch it as a non-falcon wallet and
+        # similarly if it was created as a non-falcon wallet then launch it as a falcon wallet.  It should
+        # not be possible in either case.
+        logging.info("Launch with incorrect HD type ...")
+        stop_node(self.nodes[1], 1)
+        enableFalcon = "0"
+        if (self.options.enableFalcon == "1"):
+            enableFalcon = "0"
+        else:
+            enableFalcon = "1"
+        
+        try:
+            self.nodes[1] = start_node(1, self.options.tmpdir, ['-test.falcon=' + enableFalcon])
+            raise AssertionError("Incorrect HD wallet type was launched without error")
+        except:
+            # PASSED - node should not have started.
+            logging.info("   PASSED: Launch failed as expected")
+
 
         # cleanup backup file
         os.remove(tmpdir + "hd.bak")

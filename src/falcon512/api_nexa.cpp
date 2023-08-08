@@ -12,7 +12,7 @@
 
 int falcon_create_deterministic_keypair(uint8_t *pk, uint8_t *sk, uint8_t *seed, uint16_t len)
 {
-    assert(len == 48);
+    assert(len >= 48);
 
     // Begin key pair section using the seed deteministic seed we created.
     union {

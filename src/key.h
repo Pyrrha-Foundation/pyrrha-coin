@@ -318,7 +318,11 @@ public:
     bool SignCompact(const uint256 &hash, std::vector<unsigned char> &vchSig) const;
 
     //! Derive BIP32 child key.
-    bool Derive(CKey &keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode &cc) const;
+    bool Derive(CKey &keyChild,
+        ChainCode &ccChild,
+        unsigned int nChild,
+        const ChainCode &cc,
+        bool _fFalcon = false) const;
 
     /**
      * Verify thoroughly whether a private key and a public key match.
@@ -350,7 +354,7 @@ struct CExtKey
 
     void Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const;
     void Decode(const unsigned char code[BIP32_EXTKEY_SIZE]);
-    bool Derive(CExtKey &out, unsigned int nChild) const;
+    bool Derive(CExtKey &out, unsigned int nChild, bool _fFalcon = false) const;
     CExtPubKey Neuter() const;
     void SetMaster(const unsigned char *seed, unsigned int nSeedLen);
     template <typename Stream>

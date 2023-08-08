@@ -3052,9 +3052,12 @@ UniValue getwalletinfo(const UniValue &params, bool fHelp)
     if (pwalletMain->IsCrypted())
         obj.pushKV("unlocked_until", nWalletUnlockTime);
     obj.pushKV("paytxfee", CFeeRate(payTxFeeTweak.Value()).GetFeePerK());
-    CKeyID masterKeyID = pwalletMain->GetHDChain().masterKeyID;
-    if (!masterKeyID.IsNull())
-        obj.pushKV("hdmasterkeyid", masterKeyID.GetHex());
+    CHDChain hdChain = pwalletMain->GetHDChain();
+    if (!hdChain.masterKeyID.IsNull())
+    {
+        obj.pushKV("hdmasterkeyid", hdChain.masterKeyID.GetHex());
+        obj.pushKV("hdwallettype", hdChain.fFalcon ? "Falcon" : "Standard");
+    }
     return obj;
 }
 
