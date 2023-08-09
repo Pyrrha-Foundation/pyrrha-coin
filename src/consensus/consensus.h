@@ -35,8 +35,6 @@ static const uint64_t DEFAULT_LARGEST_BLOCKSIZE_POSSIBLE = 1000 * ONE_MEGABYTE;
 
 /** The maximum allowed number of signature check operations in a 1MB block (network rule), and the suggested max sigops
  * per (MB rounded up) in blocks > 1MB. */
-static const unsigned int MAX_BLOCK_SIGOPS_PER_MB = 20000;
-static const unsigned int MAX_TX_SIGOPS_COUNT = 20000;
 static const unsigned int MAX_TX_SIGCHECK_COUNT = 3000;
 /** The maximum suggested length of a transaction */
 static const unsigned int DEFAULT_LARGEST_TRANSACTION = ONE_MEGABYTE;
@@ -90,13 +88,6 @@ static const uint16_t COINBASE_RESERVED_SIGOPS = 100;
  * many block bytes per sigcheck. (network rule).
  */
 static const uint16_t BLOCK_SIGCHECKS_RATIO = 141;
-
-/** Compute the maximum sigops allowed in a block given the block size. */
-inline uint64_t GetMaxBlockSigOpsCount(uint64_t nBlockSize)
-{
-    auto nMbRoundedUp = 1 + ((nBlockSize - 1) / 1000000);
-    return nMbRoundedUp * MAX_BLOCK_SIGOPS_PER_MB;
-}
 
 /**
  * Compute the maximum number of sigchecks that can be contained in a block
