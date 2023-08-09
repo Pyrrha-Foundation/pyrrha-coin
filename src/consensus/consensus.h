@@ -79,9 +79,6 @@ static const uint32_t MANDATORY_SCRIPT_VERIFY_FLAGS = SCRIPT_VERIFY_P2SH |
 
 /* clang-format on */
 
-/** Number of sigops to reserve for coinbase transaction */
-static const uint16_t COINBASE_RESERVED_SIGOPS = 100;
-
 /**
  * The ratio between the maximum allowable block size and the maximum allowable
  * SigChecks (executed signature check operations) in the block, or in other words, how
@@ -98,9 +95,6 @@ static const uint16_t BLOCK_SIGCHECKS_RATIO = 141;
  */
 inline uint64_t GetMaxBlockSigChecks(uint64_t nBlockSize)
 {
-    static_assert(
-        DEFAULT_NEXT_MAX_BLOCK_SIZE / BLOCK_SIGCHECKS_RATIO >= COINBASE_RESERVED_SIGOPS, "enough sigops for coinbase");
-
     if (maxSigChecks.Value() > 0)
         return maxSigChecks.Value();
     if (!nextMaxBlockSize.Value())
