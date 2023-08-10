@@ -137,23 +137,6 @@ unsigned int GetLegacySigOpCount(const CTransactionRef tx, const uint32_t flags)
     return nSigOps;
 }
 
-unsigned int GetP2SHSigOpCount(const CTransactionRef tx, const CCoinsViewCache &inputs, const uint32_t flags)
-{
-    if ((flags & SCRIPT_VERIFY_P2SH) == 0 || tx->IsCoinBase())
-        return 0;
-
-    unsigned int nSigOps = 0;
-    {
-        for (unsigned int i = 0; i < tx->vin.size(); i++)
-        {
-            CoinAccessor coin(inputs, tx->vin[i].prevout);
-            if (coin && coin->out.scriptPubKey.IsPayToScriptHash())
-                nSigOps += coin->out.scriptPubKey.GetSigOpCount(flags, tx->vin[i].scriptSig);
-        }
-    }
-    return nSigOps;
-}
-
 bool ContextualCheckTransaction(const CTransactionRef tx,
     CValidationState &state,
     CBlockIndex *const pindexPrev,
@@ -373,7 +356,7 @@ bool Consensus::CheckTxInputs(const CTransactionRef tx,
     return true;
 }
 
-uint64_t GetTransactionSigOpCount(const CTransactionRef ptx, const CCoinsViewCache &coins, const uint32_t flags)
+uint64_t GetTransactionSigOpCount(const CTransactionRef ptx, const uint32_t flags)
 {
-    return GetLegacySigOpCount(ptx, flags) + GetP2SHSigOpCount(ptx, coins, flags);
+    return GetLegacySigOpCount(ptx, flags);
 }
