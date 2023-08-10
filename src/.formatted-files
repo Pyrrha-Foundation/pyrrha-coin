@@ -374,7 +374,6 @@ test/rpc_tests.cpp
 test/sanity_tests.cpp
 test/scriptnum10.h
 test/scriptnum_tests.cpp
-test/script_P2SH_tests.cpp
 test/script_bitfield_tests.cpp
 test/script_tests.cpp
 test/scripttemplate_tests.cpp
