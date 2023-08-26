@@ -132,6 +132,7 @@ class TxnDoubleSpendTest(BitcoinTestFramework):
             assert(False)
         
         # Check balances. The txn just received should intially show in the unconfirmed balance
+        waitFor(instantTxnDelay, lambda: self.nodes[1].getwalletinfo()["unconfirmed_balance"] == 5000000)
         balance = self.nodes[1].getwalletinfo()["balance"]
         unconfirmed_balance = self.nodes[1].getwalletinfo()["unconfirmed_balance"]
         immature_balance = self.nodes[1].getwalletinfo()["immature_balance"]
