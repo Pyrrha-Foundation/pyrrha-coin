@@ -180,10 +180,10 @@ BOOST_AUTO_TEST_CASE(GetTxSigOpCost)
         // scriptPubKeys of a transaction and does not take the actual executed
         // sig operations into account. spendingTx in itself does not contain a
         // signature operation.
-        BOOST_CHECK_EQUAL(GetTransactionSigOpCount(MakeTransactionRef(CTransaction(spendingTx)), coins, flags), 0ULL);
+        BOOST_CHECK_EQUAL(GetTransactionSigOpCount(MakeTransactionRef(CTransaction(spendingTx)), flags), 0ULL);
         // creationTx contains two signature operations in its scriptPubKey, but
         // legacy counting is not accurate.
-        BOOST_CHECK_EQUAL(GetTransactionSigOpCount(MakeTransactionRef(CTransaction(creationTx)), coins, flags),
+        BOOST_CHECK_EQUAL(GetTransactionSigOpCount(MakeTransactionRef(CTransaction(creationTx)), flags),
             static_cast<unsigned long long>(MAX_PUBKEYS_PER_MULTISIG));
         // Sanity check: script verification fails because of an invalid
         // signature.
@@ -192,31 +192,9 @@ BOOST_AUTO_TEST_CASE(GetTxSigOpCost)
         // Make sure non P2SH sigops are counted even if the flag for P2SH is
         // not passed in.
         BOOST_CHECK_EQUAL(
-            GetTransactionSigOpCount(MakeTransactionRef(CTransaction(spendingTx)), coins, SCRIPT_VERIFY_NONE), 0ULL);
-        BOOST_CHECK_EQUAL(
-            GetTransactionSigOpCount(MakeTransactionRef(CTransaction(creationTx)), coins, SCRIPT_VERIFY_NONE),
+            GetTransactionSigOpCount(MakeTransactionRef(CTransaction(spendingTx)), SCRIPT_VERIFY_NONE), 0ULL);
+        BOOST_CHECK_EQUAL(GetTransactionSigOpCount(MakeTransactionRef(CTransaction(creationTx)), SCRIPT_VERIFY_NONE),
             static_cast<unsigned long long>(MAX_PUBKEYS_PER_MULTISIG));
-    }
-
-    // Multisig nested in P2SH
-    {
-        std::string popNetwork = Params().NetworkIDString();
-        SelectParams("regtest"); // P2SH disabled on nexa mainnet
-
-        CScript redeemScript = CScript() << 1 << ToByteVector(pubkey) << ToByteVector(pubkey) << 2
-                                         << OP_CHECKMULTISIGVERIFY;
-        CScript scriptPubKey = GetScriptForDestination(CScriptID(redeemScript));
-        CScript scriptSig = CScript() << OP_0 << OP_1 << ToByteVector(redeemScript);
-
-        BuildTxs(spendingTx, coins, creationTx, scriptPubKey, scriptSig);
-        BOOST_CHECK_EQUAL(GetTransactionSigOpCount(MakeTransactionRef(CTransaction(spendingTx)), coins, flags), 2ULL);
-        BOOST_CHECK_EQUAL(VerifyWithFlag(CTransaction(creationTx), spendingTx, flags), SCRIPT_ERR_CHECKMULTISIGVERIFY);
-
-        // Make sure P2SH sigops are not counted if the flag for P2SH is not
-        // passed in.
-        BOOST_CHECK_EQUAL(
-            GetTransactionSigOpCount(MakeTransactionRef(CTransaction(spendingTx)), coins, SCRIPT_VERIFY_NONE), 0ULL);
-        SelectParams(popNetwork); // P2SH disabled on nexa mainnet
     }
 }
 
