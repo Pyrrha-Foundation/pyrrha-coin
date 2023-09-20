@@ -974,7 +974,7 @@ SLAPI int signMessage(const unsigned char *message,
 
     checkSigInit();
 
-    CKey key = LoadKey((const unsigned char *)secret);
+    CKey key = LoadKey((const unsigned char *)secret, false);
 
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic << std::vector<unsigned char>(message, message + msgLen);
