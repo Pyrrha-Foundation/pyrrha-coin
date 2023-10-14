@@ -2144,6 +2144,85 @@ bool ScriptMachine::Step()
                 }
                 break;
 
+                // assembles a minimally serialized data blob from N elements on stack, if N is positive
+                // splits a data blob on stack into N elements and remainder, if N is negative
+                // splits entire data blob on stack into elements and pushes the count of elements onto stack, if N is zero
+                case OP_CONVERT:
+                {
+                    if (stack.size() < 2)
+                    {
+                        return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION);
+                    }
+
+                    const int64_t count = stackItemAt(-1).asInt64(fRequireMinimal);
+                    popstack(stack);
+
+                    if (count <= 0) {
+                        if (!stackItemAt(-1).isVch())
+                        {
+                            return set_error(serror, SCRIPT_ERR_BAD_OPERATION_ON_TYPE);
+                        }
+
+                        const valtype code = stacktop(-1);
+                        const CScript resultScript = CScript(code.begin(), code.end());
+                        popstack(stack);
+
+                        opcodetype opcodeRet;
+                        StackItem itemRet;
+                        int32_t readCount = 0;
+                        const int64_t absCount = -1 * count;
+
+                        CScript::const_iterator scriptIter = resultScript.begin();
+                        while (scriptIter < resultScript.end())
+                        {
+                            resultScript.GetOp(scriptIter, opcodeRet, itemRet);
+                            readCount++;
+                            stack.push_back(itemRet);
+
+                            if (absCount && readCount == absCount)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (scriptIter != resultScript.end())
+                        {
+                            // we did not consume entire data
+                            // push the rest of data to stack
+                            stack.push_back(StackItem(scriptIter, resultScript.end()));
+                        }
+
+                        if (readCount < absCount)
+                        {
+                            // not enough chunks provided, expected more
+                            return set_error(serror, SCRIPT_ERR_INVALID_NUMBER_RANGE);
+                        }
+
+                        if (absCount == 0)
+                        {
+                            // push the amount of elements
+                            stack.push_back(CScriptNum::fromIntUnchecked(readCount).getvch());
+                        }
+                    }
+                    else
+                    {
+                        if (stack.size() < (size_t) count)
+                        {
+                            return set_error(serror, SCRIPT_ERR_STACK_SIZE);
+                        }
+
+                        CScript resultScript;
+                        for (int64_t i = 0; i < count; i++)
+                        {
+                            resultScript << stackItemAt(-1).asVch();
+                            popstack(stack);
+                        }
+
+                        stack.push_back(StackItem(resultScript.begin(), resultScript.end()));
+                    }
+                }
+                break;
+
                 default:
                     LOG(SCRIPT, "Unknown opcode rejected %d", opcode);
                     return set_error(serror, SCRIPT_ERR_BAD_OPCODE);

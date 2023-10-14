@@ -304,6 +304,8 @@ const char *GetOpName(opcodetype opcode)
         break;
 
     // NEXA opcodes
+    case OP_CONVERT:
+        return "OP_CONVERT";
     case OP_PLACE:
         return "OP_PLACE";
     case OP_PUSH_TX_STATE:
