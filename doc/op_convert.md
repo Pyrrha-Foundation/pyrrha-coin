@@ -50,9 +50,9 @@ Assuming the opcodes read and executed by VM left to right and stack elements lo
 * `<02f00d> OP_2 OP_CONVERT -> fail` // 2 chunks expected, 1 chunk provided
 * `OP_1 OP_2 OP_CONVERT -> fail` // 2 items expected to be encoded, 1 item on stack provided
 * `<02f00d02beef02feed> OP_0 OP_CONVERT -> OP_3 <feed> <beef> <f00d>` // parsed all, pared item count on top of the stack
-* `<02f00d02beef02feed> OP_3 OP_CONVERT -> <feed> <beef> <f00d>` // parsed all requested items
+* `<02f00d02beef02feed> OP_3 OP_NEGATE OP_CONVERT -> <feed> <beef> <f00d>` // parsed all requested items
 * `<02f00d02beef02feed> OP_1NEGATE OP_CONVERT -> <02beef02feed> <f00d>` // parse 1 item from data, unparsed remainder is left on top of the stack
-* `OP_1 OP_0 OP_1NEGATE <"AB"> OP_4 OPCONVERT -> <0241424f0051>` // encode various data primitives into minimally encoded data blob
+* `OP_1 OP_0 OP_1NEGATE <"AB"> OP_4 OP_CONVERT -> <0241424f0051>` // encode various data primitives into minimally encoded data blob
 * `OP_1 OP_0 <"AB"> OP_2 OP_CONVERT -> <02414200> OP_1` // 2 items out of 3 are encoded, 1 is left on stack
 * `OP_1 OP_0 <"AB"> OP_1 OP_CONVERT -> <024142> OP_0 OP_1` // 1 item out of 3 is encoded, 2 are left on stack
 * `<02f00d02beef02feed> OP_0 OP_CONVERT OP_CONVERT -> <02feed02beef02f00d>` // inversion of OP_CONVERT results in the inverted data blob compared to initial data blob
