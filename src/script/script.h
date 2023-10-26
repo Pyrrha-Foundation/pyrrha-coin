@@ -280,6 +280,7 @@ enum opcodetype
     OP_NATIVE_INTROSPECTION_RESERVED2 = 0xcf,
 
     // NEXA opcodes
+    OP_MERKLE = 0xe7,
     OP_PLACE = 0xe9,
     OP_PUSH_TX_STATE = 0xea,
     OP_SETBMD = 0xeb,
