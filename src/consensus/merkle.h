@@ -237,7 +237,7 @@ bool Merkle<Hasher, Uint>::ValidateMerkleProof(const Uint &root, const Uint &lea
 typedef Merkle<CHash256, uint256> MerkleHash256;
 typedef Merkle<CHash160, uint160> MerkleHash160;
 
-const auto& ComputeMerkleBranch = MerkleHash256::ComputeMerkleBranch;
-const auto& ComputeMerkleRootFromBranch = MerkleHash256::ComputeMerkleRootFromBranch;
+inline const auto& ComputeMerkleBranch = MerkleHash256::ComputeMerkleBranch;
+inline const auto& ComputeMerkleRootFromBranch = MerkleHash256::ComputeMerkleRootFromBranch;
 
 #endif // NEXA_CONSENSUS_MERKLE_H

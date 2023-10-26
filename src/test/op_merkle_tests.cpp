@@ -4,12 +4,15 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "consensus/merkle.h"
+#include "core_io.h"
 #include "test/test_nexa.h"
 #include "utilstrencodings.h"
 
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <iostream>
+#include <fstream>
 
 template <unsigned int BITS>
 std::string hex(base_blob<BITS> blob) {
@@ -238,7 +241,7 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
         BOOST_CHECK(ret);
     }
 
-    // fail, wrong merkle proof
+    // fail, wrong merkle proof for element at index 1
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
@@ -298,12 +301,58 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
         BOOST_CHECK(ret);
     }
 
-    // fail, wrong merkle proof
+    // fail, wrong merkle proof for element at index 1
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
           root << ParseHex(proof) <<
           OP_1 << ParseHex("c455341393a77a07669232bbb39d84eb80c9723c5a2a76118b6e48de818a922e") << OP_0 << OP_MERKLE <<
+          OP_1 << OP_EQUALVERIFY << OP_1;
+
+        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
+        BOOST_CHECK(!ret);
+        BOOST_CHECK(error == SCRIPT_ERR_EQUALVERIFY);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(block_tx_proof_test) {
+    std::ifstream blockData("src/test/data/block_391502.hex");
+    std::string blockHex((std::istreambuf_iterator<char>(blockData)),
+        (std::istreambuf_iterator<char>()));
+
+    CBlock block;
+    DecodeHexBlk(block, blockHex);
+    const uint256 root = BlockMerkleRoot(block);
+    BOOST_CHECK(root == block.hashMerkleRoot);
+    const std::vector<uint256> blockMerkleBranch = BlockMerkleBranch(block, 0);
+    std::string proof = "";
+    for (const auto& element : blockMerkleBranch) {
+        proof += hex(element);
+    }
+
+    auto flags = MANDATORY_SCRIPT_VERIFY_FLAGS;
+    ScriptImportedState sis; // no imported state
+    ScriptError error;
+    bool ret;
+
+    // ok, valid merkle proof
+    {
+        CScript scriptSig = CScript();
+        CScript scriptPubKey = CScript() <<
+          ParseHex(hex(root)) << ParseHex(proof) <<
+          OP_0 << ParseHex(hex(block.vtx[0]->GetId())) << OP_0 << OP_MERKLE <<
+          OP_1 << OP_EQUALVERIFY << OP_1;
+
+        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
+        BOOST_CHECK(ret);
+    }
+
+    // fail, wrong merkle proof for element at index 1
+    {
+        CScript scriptSig = CScript();
+        CScript scriptPubKey = CScript() <<
+          root << ParseHex(proof) <<
+          OP_1 << ParseHex(hex(block.vtx[0]->GetId())) << OP_0 << OP_MERKLE <<
           OP_1 << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
