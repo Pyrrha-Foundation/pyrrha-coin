@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("14253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
           ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
           ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << OP_EQUALVERIFY << OP_1;
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("14253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
           ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_10 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1NEGATE <<
+          ParseHex("14253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1NEGATE <<
           ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("14253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
           ParseHex("") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("14253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
           ParseHex("beef") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
@@ -147,16 +147,28 @@ BOOST_AUTO_TEST_CASE(validations_test) {
         BOOST_CHECK(error == SCRIPT_ERR_INVALID_OPERAND_SIZE);
     }
 
-    // fail, leaf size not multiple of hash size
+    // fail, proof element size not 160 bit
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("beef") << OP_1 <<
+          ParseHex("02beef") << OP_1 <<
           ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
         BOOST_CHECK(error == SCRIPT_ERR_INVALID_OPERAND_SIZE);
+    }
+
+    // fail, serialized proof is not pushonly contains an opcode
+    {
+        CScript scriptSig = CScript();
+        CScript scriptPubKey = CScript() <<
+          ParseHex("6a253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
+
+        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
+        BOOST_CHECK(!ret);
+        BOOST_CHECK(error == SCRIPT_ERR_BAD_OPERATION_ON_TYPE);
     }
 }
 
@@ -183,7 +195,7 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
     std::vector<uint160> mklProof = MerkleHash160::ComputeMerkleBranch(leaves, 0);
     std::string proof = "";
     for (const auto& element : mklProof) {
-        proof += hex(element);
+        proof += "14" + hex(element);
     }
 
     const uint160 root = MerkleHash160::ComputeMerkleRootFromBranch(leaves[0], mklProof, 0);
@@ -243,7 +255,7 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
     std::vector<uint256> mklProof = MerkleHash256::ComputeMerkleBranch(leaves, 0);
     std::string proof = "";
     for (const auto& element : mklProof) {
-        proof += hex(element);
+        proof += "20" + hex(element);
     }
 
     const uint256 root = MerkleHash256::ComputeMerkleRootFromBranch(leaves[0], mklProof, 0);
@@ -292,7 +304,7 @@ BOOST_AUTO_TEST_CASE(block_tx_proof_test) {
     const std::vector<uint256> blockMerkleBranch = BlockMerkleBranch(block, 0);
     std::string proof = "";
     for (const auto& element : blockMerkleBranch) {
-        proof += hex(element);
+        proof += "20" + hex(element);
     }
 
     auto flags = MANDATORY_SCRIPT_VERIFY_FLAGS;

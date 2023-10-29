@@ -2134,11 +2134,11 @@ bool ScriptMachine::Step()
                 // algoIndex selects the hashing function used to build the tree, also the size of elements
                 //   algoIndex == 0 -> Hash256 and 32 byte long elements
                 //   algoIndex == 1 -> Hash160 and 20 byte long elements
-                // leaf is the element for which the root shall be computed, properly sized
+                // leaf is the element for which the root shall be computed, must be properly sized
                 // leafIndex is the element index from which the proof was built
                 //   and for which the root computation shall be made
-                // proof0proof1proofN is a byte sequence built by concatenation of all proof elements,
-                //   must not be zero, must be sized in multiples of the element size
+                // proof0proof1proofN serialized push-only encoded Merkle proof
+                //   must not be zero length, must be properly sized
                 case OP_MERKLE:
                 {
                     if (stack.size() < 4)
@@ -2160,7 +2160,7 @@ bool ScriptMachine::Step()
 
                     const size_t leafSize = algoIndex == 0 ? sizeof(uint256) : sizeof(uint160);
                     if (leaf.size() != leafSize ||
-                        !proof.size() || proof.size() % leafSize != 0)
+                        !proof.size() || (proof.size() % (leafSize + 1)) != 0)
                     {
                         return set_error(serror, SCRIPT_ERR_INVALID_OPERAND_SIZE);
                     }

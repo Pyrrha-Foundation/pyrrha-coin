@@ -218,15 +218,32 @@ Uint Merkle<Hasher, Uint>::ComputeMerkleRootFromBranch(const Uint &leaf, const s
     return hash;
 }
 
-/* Given the serialized Merkle proof, return the vector of proof elements, aka Merkle branch
+/* Given the serialized push-only encoded Merkle proof, return the vector of proof elements, aka Merkle branch
  * Helper function for OP_MERKLE
 */
 template <typename Uint>
 inline std::vector<Uint> RawProofToBranch(const VchType &proof) {
   std::vector<Uint> branch;
-  branch.reserve(proof.size() / sizeof(Uint));
-  for (auto it = proof.begin(); it < proof.end(); it += sizeof(Uint)) {
-      branch.emplace_back(Uint(&(*it)));
+
+  // assumption of data push size of 1 is fine even for 512 bit hashes
+  branch.reserve(proof.size() / (sizeof(Uint) + 1));
+
+  const CScript script = CScript(proof.begin(), proof.end());
+
+  opcodetype opcodeRet;
+  VchType itemRet;
+  CScript::const_iterator scriptIter = script.begin();
+  while (scriptIter < script.end())
+  {
+      script.GetOp(scriptIter, opcodeRet, itemRet);
+
+      // an optimization over Script.IsPushOnly() which does analyse the entire script
+      if (opcodeRet > OP_16)
+      {
+          throw BadOpOnType("Not push only");
+      }
+
+      branch.emplace_back(Uint(itemRet));
   }
 
   return branch;
