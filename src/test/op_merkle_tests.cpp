@@ -74,36 +74,25 @@ BOOST_AUTO_TEST_CASE(validations_test) {
         BOOST_CHECK(error == SCRIPT_ERR_INVALID_STACK_OPERATION);
     }
 
-    // fail, invalid amount of arguments (4)
+    // ok, valid amount of arguments (4), negative result
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
+          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
+          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
-        BOOST_CHECK(error == SCRIPT_ERR_INVALID_STACK_OPERATION);
-    }
-
-    // ok, valid amount of arguments (5), negative result
-    {
-        CScript scriptSig = CScript();
-        CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
-          OP_0 << OP_EQUALVERIFY << OP_1;
-
-        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
-        BOOST_CHECK(ret);
+        BOOST_CHECK(error == SCRIPT_ERR_EQUALVERIFY);
     }
 
     // fail, unknown algo index
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_10 << OP_MERKLE;
+          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_10 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -114,8 +103,8 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1NEGATE << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
+          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1NEGATE <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -126,8 +115,8 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("") << OP_1 << OP_MERKLE;
+          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -138,8 +127,8 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("beef") << OP_1 << OP_MERKLE;
+          ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") << OP_1 <<
+          ParseHex("beef") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -150,8 +139,8 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
+          ParseHex("") << OP_1 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -162,32 +151,8 @@ BOOST_AUTO_TEST_CASE(validations_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex("d008eb3373fe5dc992bd2c2dfe40cc7181ba29cd") << ParseHex("beef") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
-
-        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
-        BOOST_CHECK(!ret);
-        BOOST_CHECK(error == SCRIPT_ERR_INVALID_OPERAND_SIZE);
-    }
-
-    // fail, root size 0
-    {
-        CScript scriptSig = CScript();
-        CScript scriptPubKey = CScript() <<
-          ParseHex("0") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
-
-        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
-        BOOST_CHECK(!ret);
-        BOOST_CHECK(error == SCRIPT_ERR_INVALID_OPERAND_SIZE);
-    }
-
-    // fail, root size not multiple of hash size
-    {
-        CScript scriptSig = CScript();
-        CScript scriptPubKey = CScript() <<
-          ParseHex("beef") << ParseHex("253dd43e0a12ebcc6cd6bb76289460a61d512a06") <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
+          ParseHex("beef") << OP_1 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -233,9 +198,9 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex(hex(root)) << ParseHex(proof) <<
-          OP_0 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
-          OP_1 << OP_EQUALVERIFY << OP_1;
+          ParseHex(proof) << OP_0 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(ret);
@@ -245,9 +210,9 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          root << ParseHex(proof) <<
-          OP_1 << ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
-          OP_1 << OP_EQUALVERIFY << OP_1;
+          ParseHex(proof) << OP_1 <<
+          ParseHex("f833e698fb72f2e6a096dca1c0a6d4ac6930b37b") << OP_1 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -293,9 +258,9 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex(hex(root)) << ParseHex(proof) <<
-          OP_0 << ParseHex("c455341393a77a07669232bbb39d84eb80c9723c5a2a76118b6e48de818a922e") << OP_0 << OP_MERKLE <<
-          OP_1 << OP_EQUALVERIFY << OP_1;
+          ParseHex(proof) << OP_0 <<
+          ParseHex("c455341393a77a07669232bbb39d84eb80c9723c5a2a76118b6e48de818a922e") << OP_0 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(ret);
@@ -305,9 +270,9 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          root << ParseHex(proof) <<
-          OP_1 << ParseHex("c455341393a77a07669232bbb39d84eb80c9723c5a2a76118b6e48de818a922e") << OP_0 << OP_MERKLE <<
-          OP_1 << OP_EQUALVERIFY << OP_1;
+          ParseHex(proof) << OP_1 <<
+          ParseHex("c455341393a77a07669232bbb39d84eb80c9723c5a2a76118b6e48de818a922e") << OP_0 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
@@ -339,9 +304,9 @@ BOOST_AUTO_TEST_CASE(block_tx_proof_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          ParseHex(hex(root)) << ParseHex(proof) <<
-          OP_0 << ParseHex(hex(block.vtx[0]->GetId())) << OP_0 << OP_MERKLE <<
-          OP_1 << OP_EQUALVERIFY << OP_1;
+          ParseHex(proof) << OP_0 <<
+          ParseHex(hex(block.vtx[0]->GetId())) << OP_0 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(ret);
@@ -351,9 +316,9 @@ BOOST_AUTO_TEST_CASE(block_tx_proof_test) {
     {
         CScript scriptSig = CScript();
         CScript scriptPubKey = CScript() <<
-          root << ParseHex(proof) <<
-          OP_1 << ParseHex(hex(block.vtx[0]->GetId())) << OP_0 << OP_MERKLE <<
-          OP_1 << OP_EQUALVERIFY << OP_1;
+          ParseHex(proof) << OP_1 <<
+          ParseHex(hex(block.vtx[0]->GetId())) << OP_0 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
 
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);

@@ -59,7 +59,6 @@ public:
   }
   static std::vector<Uint> ComputeMerkleBranch(const std::vector<Uint> &leaves, uint32_t position);
   static Uint ComputeMerkleRootFromBranch(const Uint &leaf, const std::vector<Uint> &branch, uint32_t position);
-  static bool ValidateMerkleProof(const Uint &root, const Uint &leaf, const VchType &proof, uint32_t position);
 };
 
 /* This implements a constant-space merkle root/path calculator, limited to 2^32 leaves.
@@ -219,19 +218,18 @@ Uint Merkle<Hasher, Uint>::ComputeMerkleRootFromBranch(const Uint &leaf, const s
     return hash;
 }
 
-/* Given the Merkle branch, leaf and it position, validate computed merkle root against provided value
-   Helper function for OP_MERKLE
+/* Given the serialized Merkle proof, return the vector of proof elements, aka Merkle branch
+ * Helper function for OP_MERKLE
 */
-template <typename Hasher, typename Uint>
-bool Merkle<Hasher, Uint>::ValidateMerkleProof(const Uint &root, const Uint &leaf, const VchType &proof, uint32_t position)
-{
+template <typename Uint>
+inline std::vector<Uint> RawProofToBranch(const VchType &proof) {
   std::vector<Uint> branch;
   branch.reserve(proof.size() / sizeof(Uint));
   for (auto it = proof.begin(); it < proof.end(); it += sizeof(Uint)) {
       branch.emplace_back(Uint(&(*it)));
   }
-  const Uint computedRoot = Merkle<Hasher, Uint>::ComputeMerkleRootFromBranch(Uint(leaf), branch, position);
-  return computedRoot == root;
+
+  return branch;
 }
 
 typedef Merkle<CHash256, uint256> MerkleHash256;
