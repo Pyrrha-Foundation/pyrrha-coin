@@ -10,6 +10,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -23,7 +24,6 @@ std::string hex(base_blob<BITS> blob) {
 BOOST_FIXTURE_TEST_SUITE(op_merkle_tests, BasicTestingSetup)
 
 // call signature: <ROOT> <proof0proof1proofN> <leafIndex> <leaf> <algoIndex> OP_MERKLE
-
 BOOST_AUTO_TEST_CASE(validations_test) {
     auto flags = MANDATORY_SCRIPT_VERIFY_FLAGS;
     ScriptImportedState sis; // no imported state
@@ -190,6 +190,7 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
       uint160(ParseHex("a3fcfef1e79294dcf6bf4ee4edacf4f608bc30e4")),
       uint160(ParseHex("3f0c508ed723a34238550f0cbce609ab59e9ab31")),
       uint160(ParseHex("fb47813521c6e9a4f9c7d8e0c0c49de6ab7d6e25")),
+      uint160(ParseHex("0000000000000000000000000000000000000000")),
     };
 
     std::vector<uint160> mklProof = MerkleHash160::ComputeMerkleBranch(leaves, 0);
@@ -198,7 +199,7 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
         proof += "14" + hex(element);
     }
 
-    const uint160 root = MerkleHash160::ComputeMerkleRootFromBranch(leaves[0], mklProof, 0);
+    uint160 root = MerkleHash160::ComputeMerkleRootFromBranch(leaves[0], mklProof, 0);
 
 
     auto flags = MANDATORY_SCRIPT_VERIFY_FLAGS;
@@ -229,6 +230,28 @@ BOOST_AUTO_TEST_CASE(hash160_test) {
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
         BOOST_CHECK(error == SCRIPT_ERR_EQUALVERIFY);
+    }
+
+    // get compact proof for 17th element in the tree
+    mklProof = MerkleHash160::ToCompactProof(MerkleHash160::ComputeMerkleBranch(leaves, 16), 16);
+    BOOST_CHECK(mklProof.size() == 1);
+    proof = "";
+    for (const auto& element : mklProof) {
+        proof += "14" + hex(element);
+    }
+
+    root = MerkleHash160::ComputeMerkleRootFromBranch(leaves[16], mklProof, 16);
+
+    // ok, valid compact merkle proof
+    {
+        CScript scriptSig = CScript();
+        CScript scriptPubKey = CScript() <<
+          ParseHex(proof) << OP_0 <<
+          ParseHex("0000000000000000000000000000000000000000") << OP_1 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
+
+        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
+        BOOST_CHECK(ret);
     }
 }
 
@@ -250,6 +273,7 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
       uint256(ParseHex("318462e5a7404accdb9b28dc0a3dbca2baa69b475bfe7aac6fb42c4ccd6f7cbf")),
       uint256(ParseHex("201754330c34f188a46e27b61be81747e092a60762f29fc39d378adaf2ccb4c9")),
       uint256(ParseHex("56b015d4e588622c0b8f5737ca2089395f90d130fcd890769676ae7a23c9d1eb")),
+      uint256(ParseHex("0000000000000000000000000000000000000000000000000000000000000000")),
     };
 
     std::vector<uint256> mklProof = MerkleHash256::ComputeMerkleBranch(leaves, 0);
@@ -258,7 +282,7 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
         proof += "20" + hex(element);
     }
 
-    const uint256 root = MerkleHash256::ComputeMerkleRootFromBranch(leaves[0], mklProof, 0);
+    uint256 root = MerkleHash256::ComputeMerkleRootFromBranch(leaves[0], mklProof, 0);
 
 
     auto flags = MANDATORY_SCRIPT_VERIFY_FLAGS;
@@ -289,6 +313,28 @@ BOOST_AUTO_TEST_CASE(hash256_test) {
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
         BOOST_CHECK(error == SCRIPT_ERR_EQUALVERIFY);
+    }
+
+    // get compact proof for 17th element in the tree
+    mklProof = MerkleHash256::ToCompactProof(MerkleHash256::ComputeMerkleBranch(leaves, 16), 16);
+    BOOST_CHECK(mklProof.size() == 1);
+    proof = "";
+    for (const auto& element : mklProof) {
+        proof += "20" + hex(element);
+    }
+
+    root = MerkleHash256::ComputeMerkleRootFromBranch(leaves[16], mklProof, 16);
+
+    // ok, valid compact merkle proof
+    {
+        CScript scriptSig = CScript();
+        CScript scriptPubKey = CScript() <<
+          ParseHex(proof) << OP_0 <<
+          ParseHex("0000000000000000000000000000000000000000000000000000000000000000") << OP_0 << OP_MERKLE <<
+          ParseHex(hex(root)) << OP_EQUALVERIFY << OP_1;
+
+        ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
+        BOOST_CHECK(ret);
     }
 }
 
@@ -335,6 +381,64 @@ BOOST_AUTO_TEST_CASE(block_tx_proof_test) {
         ret = VerifyScript(scriptSig, scriptPubKey, flags, sis, &error);
         BOOST_CHECK(!ret);
         BOOST_CHECK(error == SCRIPT_ERR_EQUALVERIFY);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(next_proof_test) {
+    const std::vector<std::string> leaves = {
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll", "mm", "nn", "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz",
+        "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "II", "JJ", "KK", "LL", "MM", "NN", "OO", "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX", "YY", "ZZ",
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    };
+    std::vector<uint160> hashes;
+    std::transform(leaves.begin(), leaves.end(), std::back_inserter(hashes), [](const auto& item){
+        return uint160(Hash160(item.begin(), item.end()));
+    });
+
+    std::vector<uint160> prevProof;
+    std::vector<uint160> prevCompactProof;
+    uint160 prevRoot;
+    uint32_t prevIndex = 0;
+    uint160 prevLeafHash = hashes[prevIndex];
+    {
+        const std::vector<uint160> copy(hashes.begin(), hashes.begin() + prevIndex + 1);
+
+        std::vector<uint160> mklProof = MerkleHash160::ComputeMerkleBranch(copy, prevIndex);
+
+        prevProof = mklProof;
+        prevCompactProof = MerkleHash160::ToCompactProof(prevProof, prevIndex);
+
+        prevRoot = MerkleHash160::ComputeMerkleRootFromBranch(copy[prevIndex], mklProof, prevIndex);
+    }
+
+    for (prevIndex = 0; prevIndex < 129; prevIndex++) {
+        const auto newCompactProof = MerkleHash160::GetNewCompactProof(prevLeafHash, prevCompactProof, prevIndex);
+        const uint32_t newIndex = prevIndex + 1;
+        uint160 newRootFromFullProof;
+        const auto newFullProof = MerkleHash160::ToFullProof(hashes[newIndex], newCompactProof, newIndex, &newRootFromFullProof);
+        const uint160 newRoot = MerkleHash160::ComputeMerkleRootFromBranch(hashes[newIndex], newFullProof, newIndex);
+        // verification
+        {
+            const std::vector<uint160> copy(hashes.begin(), hashes.begin() + newIndex + 1);
+
+            std::vector<uint160> fullProof = MerkleHash160::ComputeMerkleBranch(copy, newIndex);
+            BOOST_CHECK(fullProof == newFullProof);
+
+            const uint160 root = MerkleHash160::ComputeMerkleRootFromBranch(copy[newIndex], fullProof, newIndex);
+            BOOST_CHECK(newRoot == root);
+            BOOST_CHECK(newRootFromFullProof == root);
+
+            std::vector<uint160> compactProof = MerkleHash160::ToCompactProof(fullProof, newIndex);
+            BOOST_CHECK(newCompactProof == compactProof);
+
+            prevProof = newFullProof;
+            prevCompactProof = newCompactProof;
+            prevRoot = root;
+            prevLeafHash = hashes[newIndex];
+        }
     }
 }
 

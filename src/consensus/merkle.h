@@ -59,7 +59,26 @@ public:
   }
   static std::vector<Uint> ComputeMerkleBranch(const std::vector<Uint> &leaves, uint32_t position);
   static Uint ComputeMerkleRootFromBranch(const Uint &leaf, const std::vector<Uint> &branch, uint32_t position);
+  static Uint RawProofToRoot(const VchType &proof, const Uint &leaf, uint32_t nIndex);
+  static std::vector<Uint> ToCompactProof(std::vector<Uint> fullProof, uint32_t elementIndex);
+  static std::vector<Uint> ToFullProof(Uint leafHash, std::vector<Uint> compactProof, uint32_t elementIndex, Uint* rootOut = nullptr);
+  static std::vector<Uint> GetNewCompactProof(Uint prevLeafHash, std::vector<Uint> prevCompactProof, uint32_t prevIndex);
 };
+
+/*
+ * Get nearest rounded down log2 base using only bitwise operations
+ */
+inline uint32_t ulog2(uint32_t u)
+{
+    uint32_t s, t;
+
+    t = (u > 0xffff) << 4; u >>= t;
+    s = (u > 0xff  ) << 3; u >>= s, t |= s;
+    s = (u > 0xf   ) << 2; u >>= s, t |= s;
+    s = (u > 0x3   ) << 1; u >>= s, t |= s;
+
+    return (t | (u >> 1));
+}
 
 /* This implements a constant-space merkle root/path calculator, limited to 2^32 leaves.
 
@@ -218,11 +237,11 @@ Uint Merkle<Hasher, Uint>::ComputeMerkleRootFromBranch(const Uint &leaf, const s
     return hash;
 }
 
-/* Given the serialized push-only encoded Merkle proof, return the vector of proof elements, aka Merkle branch
+/* Given the serialized push-only encoded Merkle proof, expand if necessary, and compute the root
  * Helper function for OP_MERKLE
-*/
-template <typename Uint>
-inline std::vector<Uint> RawProofToBranch(const VchType &proof) {
+ */
+template <typename Hasher, typename Uint>
+Uint Merkle<Hasher, Uint>::RawProofToRoot(const VchType &proof, const Uint &leaf, uint32_t nIndex) {
   std::vector<Uint> branch;
 
   // assumption of data push size of 1 is fine even for 512 bit hashes
@@ -246,7 +265,112 @@ inline std::vector<Uint> RawProofToBranch(const VchType &proof) {
       branch.emplace_back(Uint(itemRet));
   }
 
-  return branch;
+  Uint root;
+
+  // expand proof if it is compact and get the root
+  if (branch.size() < (ulog2(nIndex) + 1)) {
+      ToFullProof(leaf, branch, nIndex, &root);
+  } else {
+    // compute the root for a full proof
+    root = ComputeMerkleRootFromBranch(leaf, branch, nIndex);
+  }
+
+  return root;
+}
+
+/*
+ * Transform a full proof of last element in the data set into a compact proof
+ */
+template <typename Hasher, typename Uint>
+std::vector<Uint> Merkle<Hasher, Uint>::ToCompactProof(std::vector<Uint> fullProof, uint32_t elementIndex) {
+    uint32_t index = 0;
+    while (elementIndex) {
+        if (elementIndex & 1) {
+            index += 1;
+        } else {
+            fullProof.erase(fullProof.begin() + index);
+        }
+
+        elementIndex >>= 1;
+    }
+
+    return fullProof;
+}
+
+/*
+ * Transform the compact proof of last element in the data set into a full proof.
+ * This involves computation of the hashes of duplicated (right hand sided) merkle tree elements
+ *   to fill the gaps in the sparse compact proof
+ * Optionally this method also returns the root of the merkle tree in question
+ */
+template <typename Hasher, typename Uint>
+std::vector<Uint> Merkle<Hasher, Uint>::ToFullProof(Uint leafHash, std::vector<Uint> compactProof, uint32_t elementIndex, Uint* rootOut) {
+    auto hash = leafHash; // previous element hash
+    uint32_t index = 0;
+    std::vector<Uint> result;
+    uint32_t size = 0;
+    while (elementIndex) {
+        if (elementIndex & 1) {
+            // simply copy from merkle branch and compute this level's hash
+            result.push_back(compactProof[index]);
+            hash = Merkle<Hasher, Uint>::Hash(BEGIN(compactProof[index]), END(compactProof[index]), BEGIN(hash), END(hash));
+            index += 1;
+        } else {
+            if (!size) {
+                // first element being leaf hash
+                result.push_back(leafHash);
+            } else {
+                result.push_back(hash);
+            }
+
+            // compute missing hash from duplicated items
+            hash = Merkle<Hasher, Uint>::Hash(BEGIN(hash), END(hash), BEGIN(hash), END(hash));
+        }
+
+        size += 1;
+        elementIndex >>= 1;
+    }
+
+    if (rootOut) {
+        *rootOut = hash;
+    }
+
+    return result;
+}
+
+/*
+ * Get the new compact proof given the old compact proof info - sparse proof, previous element hash and previous element index
+ *
+ * This method is the key for a zero-knowledge expansion of a data set given its previous state.
+ * Contracts can use it to permissionlessly and trustlessly propose the next state of a decentralized dataset.
+ */
+template <typename Hasher, typename Uint>
+std::vector<Uint> Merkle<Hasher, Uint>::GetNewCompactProof(Uint prevLeafHash, std::vector<Uint> prevCompactProof, uint32_t prevIndex) {
+    uint32_t newIndex = prevIndex + 1; // aka binaryPath
+    uint32_t setBits = ((newIndex - 1) ^ (newIndex)) & (newIndex);
+
+    std::vector<Uint> newCompactProof;
+    if (setBits == 1) {
+        newCompactProof = {prevLeafHash};
+        std::copy(prevCompactProof.begin(), prevCompactProof.end(), std::back_inserter(newCompactProof));
+    } else if (setBits == (1 << ulog2(prevIndex))) {
+        newCompactProof = {Merkle<Hasher, Uint>::ComputeMerkleRootFromBranch(prevLeafHash, prevCompactProof, 0xffffffff)};
+    } else {
+        uint32_t level = 0;
+        while ((setBits & 1) == 0) {
+            level++;
+            setBits >>= 1;
+        }
+
+        std::vector<Uint> lowPart(prevCompactProof.begin(), prevCompactProof.begin() + level);
+        std::vector<Uint> highPart(prevCompactProof.begin() + level, prevCompactProof.end());
+
+        const Uint subRoot = Merkle<Hasher, Uint>::ComputeMerkleRootFromBranch(prevLeafHash, lowPart, 0xffffffff);
+        newCompactProof = {subRoot};
+        std::copy(highPart.begin(), highPart.end(), std::back_inserter(newCompactProof));
+    }
+
+    return newCompactProof;
 }
 
 typedef Merkle<CHash256, uint256> MerkleHash256;

@@ -2173,16 +2173,14 @@ bool ScriptMachine::Step()
                     switch (algoIndex) {
                         case 0:
                         {
-                            uint256 root = MerkleHash256::ComputeMerkleRootFromBranch(uint256(leaf),
-                                std::move(RawProofToBranch<uint256>(proof)), leafIndex);
+                            uint256 root = MerkleHash256::RawProofToRoot(proof, uint256(leaf), leafIndex);
 
                             stack.push_back(StackItem(root.begin(), root.end()));
                         }
                         break;
                         case 1:
                         {
-                            uint160 root = MerkleHash160::ComputeMerkleRootFromBranch(uint160(leaf),
-                                std::move(RawProofToBranch<uint160>(proof)), leafIndex);
+                            uint160 root = MerkleHash160::RawProofToRoot(proof, uint160(leaf), leafIndex);
 
                             stack.push_back(StackItem(root.begin(), root.end()));
                         }
