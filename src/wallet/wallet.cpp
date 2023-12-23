@@ -55,6 +55,8 @@ const char *DEFAULT_WALLET_DAT = "wallet.dat";
 
 const uint256 CMerkleTx::ABANDON_HASH(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
 
+static const CGroupTokenID grpNUSD = DecodeGroupToken("tqcr5dzhetyyughy9uwgsc35altfmhwuk9t5vyn7yjzw9pc0pqqqqyz68skt0", Params(CBaseChainParams::NEXA));
+
 extern CTweak<bool> useBIP69;
 extern CTweak<bool> feeEstimationTweak;
 extern CTweak<bool> instantTxns;
@@ -3982,6 +3984,12 @@ DBErrors CWallet::LoadWallet(bool &fFirstRunRet)
     ClearAllSpent();
     // fixes an older issue of non-user groups being added as token trackers
     SanitiseTokenTrackers();
+
+    // Always track Native Stablecoins
+    if (mapTokenTrackers.count(grpNUSD) == 0)
+    {
+        AddTokenTracker(grpNUSD, "NUSD");
+    }
 
     uiInterface.LoadWallet(this);
 
