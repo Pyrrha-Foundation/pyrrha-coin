@@ -55,7 +55,8 @@ const char *DEFAULT_WALLET_DAT = "wallet.dat";
 
 const uint256 CMerkleTx::ABANDON_HASH(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
 
-static const CGroupTokenID grpNUSD = DecodeGroupToken("tqcr5dzhetyyughy9uwgsc35altfmhwuk9t5vyn7yjzw9pc0pqqqqyz68skt0", Params(CBaseChainParams::NEXA));
+static const CGroupTokenID grpNUSD =
+    DecodeGroupToken("tqcr5dzhetyyughy9uwgsc35altfmhwuk9t5vyn7yjzw9pc0pqqqqyz68skt0", Params(CBaseChainParams::NEXA));
 
 extern CTweak<bool> useBIP69;
 extern CTweak<bool> feeEstimationTweak;
@@ -113,6 +114,15 @@ int CWallet::AddTokenTracker(const CGroupTokenID &id, const std::string &strToke
     if (id.isUserGroup() == false)
     {
         return -1;
+    }
+    std::string tickerUpper;
+    std::transform(strTokenTicker.begin(), strTokenTicker.end(), tickerUpper.begin(), ::toupper);
+    if (tickerUpper == "NUSD")
+    {
+        if (id != grpNUSD)
+        {
+            return -1;
+        }
     }
     {
         LOCK(cs_wallet);
@@ -1881,7 +1891,8 @@ void CWalletTx::GetAccountAmounts(const std::string &strAccount,
         {
             if (pwallet->mapAddressBook.count(r.destination))
             {
-                std::map<CTxDestination, CAddressBookData>::const_iterator mi = pwallet->mapAddressBook.find(r.destination);
+                std::map<CTxDestination, CAddressBookData>::const_iterator mi =
+                    pwallet->mapAddressBook.find(r.destination);
                 if (mi != pwallet->mapAddressBook.end() && (*mi).second.name == strAccount)
                     nReceived += r.amount;
             }
