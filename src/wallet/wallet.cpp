@@ -55,8 +55,15 @@ const char *DEFAULT_WALLET_DAT = "wallet.dat";
 
 const uint256 CMerkleTx::ABANDON_HASH(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
 
+static const CGroupTokenID grpNAUD =
+    DecodeGroupToken("trvvcvl9y7x58q68g00gnn784urw946r7a5pf5pmt60ceuqyfgqqqtqd49y4w", Params(CBaseChainParams::NEXA));
+
+static const CGroupTokenID grpNEUR =
+    DecodeGroupToken("tper4cvym037jyad36vz4qh4zv330rje5ftxt7rr0kmwthdd3uqqqlex5td0e", Params(CBaseChainParams::NEXA));
+
 static const CGroupTokenID grpNUSD =
     DecodeGroupToken("tqcr5dzhetyyughy9uwgsc35altfmhwuk9t5vyn7yjzw9pc0pqqqqyz68skt0", Params(CBaseChainParams::NEXA));
+
 
 extern CTweak<bool> useBIP69;
 extern CTweak<bool> feeEstimationTweak;
@@ -117,12 +124,17 @@ int CWallet::AddTokenTracker(const CGroupTokenID &id, const std::string &strToke
     }
     std::string tickerUpper;
     std::transform(strTokenTicker.begin(), strTokenTicker.end(), tickerUpper.begin(), ::toupper);
-    if (tickerUpper == "NUSD")
+    if (tickerUpper == "NAUD" && id != grpNAUD)
     {
-        if (id != grpNUSD)
-        {
-            return -1;
-        }
+        return -1;
+    }
+    else if (tickerUpper == "NEUR" && id != grpNEUR)
+    {
+        return -1;
+    }
+    else if (tickerUpper == "NUSD" && id != grpNUSD)
+    {
+        return -1;
     }
     {
         LOCK(cs_wallet);
@@ -142,6 +154,12 @@ int CWallet::AddTokenTracker(const CGroupTokenID &id, const std::string &strToke
 
 int CWallet::RemoveTokenTracker(const CGroupTokenID &id)
 {
+    // Dsiallow removing Native Stablecoin trackers, we could allow it but they would
+    // automatically be added back in on LoadWallet() call so why bother removing.
+    if (id == grpNAUD || id == grpNEUR || id == grpNUSD)
+    {
+        return -1;
+    }
     {
         LOCK(cs_wallet);
         // write to disk first
@@ -3997,6 +4015,14 @@ DBErrors CWallet::LoadWallet(bool &fFirstRunRet)
     SanitiseTokenTrackers();
 
     // Always track Native Stablecoins
+    if (mapTokenTrackers.count(grpNAUD) == 0)
+    {
+        AddTokenTracker(grpNAUD, "NAUD");
+    }
+    if (mapTokenTrackers.count(grpNEUR) == 0)
+    {
+        AddTokenTracker(grpNEUR, "NEUR");
+    }
     if (mapTokenTrackers.count(grpNUSD) == 0)
     {
         AddTokenTracker(grpNUSD, "NUSD");
