@@ -55,6 +55,10 @@ const char *DEFAULT_WALLET_DAT = "wallet.dat";
 
 const uint256 CMerkleTx::ABANDON_HASH(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
 
+static const CGroupTokenID regtestGrp =
+    DecodeGroupToken("trzgxdv9tl7c046ae6gmynylsk42n08xpgum4gqh8tsl3t3sccqqqkqaa3uac",
+        Params(CBaseChainParams::REGTEST));
+
 static const CGroupTokenID grpNAUD =
     DecodeGroupToken("trvvcvl9y7x58q68g00gnn784urw946r7a5pf5pmt60ceuqyfgqqqtqd49y4w", Params(CBaseChainParams::NEXA));
 
@@ -122,19 +126,29 @@ int CWallet::AddTokenTracker(const CGroupTokenID &id, const std::string &strToke
     {
         return -1;
     }
-    std::string tickerUpper;
-    std::transform(strTokenTicker.begin(), strTokenTicker.end(), tickerUpper.begin(), ::toupper);
-    if (tickerUpper == "NAUD" && id != grpNAUD)
+    std::string tickerUpper = "";
+    std::transform(strTokenTicker.begin(), strTokenTicker.end(), std::back_inserter(tickerUpper), ::toupper);
+    if (Params().NetworkIDString() == "regtest")
     {
-        return -1;
+        if (tickerUpper == "NUSD" && id != regtestGrp)
+        {
+            return -1;
+        }
     }
-    else if (tickerUpper == "NEUR" && id != grpNEUR)
+    else if (Params().NetworkIDString() == "nexa")
     {
-        return -1;
-    }
-    else if (tickerUpper == "NUSD" && id != grpNUSD)
-    {
-        return -1;
+        if (tickerUpper == "NAUD" && id != grpNAUD)
+        {
+            return -1;
+        }
+        else if (tickerUpper == "NEUR" && id != grpNEUR)
+        {
+            return -1;
+        }
+        else if (tickerUpper == "NUSD" && id != grpNUSD)
+        {
+            return -1;
+        }
     }
     {
         LOCK(cs_wallet);
@@ -156,9 +170,19 @@ int CWallet::RemoveTokenTracker(const CGroupTokenID &id)
 {
     // Dsiallow removing Native Stablecoin trackers, we could allow it but they would
     // automatically be added back in on LoadWallet() call so why bother removing.
-    if (id == grpNAUD || id == grpNEUR || id == grpNUSD)
+    if (Params().NetworkIDString() == "regtest")
     {
-        return -1;
+        if (id == regtestGrp)
+        {
+            return -1;
+        }
+    }
+    else if (Params().NetworkIDString() == "nexa")
+    {
+        if (id == grpNAUD || id == grpNEUR || id == grpNUSD)
+        {
+            return -1;
+        }
     }
     {
         LOCK(cs_wallet);
@@ -4015,17 +4039,27 @@ DBErrors CWallet::LoadWallet(bool &fFirstRunRet)
     SanitiseTokenTrackers();
 
     // Always track Native Stablecoins
-    if (mapTokenTrackers.count(grpNAUD) == 0)
+    if (Params().NetworkIDString() == "regtest")
     {
-        AddTokenTracker(grpNAUD, "NAUD");
+        if (mapTokenTrackers.count(regtestGrp) == 0)
+        {
+            AddTokenTracker(regtestGrp, "NUSD");
+        }
     }
-    if (mapTokenTrackers.count(grpNEUR) == 0)
+    else if (Params().NetworkIDString() == "nexa")
     {
-        AddTokenTracker(grpNEUR, "NEUR");
-    }
-    if (mapTokenTrackers.count(grpNUSD) == 0)
-    {
-        AddTokenTracker(grpNUSD, "NUSD");
+        if (mapTokenTrackers.count(grpNAUD) == 0)
+        {
+            AddTokenTracker(grpNAUD, "NAUD");
+        }
+        if (mapTokenTrackers.count(grpNEUR) == 0)
+        {
+            AddTokenTracker(grpNEUR, "NEUR");
+        }
+        if (mapTokenTrackers.count(grpNUSD) == 0)
+        {
+            AddTokenTracker(grpNUSD, "NUSD");
+        }
     }
 
     uiInterface.LoadWallet(this);
