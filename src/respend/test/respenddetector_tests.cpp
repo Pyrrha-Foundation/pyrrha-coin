@@ -227,8 +227,8 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     CCoinsViewCache coins(&coinsDummy);
     std::vector<CMutableTransaction> dummyTransactions = SetupDummyInputs(keystore, coins);
 
-    // Create a basic signed transactions and add them to the pool. We will use these transactions
-    // to create the spend and respend transactions.
+    // Create a basic signed transactions (tx1 and tx2) and add them to the pool. We will use these transactions
+    // to create the spend and respend transactions (tx1's output will use and ECC pubkey and tx2 a falcon512 pubkey).
     CMutableTransaction t1;
     t1.nLockTime = 0;
     t1.vin.resize(1);
@@ -250,8 +250,7 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
         bool worked = ProduceSignature(tsc, scriptPubKey, scriptSigRes);
         BOOST_CHECK(worked);
     }
-    CTransaction tx1a(t1);
-    pool.addUnchecked(entry.FromTx(tx1a));
+    pool.addUnchecked(entry.FromTx(tx1));
 
     CMutableTransaction t2;
     t2.nLockTime = 0;
@@ -260,10 +259,12 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     t2.vin[0].amount = dummyTransactions[0].vout[1].nValue;
     t2.vout.resize(1);
     t2.vout[0].nValue = 50 * CENT;
-    key.MakeNewKey(true);
+    t2.vout[0].type = 1;
+    key.MakeNewKey(true, true); // falcon512 key
     keystore.AddKey(key);
     t2.vout[0].scriptPubKey << OP_DUP << OP_HASH160 << ToByteVector(key.GetPubKey().GetID()) << OP_EQUALVERIFY
                             << OP_CHECKSIG;
+
     CTransaction tx2(t2);
     {
         TransactionSignatureCreator tsc(&keystore, &tx2, 0, defaultSigHashType);
@@ -272,8 +273,7 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
         bool worked = ProduceSignature(tsc, scriptPubKey, scriptSigRes);
         BOOST_CHECK(worked);
     }
-    CTransaction tx2a(t2);
-    pool.addUnchecked(entry.FromTx(tx2a));
+    pool.addUnchecked(entry.FromTx(tx2));
     BOOST_CHECK(pool.size() == 2);
 
 
@@ -281,8 +281,8 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     CMutableTransaction s1;
     s1.nLockTime = 0;
     s1.vin.resize(1);
-    s1.vin[0].prevout = COutPoint(tx1a.GetIdem(), 0);
-    s1.vin[0].amount = tx1a.vout[0].nValue;
+    s1.vin[0].prevout = COutPoint(tx1.GetIdem(), 0);
+    s1.vin[0].amount = tx1.vout[0].nValue;
     s1.vout.resize(1);
     s1.vout[0].nValue = 50 * CENT;
     key.MakeNewKey(true);
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     CTransaction spend1(s1);
     {
         TransactionSignatureCreator tsc(&keystore, &spend1, 0, defaultSigHashType);
-        const CScript &scriptPubKey = tx1a.vout[0].scriptPubKey;
+        const CScript &scriptPubKey = tx1.vout[0].scriptPubKey;
         CScript &scriptSigRes = s1.vin[0].scriptSig;
         bool worked = ProduceSignature(tsc, scriptPubKey, scriptSigRes);
         BOOST_CHECK(worked);
@@ -301,15 +301,15 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     CTransaction spend1a(s1);
 
 
-    // Create a respend tx1a's output.
+    // Create a respend tx1's output.
     CMutableTransaction s2;
     s2.nLockTime = 0;
     s2.vin.resize(1);
-    s2.vin[0].prevout = COutPoint(tx1a.GetIdem(), 0);
-    s2.vin[0].amount = tx1a.vout[0].nValue;
+    s2.vin[0].prevout = COutPoint(tx1.GetIdem(), 0);
+    s2.vin[0].amount = tx1.vout[0].nValue;
     s2.vout.resize(1);
     s2.vout[0].nValue = 50 * CENT;
-    key.MakeNewKey(true);
+    key.MakeNewKey(true, true); // falcon512 key
     keystore.AddKey(key);
     s2.vout[0].scriptPubKey << OP_DUP << OP_HASH160 << ToByteVector(key.GetPubKey().GetID()) << OP_EQUALVERIFY
                             << OP_CHECKSIG;
@@ -317,12 +317,13 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     CTransaction spend2(s2);
     {
         TransactionSignatureCreator tsc(&keystore, &spend2, 0, defaultSigHashType);
-        const CScript &scriptPubKey = tx1a.vout[0].scriptPubKey;
+        const CScript &scriptPubKey = tx1.vout[0].scriptPubKey;
         CScript &scriptSigRes = s2.vin[0].scriptSig;
         bool worked = ProduceSignature(tsc, scriptPubKey, scriptSigRes);
         BOOST_CHECK(worked);
 
-        { // Sanity check that the signature is actually correct
+        // Sanity check that the signature is actually correct
+        {
             TransactionSignatureChecker checker1(
                 &spend2, 0, STANDARD_SCRIPT_VERIFY_FLAGS | SCRIPT_ENABLE_SIGHASH_FORKID);
             CValidationState empty;
@@ -340,7 +341,8 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     }
     CTransaction spend2a(s2);
 
-    // add a ds orphan for spend1a and spend2a
+    // Create and validate a doublespendproof using spend1a and spend2a
+    // and then add a ds orphan to the storage
     ClearInventory(&node);
     DoubleSpendProof dsp_first;
     {
@@ -359,17 +361,18 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     // Check that the orphan is present and can be looked up correctly
     BOOST_CHECK(pool.doubleSpendProofStorage()->exists(dsp_first.GetHash()) == true);
     std::list<std::pair<int, int> > dsp_list1 =
-        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx1a.GetIdem(), 0));
+        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx1.GetIdem(), 0));
     BOOST_CHECK(dsp_list1.size() == 1);
     BOOST_CHECK_EQUAL(size_t(0), node.GetInventoryToSendSize());
 
-    // Try looking up orphans that should not exist
+    // Try looking up orphans that should not exist by looking up idems which were
+    // never added as double spend proofs
     std::list<std::pair<int, int> > dsp_list2 =
-        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx1a.GetIdem(), 1));
+        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx1.GetIdem(), 1));
     BOOST_CHECK(dsp_list2.size() == 0);
 
     std::list<std::pair<int, int> > dsp_list3 =
-        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx2a.GetIdem(), 0));
+        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx2.GetIdem(), 0));
     BOOST_CHECK(dsp_list3.size() == 0);
 
     // do a check for respend to trigger the orphan code with spend1a. The orphan will be removed and the inv
@@ -384,7 +387,7 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
         BOOST_CHECK(!node.vInventoryToSend.empty() && 7 == node.vInventoryToSend.at(0).type);
     }
     std::list<std::pair<int, int> > dsp_list4 =
-        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx1a.GetIdem(), 0));
+        pool.doubleSpendProofStorage()->findOrphans(COutPoint(tx1.GetIdem(), 0));
     BOOST_CHECK(dsp_list4.size() == 0);
 
 
@@ -399,7 +402,93 @@ BOOST_AUTO_TEST_CASE(dsproof_orphan_handling)
     proofId = pool.doubleSpendProofStorage()->add(dsp_first).second;
     BOOST_CHECK(pool.doubleSpendProofStorage()->orphanCount(proofId) == 0);
 
+    /** Check that we can create and validate a doublespend of an output for a transaction (t2) where the output was
+     *  sent to a falcon512 address. This transaction (tx2) was created already.
+     */
+    auto nTempMaxSize = MAX_SCRIPT_ELEMENT_SIZE;
+    MAX_SCRIPT_ELEMENT_SIZE = 20000;
+
+    // Create a spend of tx2's output.
+    CMutableTransaction sFalcon1;
+    sFalcon1.nLockTime = 0;
+    sFalcon1.vin.resize(1);
+    sFalcon1.vin[0].prevout = COutPoint(tx2.GetIdem(), 0);
+    sFalcon1.vin[0].amount = tx2.vout[0].nValue;
+    sFalcon1.vout.resize(1);
+    sFalcon1.vout[0].nValue = 50 * CENT;
+    key.MakeNewKey(true);
+    keystore.AddKey(key);
+    sFalcon1.vout[0].scriptPubKey << OP_DUP << OP_HASH160 << ToByteVector(key.GetPubKey().GetID()) << OP_EQUALVERIFY
+                                  << OP_CHECKSIG;
+
+    CTransaction spendFalcon1(sFalcon1);
+    {
+        TransactionSignatureCreator tsc(&keystore, &spendFalcon1, 0, defaultSigHashType);
+        const CScript &scriptPubKey = tx2.vout[0].scriptPubKey;
+        CScript &scriptSigRes = sFalcon1.vin[0].scriptSig;
+        bool worked = ProduceSignature(tsc, scriptPubKey, scriptSigRes);
+        BOOST_CHECK(worked);
+    }
+    CTransaction spendFalcon1a(sFalcon1);
+
+    // Create a respend tx2's output. Spend this one to a falcon key
+    CMutableTransaction sFalcon2;
+    sFalcon2.nLockTime = 0;
+    sFalcon2.vin.resize(1);
+    sFalcon2.vin[0].prevout = COutPoint(tx2.GetIdem(), 0);
+    sFalcon2.vin[0].amount = tx2.vout[0].nValue;
+    sFalcon2.vout.resize(1);
+    sFalcon2.vout[0].nValue = 50 * CENT;
+    sFalcon2.vout[0].type = 1;
+    key.MakeNewKey(true, true);
+    keystore.AddKey(key);
+    sFalcon2.vout[0].scriptPubKey << OP_DUP << OP_HASH160 << ToByteVector(key.GetPubKey().GetID()) << OP_EQUALVERIFY
+                                  << OP_CHECKSIG;
+    sFalcon2.vout[0].scriptPubKey.type = ScriptType(sFalcon2.vout[0].type & 1);
+    CTransaction spendFalcon2(sFalcon2);
+    {
+        TransactionSignatureCreator tsc(&keystore, &spendFalcon2, 0, defaultSigHashType);
+        const CScript &scriptPubKey = tx2.vout[0].scriptPubKey;
+        CScript &scriptSigRes = sFalcon2.vin[0].scriptSig;
+        bool worked = ProduceSignature(tsc, scriptPubKey, scriptSigRes);
+        BOOST_CHECK(worked);
+
+        // Sanity check that the signature is actually correct
+        {
+            TransactionSignatureChecker checker1(
+                &spendFalcon2, 0, STANDARD_SCRIPT_VERIFY_FLAGS | SCRIPT_ENABLE_SIGHASH_FORKID);
+            CValidationState empty;
+            std::vector<CTxOut> fakeprevouts;
+            fakeprevouts.resize(spendFalcon2.vin.size());
+            ScriptImportedState sis1(&checker1, MakeTransactionRef(spend2), empty, fakeprevouts, 0);
+            ScriptError_t error;
+            if (!VerifyScript(scriptSigRes, scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS | SCRIPT_ENABLE_SIGHASH_FORKID,
+                    sis1, &error))
+            {
+                LOG(DSPROOF, "Sanity check signature failed due to: %s\n", ScriptErrorString(error));
+                assert(0);
+            }
+        }
+    }
+    CTransaction spendFalcon2a(sFalcon2);
+
+    // Create and validate a doublespendproof using spendFalcon1a and spendFalcon2a
+    // and then add a ds orphan to the storage
+    ClearInventory(&node);
+    DoubleSpendProof dsp_second;
+    {
+        READLOCK(pool.cs_txmempool);
+        dsp_second = DoubleSpendProof::create(spendFalcon1a, spendFalcon2a, pool);
+        {
+            auto ref = MakeTransactionRef(spendFalcon2a);
+            auto rc = dsp_second.validate(pool, ref);
+            BOOST_CHECK(rc == DoubleSpendProof::Valid);
+        }
+    }
+
+
     // Cleanup
     vNodes.erase(vNodes.end() - 1);
+    MAX_SCRIPT_ELEMENT_SIZE = nTempMaxSize;
 }
 BOOST_AUTO_TEST_SUITE_END();

@@ -202,12 +202,27 @@ bool CDBEnv::Salvage(const std::string &strFile, bool fAggressive, std::vector<C
         getline(strDump, keyHex);
         if (keyHex != "DATA=END")
         {
+            if (strDump.eof())
+                break;
+
             getline(strDump, valueHex);
+
+            if (valueHex == "DATA=END")
+            {
+                LOGA("CDBEnv::Salvage: WARNING number of keys does not match number of values.\n");
+                break;
+            }
             vResult.push_back(make_pair(ParseHex(keyHex), ParseHex(valueHex)));
         }
     }
 
-    return (result == 0);
+    if (keyHex != "DATA=END")
+    {
+        LOGA("CDBEnv::Salvage: Unexpected end of file.\n");
+        return false;
+    }
+
+    return (result == 0) || (result == DB_VERIFY_BAD && fAggressive);
 }
 
 

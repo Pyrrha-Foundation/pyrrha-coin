@@ -42,6 +42,7 @@ NEXA_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) 
 NEXA_INCLUDES += -I$(srcdir)/secp256k1/include
 NEXA_INCLUDES += -I$(srcdir)/univalue/include
 NEXA_INCLUDES += -I$(srcdir)/rsm/include
+NEXA_INCLUDES += -I$(srcdir)/falcon512
 
 LIBNEXA_SERVER=libnexa_server.a
 LIBNEXA_COMMON=libnexa_common.a
@@ -533,7 +534,7 @@ endif
 crypto_libnexa_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
 
 # falcon512 primitives library
-falcon512_libnexa_falcon512_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_CONFIG_INCLUDES)
+falcon512_libnexa_falcon512_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
 falcon512_libnexa_falcon512_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 falcon512_libnexa_falcon512_a_SOURCES = \
   falcon512/api.h \
@@ -551,7 +552,9 @@ falcon512_libnexa_falcon512_a_SOURCES = \
   falcon512/randombytes.cpp \
   falcon512/rng.cpp \
   falcon512/sign.cpp \
-  falcon512/vrfy.cpp
+  falcon512/vrfy.cpp \
+  falcon512/api_nexa.h \
+  falcon512/api_nexa.cpp
 
 # common: shared between nexad, and nexa-qt and non-server tools
 libnexa_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)

@@ -11,13 +11,14 @@
 #include "pubkey.h"
 #include "serialize.h"
 #include "support/allocators/secure.h"
+#include "tweak.h"
 #include "uint256.h"
 
 #include <stdexcept>
 #include <vector>
 
 extern const uint32_t BIP32_HARDENED_KEY_LIMIT;
-
+extern CTweak<bool> falconTweak;
 
 /**
  * secure_allocator is defined in allocators.h
@@ -41,8 +42,20 @@ public:
     static_assert(PRIVATE_KEY_SIZE >= COMPRESSED_PRIVATE_KEY_SIZE,
         "COMPRESSED_PRIVATE_KEY_SIZE is larger than PRIVATE_KEY_SIZE");
 
+    /**
+     * falcon:
+     */
+    static const unsigned int FALCON_PRIVATE_KEY_SIZE = 1281;
+    static const unsigned int FALCON_COMPRESSED_PRIVATE_KEY_SIZE = 1281;
+    static const unsigned int FALCON_PUBKEY_SIZE = 897;
+    static const unsigned int FALCON_SIGN_SIZE = 666;
+    static_assert(FALCON_PRIVATE_KEY_SIZE >= FALCON_COMPRESSED_PRIVATE_KEY_SIZE,
+        "FALCON_COMPRESSED_PRIVATE_KEY_SIZE is larger than FALCON_PRIVATE_KEY_SIZE");
 
 private:
+    //! Whether this is a falcon key or not
+    bool fFalcon;
+
     //! Whether this private key is valid. We check for correctness when modifying the key
     //! data, so fValid should always correspond to the actual state.
     bool fValid;
@@ -50,71 +63,220 @@ private:
     //! Whether the public key corresponding to this private key is (to be) compressed.
     bool fCompressed;
 
-    //! The actual byte data
+    //! The actual byte data for a standard key
     unsigned char vch[32];
 
+    //! The actual byte data for a falcon key
+    std::vector<unsigned char, secure_allocator<unsigned char> > keydata;
+    std::vector<unsigned char, secure_allocator<unsigned char> > pubkeydata;
+
+
     //! Check whether the 32-byte array pointed to be vch is valid keydata.
-    bool static Check(const unsigned char *vch);
+    bool Check(const unsigned char *_vch);
 
 public:
     //! Construct an invalid private key.
-    CKey() : fValid(false), fCompressed(false) { LockObject(vch); }
-    //! Copy constructor. This is necessary because of memlocking.
-    CKey(const CKey &secret) : fValid(secret.fValid), fCompressed(secret.fCompressed)
+    CKey() : fFalcon(false), fValid(false), fCompressed(false)
     {
-        LockObject(vch);
-        memcpy(vch, secret.vch, sizeof(vch));
+        // For Falcon Keys
+        {
+            keydata.resize(FALCON_PRIVATE_KEY_SIZE);
+            pubkeydata.resize(FALCON_PUBKEY_SIZE);
+        }
+        // For ECC keys
+        {
+            LockObject(vch);
+        }
+    }
+    //! Copy constructor. This is necessary because of memlocking.
+    CKey(const CKey &secret) : fFalcon(secret.fFalcon), fValid(secret.fValid), fCompressed(secret.fCompressed)
+    {
+        if (fFalcon)
+        {
+            keydata = secret.keydata;
+            pubkeydata = secret.pubkeydata;
+        }
+        else
+        {
+            LockObject(vch);
+            memcpy(vch, secret.vch, sizeof(vch));
+        }
     }
     CKey &operator=(const CKey &secret)
     {
+        fFalcon = secret.fFalcon;
         fValid = secret.fValid;
         fCompressed = secret.fCompressed;
-        LockObject(vch);
-        memcpy(vch, secret.vch, sizeof(vch));
+
+        if (fFalcon)
+        {
+            keydata = secret.keydata;
+            pubkeydata = secret.pubkeydata;
+        }
+        else
+        {
+            LockObject(vch);
+            memcpy(vch, secret.vch, sizeof(vch));
+        }
+
         return *this;
     }
 
     //! Destructor (again necessary because of memlocking).
-    ~CKey() { UnlockObject(vch); }
+    ~CKey()
+    {
+        if (!fFalcon)
+        {
+            UnlockObject(vch);
+        }
+    }
     friend bool operator==(const CKey &a, const CKey &b)
     {
-        return a.fCompressed == b.fCompressed && a.size() == b.size() && memcmp(&a.vch[0], &b.vch[0], a.size()) == 0;
+        if (a.fFalcon || b.fFalcon)
+        {
+            return a.fFalcon == b.fFalcon && a.fCompressed == b.fCompressed && a.size() == b.size() &&
+                   memcmp(&a.keydata, &b.keydata, a.size()) == 0;
+        }
+        else
+        {
+            return a.fFalcon == b.fFalcon && a.fCompressed == b.fCompressed && a.size() == b.size() &&
+                   memcmp(&a.vch[0], &b.vch[0], a.size()) == 0;
+        }
     }
 
     //! Initialize using begin and end iterators to byte data.
     template <typename T>
     void Set(const T pbegin, const T pend, bool fCompressedIn)
     {
-        if (pend - pbegin != 32)
+        fFalcon = ((size_t)(pend - pbegin) >= keydata.size());
+        if (fFalcon)
         {
-            fValid = false;
-            return;
+            if (size_t(pend - pbegin) != keydata.size())
+            {
+                fValid = false;
+                return;
+            }
+            if (true) //(Check(&pbegin[0]))
+            {
+                memcpy(keydata.data(), (unsigned char *)&pbegin[0], keydata.size());
+                fValid = true;
+                fCompressed = fCompressedIn;
+            }
+            else
+            {
+                fValid = false;
+            }
         }
-        if (Check(&pbegin[0]))
+        else
         {
-            memcpy(vch, (unsigned char *)&pbegin[0], 32);
-            fValid = true;
-            fCompressed = fCompressedIn;
+            if (pend - pbegin != 32)
+            {
+                fValid = false;
+                return;
+            }
+            if (Check(&pbegin[0]))
+            {
+                memcpy(vch, (unsigned char *)&pbegin[0], 32);
+                fValid = true;
+                fCompressed = fCompressedIn;
+            }
+            else
+            {
+                fValid = false;
+            }
+        }
+    }
+
+    //! Initialize using begin and end iterators to byte data.
+    template <typename T>
+    void Set(const T pbegin, const T pend, CPubKey pk, bool fCompressedIn)
+    {
+        fFalcon = ((size_t)(pend - pbegin) >= keydata.size() && pk.IsFalcon());
+        if (fFalcon)
+        {
+            if (size_t(pend - pbegin) != keydata.size())
+            {
+                fValid = false;
+                return;
+            }
+            if (true) //(Check(&pbegin[0]))
+            {
+                memcpy(keydata.data(), (unsigned char *)&pbegin[0], keydata.size());
+                memcpy(pubkeydata.data(), (unsigned char *)(pk.data()), pubkeydata.size());
+                fValid = true;
+                fCompressed = fCompressedIn;
+            }
+            else
+            {
+                fValid = false;
+            }
         }
         else
         {
             fValid = false;
+            if (pend - pbegin != 32)
+            {
+                fValid = false;
+                return;
+            }
+            if (Check(&pbegin[0]))
+            {
+                memcpy(vch, (unsigned char *)&pbegin[0], 32);
+                fValid = true;
+                fCompressed = fCompressedIn;
+            }
+            else
+            {
+                fValid = false;
+            }
         }
     }
-
     //! Simple read-only vector-like interface.
-    unsigned int size() const { return (fValid ? 32 : 0); }
-    const unsigned char *begin() const { return vch; }
-    const unsigned char *end() const { return vch + size(); }
+    unsigned int size() const
+    {
+        if (fFalcon)
+            return (fValid ? keydata.size() : 0);
+        else
+            return (fValid ? 32 : 0);
+    }
+    const unsigned char *begin() const
+    {
+        if (fFalcon)
+            return keydata.data();
+        else
+            return vch;
+    }
+    const unsigned char *end() const
+    {
+        if (fFalcon)
+            return keydata.data() + size();
+        else
+            return vch + size();
+    }
+    unsigned int pksize() const
+    {
+        assert(fFalcon);
+        return (fValid ? pubkeydata.size() : 0);
+    }
+    const unsigned char *pkbegin() const
+    {
+        assert(fFalcon);
+        return pubkeydata.data();
+    }
+    const unsigned char *pkend() const
+    {
+        assert(fFalcon);
+        return pubkeydata.data() + pksize();
+    }
+    //! Check whether this is a falcon key.
+    bool IsFalcon() const { return fFalcon; }
     //! Check whether this private key is valid.
     bool IsValid() const { return fValid; }
     //! Check whether the public key corresponding to this private key is (to be) compressed.
     bool IsCompressed() const { return fCompressed; }
-    //! Initialize from a CPrivKey (serialized OpenSSL private key data).
-    bool SetPrivKey(const CPrivKey &vchPrivKey, bool fCompressed);
 
     //! Generate a new private key using a cryptographic PRNG.
-    void MakeNewKey(bool fCompressed);
+    void MakeNewKey(bool fCompressed, bool _fFalcon = false);
 
     /**
      * Convert the private key to a CPrivKey (serialized OpenSSL private key data).
@@ -141,6 +303,12 @@ public:
     bool SignSchnorr(const uint256 &hash, std::vector<uint8_t> &vchSig, uint32_t test_case = 0) const;
 
     /**
+     * Create a Falcon signature.
+     * The test_case parameter tweaks the deterministic nonce.
+     */
+    bool SignFalcon(const uint256 &hash, std::vector<uint8_t> &vchSig, uint32_t test_case = 0) const;
+
+    /**
      * Create a compact signature (65 bytes), which allows reconstructing the used public key.
      * The format is one header byte, followed by two times 32 bytes for the serialized r and s values.
      * The header byte: 0x1B = first key with even y, 0x1C = first key with odd y,
@@ -150,12 +318,16 @@ public:
     bool SignCompact(const uint256 &hash, std::vector<unsigned char> &vchSig) const;
 
     //! Derive BIP32 child key.
-    bool Derive(CKey &keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode &cc) const;
+    bool Derive(CKey &keyChild,
+        ChainCode &ccChild,
+        unsigned int nChild,
+        const ChainCode &cc,
+        bool _fFalcon = false) const;
 
     /**
      * Verify thoroughly whether a private key and a public key match.
      * This is done using a different mechanism than just regenerating it.
-     * (An ECDSA signature is created then verified.)
+     * (A signature is created then verified.)
      */
     bool VerifyPubKey(const CPubKey &vchPubKey) const;
 
@@ -182,7 +354,7 @@ struct CExtKey
 
     void Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const;
     void Decode(const unsigned char code[BIP32_EXTKEY_SIZE]);
-    bool Derive(CExtKey &out, unsigned int nChild) const;
+    bool Derive(CExtKey &out, unsigned int nChild, bool _fFalcon = false) const;
     CExtPubKey Neuter() const;
     void SetMaster(const unsigned char *seed, unsigned int nSeedLen);
     template <typename Stream>
@@ -216,6 +388,9 @@ void ECC_Stop(void);
 
 /** Check that required EC support is available at runtime. */
 bool ECC_InitSanityCheck(void);
+
+/** Check that required falcon support is available at runtime. */
+bool Falcon_InitSanityCheck(void);
 
 /** Derive a BIP-0032 heirarchial deterministic wallet key */
 int Hd32DeriveChildKey(CKey key, int externalChainCounter, CKey &secret, std::string *keypath);

@@ -77,6 +77,16 @@ struct CompareValueOnly
     }
 };
 
+unsigned int GetMaxVinForConsolidation()
+{
+    // When falcon is enabled and we do a consolidation the tx size
+    // will end up over the limit and cause the consolidation to fail.
+    if (falconTweak.Value())
+        return 60;
+    else
+        return MAX_TX_NUM_VIN;
+}
+
 std::string COutput::ToString() const
 {
     return strprintf("COutput(%s, %d) [%s]", tx->GetId().ToString(), i, FormatMoney(tx->vout[i].nValue));
@@ -234,7 +244,7 @@ CPubKey CWallet::GenerateNewKey()
     }
     else
     {
-        secret.MakeNewKey(fCompressed);
+        secret.MakeNewKey(fCompressed, falconTweak.Value());
     }
 
     // Compressed public keys were introduced in version 0.6.0
@@ -255,6 +265,8 @@ CPubKey CWallet::GenerateNewKey()
 
 void CWallet::DeriveNewChildKey(CKeyMetadata &metadata, CKey &secret)
 {
+    AssertLockHeld(cs_wallet);
+
     // for now we use a fixed keypath scheme of m/0'/0'/k
     CKey key; // master key seed (256bit)
     CExtKey masterKey; // hd master key
@@ -270,10 +282,10 @@ void CWallet::DeriveNewChildKey(CKeyMetadata &metadata, CKey &secret)
 
     // derive m/0'
     // use hardened derivation (child keys >= 0x80000000 are hardened after bip32)
-    masterKey.Derive(accountKey, BIP32_HARDENED_KEY_LIMIT);
+    masterKey.Derive(accountKey, BIP32_HARDENED_KEY_LIMIT, falconTweak.Value());
 
     // derive m/0'/0'
-    accountKey.Derive(externalChainChildKey, BIP32_HARDENED_KEY_LIMIT);
+    accountKey.Derive(externalChainChildKey, BIP32_HARDENED_KEY_LIMIT, falconTweak.Value());
 
     // derive child key at next index, skip keys already known to the wallet
     do
@@ -281,7 +293,8 @@ void CWallet::DeriveNewChildKey(CKeyMetadata &metadata, CKey &secret)
         // always derive hardened keys
         // childIndex | BIP32_HARDENED_KEY_LIMIT = derive childIndex in hardened child-index-range
         // example: 1 | BIP32_HARDENED_KEY_LIMIT == 0x80000001 == 2147483649
-        externalChainChildKey.Derive(childKey, hdChain.nExternalChainCounter | BIP32_HARDENED_KEY_LIMIT);
+        externalChainChildKey.Derive(
+            childKey, hdChain.nExternalChainCounter | BIP32_HARDENED_KEY_LIMIT, falconTweak.Value());
         metadata.hdKeypath = "m/0'/0'/" + std::to_string(hdChain.nExternalChainCounter) + "'";
         metadata.hdMasterKeyID = hdChain.masterKeyID;
         // increment childkey index
@@ -1474,7 +1487,7 @@ CAmount CWallet::GetChange(const CTransaction &tx) const
 CPubKey CWallet::GenerateNewHDMasterKey()
 {
     CKey key;
-    key.MakeNewKey(true);
+    key.MakeNewKey(true, falconTweak.Value());
 
     int64_t nCreationTime = GetTime();
     CKeyMetadata metadata(nCreationTime);
@@ -1513,6 +1526,8 @@ bool CWallet::SetHDMasterKey(const CPubKey &pubkey)
     // as a hdchain object
     CHDChain newHdChain;
     newHdChain.masterKeyID = pubkey.GetID();
+    newHdChain.fFalcon = pubkey.IsFalcon();
+
     SetHDChain(newHdChain, false);
 
     return true;
@@ -1528,7 +1543,20 @@ bool CWallet::SetHDChain(const CHDChain &chain, bool memonly)
     return true;
 }
 
-bool CWallet::IsHDEnabled() { return !hdChain.masterKeyID.IsNull(); }
+bool CWallet::IsHDEnabled()
+{
+    LOCK(cs_wallet);
+
+    if (hdChain.masterKeyID.IsNull())
+        return false;
+
+    if (falconTweak.Value() != hdChain.fFalcon)
+    {
+        InitError(_("Incorrect HD wallet type: You are trying to launch either a Falcon wallet as an ECC wallet or an "
+                    "ECC wallet as a Falcon wallet"));
+    }
+    return true;
+}
 int64_t CWalletTx::GetTxTime() const
 {
     int64_t n = nTimeSmart;
@@ -3301,7 +3329,7 @@ bool CWallet::CreateTransaction(vector<CRecipient> &vecSend,
                 _coinControl.Select(coin.GetOutPoint());
                 _nValue += coin.GetValue();
                 count++;
-                if (count >= MAX_TX_NUM_VIN)
+                if (count >= GetMaxVinForConsolidation())
                 {
                     fMaxVin = true;
                     break;
@@ -3705,7 +3733,6 @@ bool CWallet::CreateOneTransaction(const vector<CRecipient> &vecSend,
                     }
 
                     unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-
                     // Remove scriptSigs if we used dummy signatures for fee calculation
                     if (!sign)
                     {
@@ -4168,7 +4195,6 @@ void CWallet::ReserveKeyFromKeyPool(int64_t &nIndex, CKeyPool &keypool)
     keypool.vchPubKey = CPubKey();
     {
         LOCK(cs_wallet);
-
         if (!IsLocked())
             TopUpKeyPool();
 
@@ -4177,7 +4203,6 @@ void CWallet::ReserveKeyFromKeyPool(int64_t &nIndex, CKeyPool &keypool)
             return;
 
         CWalletDB walletdb(strWalletFile);
-
         nIndex = *(setKeyPool.begin());
         setKeyPool.erase(setKeyPool.begin());
         if (!walletdb.ReadPool(nIndex, keypool))
@@ -4737,8 +4762,12 @@ bool CWallet::ParameterInteraction()
 
     fSendFreeTransactions = GetBoolArg("-sendfreetransactions", DEFAULT_SEND_FREE_TRANSACTIONS);
 
+    if (GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET) && falconTweak.Value())
+        InitError(_("You can not have both falcon and HD enabled at the same time"));
+
     return true;
 }
+
 
 void CWallet::EraseFromRam(CWalletTxRef tx)
 {

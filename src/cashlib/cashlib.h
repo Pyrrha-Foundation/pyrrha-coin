@@ -106,19 +106,39 @@ SLAPI int SignTxSchnorr(const unsigned char *txData,
     unsigned char *result,
     unsigned int resultLen);
 
+/** Sign one input of a transaction using a Falcon512 signature
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+*/
+SLAPI int SignTxFalcon(unsigned char *txData,
+    int txbuflen,
+    unsigned int inputIdx,
+    int64_t inputAmount,
+    unsigned char *prevoutScript,
+    uint32_t priorScriptLen,
+    unsigned char *hashType,
+    unsigned int hashTypeLen,
+    unsigned char *keyData,
+    unsigned char *result,
+    unsigned int resultLen);
+
 /* Sign a hash (presumably the hash of some data) using an ECDSA signature */
 SLAPI int SignHashECDSA(const unsigned char *hash,
     const unsigned char *keyData,
     unsigned char *result,
     unsigned int resultLen);
 
-
-
 /* Sign a hash (presumably the hash of some data) using a Schnorr signature.  Result must be at least 64 bytes. */
 SLAPI int SignHashSchnorr(const unsigned char *hash,
     const unsigned char *keyData,
     unsigned char *result);
 
+/* Sign a hash (presumably the hash of some data) using a Falcon512 signature */
+SLAPI int SignHashFalcon(const unsigned char *hash,
+    unsigned char *keyData,
+    unsigned char *result,
+    unsigned int resultLen);
 
 // Returns <= 0 if error, size of result if good.
 SLAPI int signMessage(const unsigned char* message, unsigned int msgLen,

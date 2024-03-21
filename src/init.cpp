@@ -1160,6 +1160,14 @@ bool AppInit2(Config &config)
     // Intitialize the mininum amount needed for a group output
     GROUPED_SATOSHI_AMT = CFeeRate().GetDust();
 
+    // Set the max script element size
+    // TODO:  Once falcon is forked into the main chain we can move this back to script.h
+    //        and make it a constant value again.
+    if (falconTweak.Value())
+        MAX_SCRIPT_ELEMENT_SIZE = 20000; // must accomodate up to 20 pubkeys for multisig
+    else
+        MAX_SCRIPT_ELEMENT_SIZE = 520;
+
 
     // ********************************************************* Step 4: application initialization: dir lock,
     // daemonize, pidfile, debug log
@@ -1174,6 +1182,11 @@ bool AppInit2(Config &config)
     // Sanity check
     if (!InitSanityCheck())
         return InitError(strprintf(_("Initialization sanity check failed. %s is shutting down."), _(PACKAGE_NAME)));
+
+    // Falcon sanity check
+    if (!Falcon_InitSanityCheck())
+        return InitError(strprintf(_("Initialization sanity check failed. %s is shutting down."), _(PACKAGE_NAME)));
+
 
     std::string strDataDir = GetDataDir().string();
 

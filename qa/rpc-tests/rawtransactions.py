@@ -38,12 +38,18 @@ def initSigDebugging():
 # Create one-input, one-output, no-fee transaction:
 class RawTransactionsTest(BitcoinTestFramework):
 
+    def add_options(self, parser):
+        parser.add_option("--enableFalcon", dest="enableFalcon", default=0, action="store",
+                          help="Choose whether to enable the falcon wallet")
+
     def setup_chain(self):
         print("Initializing test directory "+self.options.tmpdir)
         initialize_chain_clean(self.options.tmpdir, 3)
 
     def setup_network(self, split=False):
-        self.nodes = start_nodes(3, self.options.tmpdir)
+        enableFalcon = str(self.options.enableFalcon)
+        self.node_args = [['-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon]]
+        self.nodes = start_nodes(3, self.options.tmpdir, self.node_args)
 
         #connect to a local machine for debugging
         #url = "http://bitcoinrpc:DP6DvqZtqXarpeNWyN3LZTFchCCyCUuHwNF7E8pX99x1@%s:%d" % ('127.0.0.1', 18332)
@@ -56,6 +62,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         self.sync_blocks()
 
     def run_test(self):
+        enableFalcon = str(self.options.enableFalcon)
         initSigDebugging()
         #prepare some coins for multiple *rawtransaction commands
         self.nodes[2].generate(1)
@@ -155,7 +162,6 @@ class RawTransactionsTest(BitcoinTestFramework):
         self.sync_blocks()
         assert_equal(self.nodes[2].getbalance(), bal+Decimal('1200000.00')) #node2 has both keys of the 2of2 ms addr., tx should affect the balance
 
-
         # 2of3 test from different nodes
         bal = self.nodes[2].getbalance()
         addr1 = self.nodes[1].getnewaddress()
@@ -246,7 +252,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         stop_nodes(self.nodes)
         wait_bitcoinds()
         # restart the node with a flag that forces the behavior to be more like mainnet -- don't accept nonstandard tx
-        self.nodes = start_nodes(3, self.options.tmpdir, [ ["--acceptnonstdtxn=0"], [], [], []])
+        self.nodes = start_nodes(3, self.options.tmpdir, [ ["--acceptnonstdtxn=0",'-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon]])
         connect_nodes_full(self.nodes)
 
         wallet = self.nodes[0].listunspent()

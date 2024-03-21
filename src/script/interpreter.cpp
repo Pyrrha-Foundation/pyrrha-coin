@@ -14,6 +14,7 @@
 #include "crypto/ripemd160.h"
 #include "crypto/sha1.h"
 #include "crypto/sha256.h"
+#include "key.h"
 #include "primitives/transaction.h"
 #include "pubkey.h"
 #include "script/script.h"
@@ -110,14 +111,20 @@ static void CleanupScriptCode(CScript &scriptCode, const std::vector<uint8_t> &v
 
 bool static IsCompressedOrUncompressedPubKey(const valtype &vchPubKey)
 {
-    if (vchPubKey.size() < CPubKey::COMPRESSED_PUBLIC_KEY_SIZE)
+    bool fFalcon = (vchPubKey.size() == CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE ||
+                    vchPubKey.size() == CPubKey::FALCON_PUBLIC_KEY_SIZE);
+    unsigned int nPubkeySize = (fFalcon ? CPubKey::FALCON_PUBLIC_KEY_SIZE : CPubKey::PUBLIC_KEY_SIZE);
+    unsigned int nCompressedPubkeySize =
+        (fFalcon ? CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE : CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+
+    if (vchPubKey.size() < nCompressedPubkeySize)
     {
         //  Non-canonical public key: too short
         return false;
     }
     if (vchPubKey[0] == 0x04)
     {
-        if (vchPubKey.size() != CPubKey::PUBLIC_KEY_SIZE)
+        if (vchPubKey.size() != nPubkeySize)
         {
             //  Non-canonical public key: invalid length for uncompressed key
             return false;
@@ -131,6 +138,14 @@ bool static IsCompressedOrUncompressedPubKey(const valtype &vchPubKey)
             return false;
         }
     }
+    else if (vchPubKey[0] == 0x09) // falcon512
+    {
+        if (vchPubKey.size() != nPubkeySize)
+        {
+            //  Non-canonical public key: invalid length for uncompressed key
+            return false;
+        }
+    }
     else
     {
         //  Non-canonical public key: neither compressed nor uncompressed
@@ -141,7 +156,11 @@ bool static IsCompressedOrUncompressedPubKey(const valtype &vchPubKey)
 
 static bool IsCompressedPubKey(const valtype &vchPubKey)
 {
-    if (vchPubKey.size() != CPubKey::COMPRESSED_PUBLIC_KEY_SIZE)
+    bool fFalcon = (vchPubKey.size() == CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE);
+    unsigned int nCompressedPubkeySize =
+        (fFalcon ? CPubKey::FALCON_COMPRESSED_PUBLIC_KEY_SIZE : CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+
+    if (vchPubKey.size() != nCompressedPubkeySize)
     {
         //  Non-canonical public key: invalid length for compressed key
         return false;
@@ -168,12 +187,21 @@ static bool CheckSignatureEncodingSigHashChoice(const vector<unsigned char> &vch
         return true;
     }
 
-    // Schnorr signatures must be 64 bytes plus the sighashtype (if the caller left that in vchSig)
-    if ((!check_sighash) && (sigSize != 64))
-        set_error(serror, SCRIPT_ERR_SIG_NONSCHNORR);
+    if (sigSize < FALCON_BASE_SIG_SIZE)
+    {
+        if (!check_sighash && sigSize != 64)
+            set_error(serror, SCRIPT_ERR_SIG_NONSCHNORR);
+        if (sigSize < 64 || sigSize > 64 + SigHashType::MAX_LEN)
+            return set_error(serror, SCRIPT_ERR_SIG_NONSCHNORR);
+    }
+    else if (sigSize >= FALCON_BASE_SIG_SIZE)
+    {
+        if (!check_sighash && sigSize > CKey::FALCON_SIGN_SIZE)
+            set_error(serror, SCRIPT_ERR_SIG_NONFALCON);
+        if (sigSize > CKey::FALCON_SIGN_SIZE + SigHashType::MAX_LEN)
+            return set_error(serror, SCRIPT_ERR_SIG_NONFALCON);
+    }
 
-    if ((sigSize < 64) || (sigSize > 64 + SigHashType::MAX_LEN))
-        return set_error(serror, SCRIPT_ERR_SIG_NONSCHNORR);
 
     if (check_sighash)
     {
@@ -2183,6 +2211,11 @@ bool BaseSignatureChecker::VerifySignature(const std::vector<uint8_t> &vchSig,
     {
         return pubkey.VerifySchnorr(sighash, vchSig);
     }
+    else
+    {
+        return pubkey.VerifyFalcon(sighash, vchSig);
+    }
+
     return false;
 }
 

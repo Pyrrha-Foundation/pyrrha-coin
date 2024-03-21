@@ -18,8 +18,6 @@ from test_framework.nodemessages import *
 
 pp = pprint.PrettyPrinter(indent=4)
 
-waitTime = 60
-
 def GenerateSingleSigP2SH(btcAddress):
     redeemScript = CScript([OP_DUP, OP_HASH160, bitcoinAddress2bin(btcAddress), OP_EQUALVERIFY, OP_CHECKSIG])
     p2shAddressBin = hash160(redeemScript)
@@ -40,6 +38,8 @@ class WalletTest (BitcoinTestFramework):
     def add_options(self, parser):
         parser.add_option("--addrType", dest="addrType", default="p2pkt", action="store",
                           help="Choose p2pkt or p2pkh address types to use with the wallet")
+        parser.add_option("--enableFalcon", dest="enableFalcon", default=0, action="store",
+                          help="Choose whether to enable the falcon wallet")
 
     def check_fee_amount(self, curr_balance, balance_with_fee, fee_per_byte, tx_size):
         """Return curr_balance after asserting the fee was in range"""
@@ -47,8 +47,11 @@ class WalletTest (BitcoinTestFramework):
         target_fee = fee_per_byte * tx_size
         if fee < target_fee:
             raise AssertionError("Fee of %s NEXA too low! (Should be %s NEXA)"%(str(fee), str(target_fee)))
-        # allow the node's estimation to be at most 2 bytes off
-        if fee > fee_per_byte * (tx_size + 2):
+        # allow the node's estimation to be at most 2 bytes off, 20 for falcon
+        deltaBytes = 2
+        if self.options.enableFalcon == "1":
+            deltaBytes = 20
+        if fee > fee_per_byte * (tx_size + deltaBytes):
             raise AssertionError("Fee of %s NEXA too high! (Should be %s NEXA)"%(str(fee), str(target_fee)))
         return curr_balance
 
@@ -57,7 +60,8 @@ class WalletTest (BitcoinTestFramework):
         initialize_chain_clean(self.options.tmpdir, 4, bitcoinConfDict, wallets)
 
     def setup_network(self, split=False):
-        self.node_args = [['-usehd=0', '-wallet.maxTxFee=10000'], ['-usehd=0', '-wallet.maxTxFee=10000'], ['-usehd=0', '-wallet.maxTxFee=10000']]
+        enableFalcon = str(self.options.enableFalcon)
+        self.node_args = [['-usehd=0', '-wallet.maxTxFee=10000', '-test.falcon=' + enableFalcon], ['-usehd=0', '-wallet.maxTxFee=10000', '-test.falcon=' + enableFalcon], ['-usehd=0', '-wallet.maxTxFee=10000', '-test.falcon=' + enableFalcon]]
         self.nodes = start_nodes(3, self.options.tmpdir, self.node_args)
         connect_nodes_full(self.nodes)
         self.is_network_split=False
@@ -116,6 +120,10 @@ class WalletTest (BitcoinTestFramework):
 
     def run_test (self):
         addrType = self.options.addrType
+        enableFalcon = self.options.enableFalcon
+        waitTime = 60
+        if enableFalcon == "1":
+            waitTime = waitTime * 2
 
         # Check that there's no UTXO on none of the nodes
         assert_equal(len(self.nodes[0].listunspent()), 0)
@@ -273,7 +281,8 @@ class WalletTest (BitcoinTestFramework):
         txid2 = self.nodes[1].sendtoaddress(self.nodes[0].getnewaddress(addrType), 1000000)
         sync_mempools(self.nodes)
 
-        self.nodes.append(start_node(3, self.options.tmpdir, ['-usehd=0']))
+        enableFalcon = str(self.options.enableFalcon)
+        self.nodes.append(start_node(3, self.options.tmpdir, ['-usehd=0', '-test.falcon=' + enableFalcon]))
         connect_nodes_bi(self.nodes, 0, 3)
         sync_blocks(self.nodes)
 
@@ -322,7 +331,7 @@ class WalletTest (BitcoinTestFramework):
         node2bal = self.nodes[1].getbalance()
         stop_nodes(self.nodes)
         wait_bitcoinds()
-        self.nodes = start_nodes(3, self.options.tmpdir, [["-walletbroadcast=0", "-usehd=0"],["-walletbroadcast=0", "-usehd=0"],["-walletbroadcast=0", "-usehd=0"]])
+        self.nodes = start_nodes(3, self.options.tmpdir, [["-walletbroadcast=0", "-usehd=0", '-test.falcon=' + enableFalcon],["-walletbroadcast=0", "-usehd=0", '-test.falcon=' + enableFalcon],["-walletbroadcast=0", "-usehd=0", '-test.falcon=' + enableFalcon]])
         connect_nodes_full(self.nodes)
         self.sync_all()
 
@@ -351,7 +360,7 @@ class WalletTest (BitcoinTestFramework):
         #restart the nodes with -walletbroadcast=1
         stop_nodes(self.nodes)
         wait_bitcoinds()
-        self.node_args = [['-usehd=0'], ['-usehd=0'], ['-usehd=0']]
+        self.node_args = [['-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon], ['-usehd=0', '-test.falcon=' + enableFalcon]]
         self.nodes = start_nodes(3, self.options.tmpdir, self.node_args)
         connect_nodes_full(self.nodes)
         sync_blocks(self.nodes)
@@ -398,6 +407,7 @@ class WalletTest (BitcoinTestFramework):
         assert(self.nodes[1].validateaddress(address_to_import)["iswatchonly"])
 
         # 4. Check that the unspents after import are not spendable
+        #print("list unspent1:  " + str(self.nodes[1].listunspent()))
         assert_array_result(self.nodes[1].listunspent(),
                            {"address": address_to_import},
                            {"spendable": False})
@@ -469,9 +479,9 @@ class WalletTest (BitcoinTestFramework):
         # verify that none of the importaddress calls added the address with a label (bug fix check)
         txns = self.nodes[2].listreceivedbyaddress(0, True, True)
         for i in range(6,21):
-            assert_array_result(txns,
-                               {"address": addrs[i]},
-                               {"label": ""})
+          assert_array_result(txns,
+                             {"address": addrs[i]},
+                             {"label": ""})
 
         # now try P2SH
         btcAddress = self.nodes[1].getnewaddress(addrType)
@@ -549,7 +559,7 @@ class WalletTest (BitcoinTestFramework):
             logging.info("check " + m)
             stop_nodes(self.nodes)
             wait_bitcoinds()
-            self.node_args = [['-usehd=0', m], ['-usehd=0', m], ['-usehd=0', m]]
+            self.node_args = [['-usehd=0', m, '-test.falcon=' + enableFalcon], ['-usehd=0', m, '-test.falcon=' + enableFalcon], ['-usehd=0', m, '-test.falcon=' + enableFalcon]]
             self.nodes = start_nodes(3, self.options.tmpdir, self.node_args)
             # wait for blockchain to catch up
             waitFor(60, lambda : [block_count] * 3 == [self.nodes[i].getblockcount() for i in range(3)])
@@ -630,9 +640,13 @@ class WalletTest (BitcoinTestFramework):
         assert_equal(coins_before, 682)
         address = self.nodes[0].getnewaddress()
         a = self.nodes[0].consolidate(600, 10, False, address)
-        # we should have 85 utxos left, 600 - 82 + #of txs needed to consilidate (which should be 3 in this case)
+        # we should have 85 utxos left, 600 - 82 + #of txs needed to consolidate (which should be 3 in this case)
         # because we are consolidating to an address the belong to node 0
-        waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == 85)
+        if self.options.enableFalcon == "1":
+            waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == 92)
+        else:
+            waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == 85)
+
         assert_equal(a['destination'], address)
         assert_greater_than(len(a['txids']), 0)
         assert_equal(len(a['txids']), len(a['txidems']))
@@ -640,26 +654,31 @@ class WalletTest (BitcoinTestFramework):
 
         # do a full consolidation.
         self.nodes[0].consolidate(5000,1)
+        waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == 1)
+        self.nodes[0].generate(1)
 
 
         # Stop and restart node with automatic consolidation turned on
         stop_nodes(self.nodes)
         wait_bitcoinds()
-        self.node_args = [['-usehd=0', '-wallet.auto=1']]
+        self.node_args = [['-usehd=0', '-wallet.auto=1', '-test.falcon=' + enableFalcon]]
         self.nodes = start_nodes(1, self.options.tmpdir, self.node_args)
-        connect_nodes_full(self.nodes)
-        sync_blocks(self.nodes)
 
-        # generate more blocks so that there are more than 256 utxos.  Then send
+        # generate more blocks so that there are more than 256 utxos (only 60 for falcon).  Then send
         # all coins to one address which will trigger an auto consolidation.
-        self.nodes[0].generate(300);
-        coins_before = len(self.nodes[0].listunspent(0));
-        waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == 301)
+        if self.options.enableFalcon == "0":
+            coins_before = len(self.nodes[0].listunspent(0));
+            self.nodes[0].generate(300);
+            waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == coins_before + 300)
+        else:
+            coins_before = len(self.nodes[0].listunspent(0));
+            self.nodes[0].generate(60);
+            waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == coins_before + 60)
+
         balance = self.nodes[0].getbalance()
         addr = self.nodes[0].getnewaddress()
         self.nodes[0].sendtoaddress(addr, balance, "", "", True)
         waitFor(waitTime, lambda: len(self.nodes[0].listunspent(0)) == 1)
-
 
 
 if __name__ == '__main__':

@@ -105,8 +105,11 @@ public:
         if (!SignatureHashNexa(scriptCode, m_spender.txVersion, m_spender.lockTime, sighashtype,
                 m_spender.hashPrevOutputs, m_spender.hashSequence, m_spender.hashInAmounts, m_spender.hashOutputs,
                 sighash, nullptr))
+        {
             return false;
-        return pubkey.VerifySchnorr(sighash, vchSig);
+        }
+
+        return VerifySignature(vchSig, pubkey, sighash);
     }
     bool CheckLockTime(const CScriptNum &) const override { return true; }
     bool CheckSequence(const CScriptNum &) const override { return true; }
@@ -165,6 +168,7 @@ DoubleSpendProof DoubleSpendProof::create(const CTransaction &t1, const CTransac
                 assert(!s2.pushData.empty()); // we resized it
                 if (s1.pushData.front().empty() || s2.pushData.front().empty())
                     throw std::runtime_error("scriptSig has no signature");
+
                 done = true;
                 break;
             }

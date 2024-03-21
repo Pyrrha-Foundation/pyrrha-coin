@@ -53,7 +53,7 @@ A max size of 100000 bytes and 50000 non-push opcodes was chosen as an initial l
 */
 
 // Maximum number of bytes pushable to the stack
-static const unsigned int MAX_SCRIPT_ELEMENT_SIZE = 520;
+extern unsigned int MAX_SCRIPT_ELEMENT_SIZE;
 
 // Maximum number of non-push operations per script
 static const int MAX_OPS_PER_SCRIPT = 201;
