@@ -10,6 +10,7 @@
 #include "bitfield.h"
 #include "bitmanip.h"
 #include "consensus/grouptokens.h"
+#include "consensus/merkle.h"
 #include "consensus/validation.h"
 #include "crypto/ripemd160.h"
 #include "crypto/sha1.h"
@@ -2122,6 +2123,72 @@ bool ScriptMachine::Step()
                     }
 
                     rawnum.push_back(signbit);
+                }
+                break;
+
+                // OP_MERKLE computes the root of a Merkle tree given the leaf element and
+                //   serialized proof
+                //
+                // call signature: <proof0proof1proofN> <leafIndex> <leaf> <algoIndex> OP_MERKLE
+                //
+                // algoIndex selects the hashing function used to build the tree, also the size of elements
+                //   algoIndex == 0 -> Hash256 and 32 byte long elements
+                //   algoIndex == 1 -> Hash160 and 20 byte long elements
+                // leaf is the element for which the root shall be computed, must be properly sized
+                // leafIndex is the element index from which the proof was built
+                //   and for which the root computation shall be made
+                // proof0proof1proofN serialized push-only encoded Merkle proof
+                //   must not be zero length, must be properly sized
+                case OP_MERKLE:
+                {
+                    if (stack.size() < 4)
+                    {
+                        return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION);
+                    }
+
+                    const uint64_t algoIndex = stackItemAt(-1).asUint64(fRequireMinimal);
+                    if (algoIndex != 0 && algoIndex != 1)
+                    {
+                        return set_error(serror, SCRIPT_ERR_INVALID_NUMBER_RANGE);
+                    }
+                    const VchType leaf = stackItemAt(-2).asVch();
+
+                    // Will result in SCRIPT_ERR_BAD_OPERATION_ON_TYPE for negative indices
+                    const uint64_t leafIndex = stackItemAt(-3).asUint64(fRequireMinimal);
+
+                    const VchType proof = stackItemAt(-4).asVch();
+
+                    const size_t leafSize = algoIndex == 0 ? sizeof(uint256) : sizeof(uint160);
+                    if (leaf.size() != leafSize ||
+                        !proof.size() || (proof.size() % (leafSize + 1)) != 0)
+                    {
+                        return set_error(serror, SCRIPT_ERR_INVALID_OPERAND_SIZE);
+                    }
+
+                    popstack(stack);
+                    popstack(stack);
+                    popstack(stack);
+                    popstack(stack);
+
+                    switch (algoIndex) {
+                        case 0:
+                        {
+                            uint256 root = MerkleHash256::RawProofToRoot(proof, uint256(leaf), leafIndex);
+
+                            stack.push_back(StackItem(root.begin(), root.end()));
+                        }
+                        break;
+                        case 1:
+                        {
+                            uint160 root = MerkleHash160::RawProofToRoot(proof, uint160(leaf), leafIndex);
+
+                            stack.push_back(StackItem(root.begin(), root.end()));
+                        }
+                        break;
+                        default:
+                            // unsupported algoIndex
+                            return set_error(serror, SCRIPT_ERR_INVALID_NUMBER_RANGE);
+                    }
                 }
                 break;
 
