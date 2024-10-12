@@ -623,6 +623,7 @@ class CExtInv
 public:
     CExtInv();
     CExtInv(uint8_t typeIn, const std::vector<uint8_t> &hashIn);
+    CExtInv(uint8_t typeIn, uint64_t &hashIn);
     CExtInv(const std::string &strType, const std::vector<uint8_t> &hashIn);
 
     ADD_SERIALIZE_METHODS;
@@ -666,7 +667,9 @@ enum
     MSG_DOUBLESPENDPROOF = 7,
 
     // CExtInv types.  They begin at 100 to allow room to add more CInv types without affect CExtInv types.
-    MSG_TOKENINFO = 100
+    MSG_TOKENINFO = 100,
+    MSG_EXT_TX = 101,
+
 };
 
 #endif // NEXA_PROTOCOL_H

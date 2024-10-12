@@ -8,6 +8,7 @@
 #include "protocol.h"
 
 #include "compat.h"
+#include "streams.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
@@ -348,6 +349,16 @@ CExtInv::CExtInv(uint8_t typeIn, const std::vector<uint8_t> &hashIn)
     hash = hashIn;
 }
 
+CExtInv::CExtInv(uint8_t typeIn, uint64_t &hashIn)
+{
+    type = typeIn;
+
+    CDataStream ss(0, 0);
+    ser_writedata64(ss, hashIn);
+    for (auto c : ss)
+        hash.push_back(c);
+}
+
 CExtInv::CExtInv(const std::string &strType, const std::vector<uint8_t> &hashIn)
 {
     bool fFound = false;
@@ -365,7 +376,7 @@ CExtInv::CExtInv(const std::string &strType, const std::vector<uint8_t> &hashIn)
     hash = hashIn;
 }
 
-bool CExtInv::IsKnownType() const { return (type >= 100 && type <= 100); }
+bool CExtInv::IsKnownType() const { return (type >= 100 && type <= 101); }
 const char *CExtInv::GetCommand() const
 {
     if (!IsKnownType())
