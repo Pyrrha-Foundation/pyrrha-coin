@@ -197,6 +197,12 @@ AC_ARG_ENABLE([javalibnexa],
   [use_javalibnexa=yes],
   [use_javalibnexa=no])
 
+AC_ARG_ENABLE([only-libnexa],
+  [AS_HELP_STRING([--enable-only-libnexa],
+  [compile only libnexa (default is no)])],
+  [build_only_libnexa=$enableval],
+  [build_only_libnexa=no])
+
 AC_ARG_ENABLE([mutrace],
   [AS_HELP_STRING([--enable-mutrace],
   [enable mutex profiler build (default is no)])],
@@ -710,6 +716,22 @@ else
   AC_SEARCH_LIBS([clock_gettime],[rt])
 fi
 
+if test x$build_only_libnexa != xno; then
+  if x$TARGET_OS != xlinux; then
+    AC_MSG_ERROR(building only libnexa is only supported on linux for now.)
+  fi
+  build_bitcoin_utils=no
+  build_nexa_libs=yes
+  build_bitcoind=no
+  bitcoin_enable_qt=no
+  use_tests=no
+  use_bench=no
+  enable_wallet=no
+  use_upnp=no
+  use_zmq=no
+  use_boost=no
+fi
+
 if test x$TARGET_OS != xwindows; then
   # All windows code is PIC, forcing it on just adds useless compile warnings
   AX_CHECK_COMPILE_FLAG([-fPIC],[PIC_FLAGS="-fPIC"])
@@ -866,7 +888,7 @@ BITCOIN_QT_INIT
 dnl sets $bitcoin_enable_qt, $bitcoin_enable_qt_test, $bitcoin_enable_qt_dbus
 BITCOIN_QT_CONFIGURE([$use_pkgconfig])
 
-if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests = xnononono; then
+if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests$build_only_libnexa = xnonononoyes; then
     use_boost=no
 else
     use_boost=yes
@@ -1046,6 +1068,10 @@ AC_MSG_RESULT($build_bitcoin_utils)
 AC_MSG_CHECKING([whether to build libraries])
 AM_CONDITIONAL([BUILD_NEXA_LIBS], [test x$build_nexa_libs = xyes])
 AC_MSG_RESULT($build_nexa_libs)
+
+AC_MSG_CHECKING([whether to build only libraries])
+AM_CONDITIONAL([BUILD_ONLY_LIBNEXA], [test x$build_only_libnexa = xyes])
+AC_MSG_RESULT($build_only_libnexa)
 
 AC_LANG_POP
 
