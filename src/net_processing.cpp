@@ -535,9 +535,27 @@ void static ProcessExtGetData(CNode *pfrom,
                 ss1 << c;
             uint64_t cheaphash = ser_readdata64(ss1);
             vStream = maprelay.Find(cheaphash);
+#ifdef DEBUG
+            // This -debug test code allows us to fall through to check the different types of searches
+            // for transactions. If we didn't do this we very rarely, if ever, check the commit queue
+            // or the txpool for transactions since we almost always get them from the relay map.
+            static std::atomic<uint32_t> count{0};
+            count++;
+            if (count >= 10)
+            {
+                vStream.clear();
+            }
+#endif
             if (vStream.empty())
             {
                 vTx = CommitQGet(cheaphash);
+#ifdef DEBUG
+                if (count >= 15)
+                {
+                    count = 0;
+                    vTx.clear();
+                }
+#endif
                 if (vTx.empty())
                 {
                     vTx = mempool.get(cheaphash);
