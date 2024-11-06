@@ -907,3 +907,70 @@ build-debian-nodeps-qt:
             - build/config.log
     rules:
       - if: $CI_PIPELINE_SOURCE != "schedule"
+
+
+######################################################
+######## Ubuntu24 base settings
+######################################################
+.ubuntu24_base:
+    image: ubuntu:noble
+
+.ubuntu24_ccache_scripts:
+    extends: .ubuntu24_base
+    before_script:
+        - mkdir -p ccache
+        - export CCACHE_BASEDIR=${PWD}
+        - export CCACHE_DIR=${PWD}/ccache
+        - export CCACHE_COMPILERCHECK=content
+        - ccache --zero-stats || true
+
+######################################################
+######## x86_64 Ubuntu24 + deps as via system lib
+######################################################
+.cache-ubuntu24-nodeps:
+    extends: .ubuntu24_ccache_scripts
+    cache:
+        <<: *global_cache_settings
+        key: ubuntu24_cache-nodeps
+
+build-ubuntu24-nodeps:
+    stage: build
+    extends: .cache-ubuntu24-nodeps
+    needs: []
+    script:
+        - apt-get update
+        - apt-get install -y ccache build-essential libtool autotools-dev autoconf automake pkg-config libssl-dev libevent-dev libgmp-dev
+        - apt-get install -y bsdmainutils git libboost-all-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5
+        - apt-get install -y qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libdb-dev libdb++-dev
+        - ./autogen.sh
+        - mkdir build; cd build
+        - ../configure --cache-file=config.cache --with-gui=no --enable-glibc-back-compat --enable-reduce-exports
+        - make -j `nproc`
+        - ccache --show-stats
+    artifacts:
+        when: on_failure
+        paths:
+            - ./build/config.log
+    rules:
+      - if: $CI_PIPELINE_SOURCE != "schedule"
+
+build-ubuntu24-nodeps-qt:
+    stage: build
+    extends: .cache-ubuntu24-nodeps
+    needs: []
+    script:
+        - apt-get update
+        - apt-get install -y ccache build-essential libtool autotools-dev autoconf automake pkg-config libssl-dev libevent-dev libgmp-dev
+        - apt-get install -y bsdmainutils git libboost-all-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5
+        - apt-get install -y qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libdb-dev libdb++-dev
+        - ./autogen.sh
+        - mkdir build; cd build
+        - ../configure --cache-file=config.cache --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-tests
+        - make -j `nproc`
+        - ccache --show-stats
+    artifacts:
+        when: on_failure
+        paths:
+            - build/config.log
+    rules:
+      - if: $CI_PIPELINE_SOURCE != "schedule"
