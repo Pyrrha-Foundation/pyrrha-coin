@@ -913,7 +913,7 @@ build-debian-nodeps-qt:
 ######## Ubuntu24 base settings
 ######################################################
 .ubuntu24_base:
-    image: ubuntu:noble
+    image: bchunlimited/nexa:ubuntu24.04
 
 .ubuntu24_ccache_scripts:
     extends: .ubuntu24_base
@@ -938,10 +938,6 @@ build-ubuntu24-nodeps:
     extends: .cache-ubuntu24-nodeps
     needs: []
     script:
-        - apt-get update
-        - apt-get install -y ccache build-essential libtool autotools-dev autoconf automake pkg-config libssl-dev libevent-dev libgmp-dev
-        - apt-get install -y bsdmainutils git libboost-all-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5
-        - apt-get install -y qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libdb-dev libdb++-dev
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --cache-file=config.cache --with-gui=no --enable-glibc-back-compat --enable-reduce-exports
@@ -959,10 +955,6 @@ build-ubuntu24-nodeps-qt:
     extends: .cache-ubuntu24-nodeps
     needs: []
     script:
-        - apt-get update
-        - apt-get install -y ccache build-essential libtool autotools-dev autoconf automake pkg-config libssl-dev libevent-dev libgmp-dev
-        - apt-get install -y bsdmainutils git libboost-all-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5
-        - apt-get install -y qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libdb-dev libdb++-dev
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --cache-file=config.cache --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-tests
