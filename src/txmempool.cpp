@@ -742,6 +742,7 @@ bool CTxMemPool::_addUnchecked(const CTxMemPoolEntry &entry, bool fCurrentEstima
 
     nTransactionsUpdated++;
     totalTxSize += entry.GetTxSize();
+    totalSigOps += entry.GetSigOpCount();
     txAdded += 1;
     poolSize() = totalTxSize;
     minerPolicyEstimator->processTransaction(entry, fCurrentEstimate);
@@ -799,6 +800,7 @@ void CTxMemPool::removeUnchecked(TxIdIter it)
     totalTxSize -= it->GetTxSize();
     cachedInnerUsage -= it->DynamicMemoryUsage();
     cachedInnerUsage -= memusage::DynamicUsage(mapLinks[it].parents) + memusage::DynamicUsage(mapLinks[it].children);
+    totalSigOps -= it->GetSigOpCount();
 
     // Erase this entry in the parents and children
     auto linksForIt = mapLinks.find(it);
@@ -867,7 +869,7 @@ void CTxMemPool::removeUnchecked(TxIdIter it)
 // can save time by not iterating over those entries.
 void CTxMemPool::_CalculateDescendants(TxIdIter entryit, setEntries &setDescendants, mapEntryHistory *mapTxnChainTips)
 {
-    AssertWriteLockHeld(cs_txmempool);
+    AssertLockHeld(cs_txmempool);
     setEntries stage;
     if (setDescendants.count(entryit) == 0)
     {
@@ -1281,6 +1283,7 @@ void CTxMemPool::_clear()
     setDirtyTxnChainTips.clear();
     totalTxSize = 0;
     cachedInnerUsage = 0;
+    totalSigOps = 0;
     ++nTransactionsUpdated;
 }
 
@@ -1300,6 +1303,7 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
 
     uint64_t checkTotal = 0;
     uint64_t innerUsage = 0;
+    uint64_t checkSigOps = 0;
 
     READLOCK(cs_txmempool);
     LOG(MEMPOOL, "Checking mempool with %u transactions and %u inputs\n", (unsigned int)mapTx.size(),
@@ -1313,6 +1317,7 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
         unsigned int i = 0;
         checkTotal += it->GetTxSize();
         innerUsage += it->DynamicMemoryUsage();
+        checkSigOps += it->GetSigOpCount();
         const CTransaction &tx = it->GetTx();
         txlinksMap::const_iterator linksiter = mapLinks.find(it);
         assert(linksiter != mapLinks.end());
@@ -1533,6 +1538,7 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
 
     assert(totalTxSize == checkTotal);
     assert(innerUsage == cachedInnerUsage);
+    assert(totalSigOps == checkSigOps);
 }
 
 void CTxMemPool::queryIds(vector<uint256> &vtxid) const
@@ -1767,7 +1773,9 @@ bool CTxMemPool::PrioritiseTransaction(const uint256 h, double dPriorityDelta, c
             _CalculateDescendants(it, setDescendants);
             setDescendants.erase(it);
             for (TxIdIter descIt : setDescendants)
+            {
                 mapTx.modify(descIt, update_ancestor_state(0, nFeeDelta, 0, 0, false));
+            }
         }
         else
         {
