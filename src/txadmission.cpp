@@ -1241,8 +1241,6 @@ bool ParallelAcceptToMemoryPool(CTxMemPool &pool,
         // Create a commit data entry
         CTxMemPoolEntry entry(
             tx, nFees, GetTime(), dPriority, chainActive.Height(), inChainInputValue, fSpendsCoinbase, nSigOps, lp);
-        // Record the actual number of sigops executed for statistical purposes only
-        entry.UpdateRuntimeSigOps(resourceTracker.GetSigOps(), resourceTracker.GetSighashBytes());
 
         nSize = entry.GetTxSize();
         if (fRelayPriority && (nModifiedFees < ::minRelayTxFee.GetFee(nSize)) &&
