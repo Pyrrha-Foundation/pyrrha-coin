@@ -18,6 +18,9 @@
 #define MAX_N_HASH_FUNC 32
 class uint256;
 
+uint256 GetRandHash() noexcept;
+
+
 /**
  * This class can be used anywhere a Bloom filter is used so long as the input data is random.
  *
@@ -290,6 +293,9 @@ protected:
     // If true then vData2 is the current one if false then it's vData3.
     bool fCurrentSwapIsData2 = true;
 
+    // A random hash created at startup which is used to salt the data.
+    uint256 salt;
+
 public:
     enum
     {
@@ -301,6 +307,8 @@ public:
         vData.resize(FILTER_BYTES);
         vData2.resize(FILTER_BYTES);
         vData3.resize(FILTER_BYTES);
+
+        salt = GetRandHash();
     }
 
     void insert(const uint256 &hash)
@@ -337,9 +345,10 @@ public:
 
         // Do the insert
         const uint32_t *pos = (const uint32_t *)hash.begin();
-        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos++)
+        const uint32_t *pos_salt = (const uint32_t *)salt.begin();
+        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos++, pos_salt++)
         {
-            uint32_t val = *pos;
+            uint32_t val = *pos ^ *pos_salt;
             uint32_t idx = val & (FILTER_SIZE - 1);
             val = __builtin_bswap32(val);
             uint32_t idx2 = val & (FILTER_SIZE - 1);
@@ -357,12 +366,13 @@ public:
         std::lock_guard<std::mutex> lock(cs_rollingfilter);
 
         const uint32_t *pos = (const uint32_t *)hash.begin();
+        const uint32_t *pos_salt = (const uint32_t *)salt.begin();
         bool unset = 0; // If any position is not set, then this will be true
         bool unset2 = 0; // If any position is not set, then this will be true
         bool unset3 = 0; // If any position is not set, then this will be true
-        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos++)
+        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos++, pos_salt++)
         {
-            uint32_t val = *pos;
+            uint32_t val = *pos ^ *pos_salt;
             uint32_t idx = val & (FILTER_SIZE - 1);
             val = __builtin_bswap32(val);
             uint32_t idx2 = val & (FILTER_SIZE - 1);
