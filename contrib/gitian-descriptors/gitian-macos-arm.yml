@@ -84,10 +84,13 @@ script: |
   export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
   mkdir -p ${BASEPREFIX}/SDKs
   tar -C ${BASEPREFIX}/SDKs -xf ${BUILD_DIR}/MacOSX11.3.sdk.tar.xz
-
+  DEPENDS_LIBNEXA="ONLY_LIBNEXA=0"
+  if [ "${ONLY_LIBNEXA_ARG}" = "--enable-only-libnexa" ]; then
+    DEPENDS_LIBNEXA="ONLY_LIBNEXA=1"
+  fi
   # Build dependencies for each host
   for i in $HOSTS; do
-    make ${MAKEOPTS} -C ${BASEPREFIX} HOST="${i}" NO_RUST=1
+    make ${MAKEOPTS} -C ${BASEPREFIX} HOST="${i}" NO_RUST=1 ${DEPENDS_LIBNEXA}
   done
 
   # Create the release tarball using (arbitrarily) the first host
