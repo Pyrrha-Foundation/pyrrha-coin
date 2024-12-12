@@ -96,6 +96,7 @@ extern uint32_t nFuzzMessages;
 extern uint32_t nDropMessages;
 extern bool fRelayPriority;
 extern bool fPrintPriority;
+extern std::atomic<bool> fRequireStandardTx;
 
 using namespace std;
 
@@ -1097,11 +1098,28 @@ bool AppInit2(Config &config)
     // cost to you of processing a transaction.
     ::minRelayTxFee = CFeeRate((CAmount)minRelayFee.Value());
 
-    bool fStandard = !GetBoolArg("-acceptnonstdtxn", !Params().RequireStandard());
-    // If we specified an override but that override was not accepted then its an error
-    if (fStandard != Params().RequireStandard())
-        return InitError(
-            strprintf("acceptnonstdtxn is not currently supported for %s chain", chainparams.NetworkIDString()));
+    // set the global atomic fRequireStandardTx to what the params for the chain require.
+    fRequireStandardTx.store(Params().RequireStandard());
+    // check args to see if user wants to accept non standard txs
+    bool fAcceptNonStandard = GetBoolArg("-acceptnonstdtxn", !Params().RequireStandard());
+    // if the chain requires standard txs and
+    // the user wants to accept non standard txs
+    // return an error
+    if (fRequireStandardTx)
+    {
+        if (fAcceptNonStandard)
+        {
+            return InitError(
+                strprintf("acceptnonstdtxn is not currently supported for %s chain", chainparams.NetworkIDString()));
+        }
+        // intentionally do nothing, the chain requires standard tx and
+        // the user configured to only allow standard tx
+    }
+    else
+    {
+        // otherwise set fRequireStandardTx to whatever the user configured
+        fRequireStandardTx.store(!fAcceptNonStandard);
+    }
 
     nBytesPerSigOp = GetArg("-bytespersigop", nBytesPerSigOp);
 

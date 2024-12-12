@@ -17,12 +17,7 @@ const std::string CBaseChainParams::SCALENET = "scale";
 const std::string CBaseChainParams::REGTEST = "regtest";
 const std::string CBaseChainParams::NEXA = "nexa";
 
-bool CBaseChainParams::RequireStandard() const
-{
-    // the acceptnonstdtxn flag can only be used to narrow the behavior.
-    // A blockchain whose default is to allow nonstandard txns can be configured to disallow them.
-    return fRequireStandard || !GetBoolArg("-acceptnonstdtxn", true);
-}
+bool CBaseChainParams::RequireStandard() const { return fRequireStandard; }
 
 static CBaseMainParams mainParams;
 static CBaseTestNetParams testNetParams;

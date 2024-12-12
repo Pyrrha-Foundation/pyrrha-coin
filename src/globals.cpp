@@ -796,6 +796,8 @@ std::map<NodeId, CMempoolSyncState> mempoolSyncResponded GUARDED_BY(cs_mempoolsy
 
 std::atomic<uint64_t> lastMempoolSync{GetStopwatchMicros()};
 
+std::atomic<bool> fRequireStandardTx{true};
+
 // Are we shutting down. Replaces boost interrupts.
 std::atomic<bool> shutdown_threads{false};
 
