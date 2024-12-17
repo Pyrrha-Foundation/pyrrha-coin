@@ -49,7 +49,6 @@ extern CTweak<uint32_t> limitFreeRelay;
 
 extern bool fRelayPriority;
 extern CRollingFastFilter<32 * 1024 * 1024> filterTransactionKnown; // guarded by cs_txKnown
-extern std::atomic<bool> fRequireStandardTx;
 
 using namespace std;
 
@@ -893,7 +892,7 @@ bool ParallelAcceptToMemoryPool(CTxMemPool &pool,
     // Reject nonstandard transactions if so configured.
     // (-testnet/-regtest allow nonstandard, and explicit submission via RPC)
     std::string reason;
-    bool fRequireStandard = fRequireStandardTx.load();
+    bool fRequireStandard = chainparams.RequireStandard();
 
     if (allowedTx == TransactionClass::STANDARD)
     {

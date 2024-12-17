@@ -44,7 +44,6 @@ extern void noui_connect();
 
 extern CTweak<uint32_t> limitFreeRelay;
 extern uint64_t nMaxSendBufferSize;
-extern std::atomic<bool> fRequireStandardTx;
 
 BasicTestingSetup::BasicTestingSetup(const std::string &chainName)
 {
@@ -63,28 +62,14 @@ BasicTestingSetup::BasicTestingSetup(const std::string &chainName)
     SelectParams(chainName);
     noui_connect();
 
-    // set the global atomic fRequireStandardTx to what the params for the chain require.
-    fRequireStandardTx.store(Params().RequireStandard());
     // check args to see if user wants to accept non standard txs
-    bool fAcceptNonStandard = GetBoolArg("-acceptnonstdtxn", !Params().RequireStandard());
-    // if the chain requires standard txs and
-    // the user wants to accept non standard txs
-    // return an error
-    if (fRequireStandardTx)
+    bool fAcceptNonStandard = GetBoolArg("-acceptnonstdtxn", !ModifiableParams().RequireStandard());
+    // attempt to change if the chain requires standard based on what the user configured
+    bool acceptedStandardChange = ModifiableParams().SetRequireStandard(fAcceptNonStandard);
+    if (acceptedStandardChange == false)
     {
-        if (fAcceptNonStandard)
-        {
-            printf("acceptnonstdtxn is not currently supported for %s chain",
-                ModifiableParams().NetworkIDString().c_str());
-            assert(false);
-        }
-        // intentionally do nothing, the chain requires standard tx and
-        // the user configured to only allow standard tx
-    }
-    else
-    {
-        // otherwise set fRequireStandardTx to whatever the user configured
-        fRequireStandardTx.store(!fAcceptNonStandard);
+        printf("acceptnonstdtxn is not currently supported for %s chain", ModifiableParams().NetworkIDString().c_str());
+        assert(false);
     }
 }
 
