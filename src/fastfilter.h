@@ -294,6 +294,8 @@ protected:
     bool fCurrentSwapIsData2 = true;
 
     // A random hash created at startup which is used to salt the data.
+    // By default, salting is turned on. However, if false is passed to the fastfilter constructor
+    // then the salt value is set to null;
     uint256 salt;
 
 public:
@@ -302,13 +304,15 @@ public:
         FILTER_BYTES = FILTER_SIZE / 8
     };
 
-    CRollingFastFilter()
+    CRollingFastFilter(bool fSalt = true)
     {
         vData.resize(FILTER_BYTES);
         vData2.resize(FILTER_BYTES);
         vData3.resize(FILTER_BYTES);
 
         salt = GetRandHash();
+        if (!fSalt)
+            salt.SetNull();
     }
 
     void insert(const uint256 &hash)
