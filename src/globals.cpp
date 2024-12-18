@@ -383,6 +383,11 @@ CTweak<uint64_t> miningPrioritySize("mining.prioritySize",
         DEFAULT_BLOCK_PRIORITY_SIZE),
     DEFAULT_BLOCK_PRIORITY_SIZE);
 
+CTweak<bool> fastBlockTemplate("mining.fastBlockTemplate",
+    strprintf("Use the optimized getblocktemplate when the txpool is smaller than max block size (default: %u)",
+        DEFAULT_FASTBLOCKTEMPLATE));
+
+
 CTweakRef<uint64_t> miningForkTime("consensus.fork1Time",
     "Time in seconds since the epoch to initiate the Nexa Fork1 protocol upgrade.  A "
     "setting of 1 will turn on the fork at the appropriate time.",
@@ -460,10 +465,6 @@ CTweak<uint64_t> maxAllowedNetMessage("test.maxAllowedNetMessage",
 CTweak<uint64_t> nextMaxBlockSize("test.nextMaxBlockSize",
     strprintf("What is the maximum allowed block size in bytes (zero means use adaptive setting, default: %d)", 0),
     0);
-
-CTweak<bool> fastBlockTemplate("test.fastBlockTemplate",
-    strprintf("Use the optimized getblocktemplate when the txpool is smaller than max block size (default: %u)",
-        DEFAULT_FASTBLOCKTEMPLATE));
 
 CTweakRef<std::string> subverOverrideTweak("net.subversionOverride",
     "If set, this field will override the normal subversion field.  This is useful if you need to hide your node",
