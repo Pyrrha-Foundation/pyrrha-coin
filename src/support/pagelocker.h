@@ -11,7 +11,8 @@
 
 #include <assert.h>
 #include <map>
-#ifdef WIN32  // std::once has undefined symbol link problems in win32, but is better for android and fine for linux
+//#ifdef WIN32  // std::once has undefined symbol link problems in win32, but is better for android and fine for linux
+#ifndef BUILD_ONLY_LIBNEXA
 #include <boost/thread/once.hpp>
 #include <boost/thread/mutex.hpp>
 #endif
@@ -47,7 +48,8 @@ public:
     // For all pages in affected range, increase lock count
     void LockRange(void* p, size_t size)
     {
-#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
+//#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
+#ifndef BUILD_ONLY_LIBNEXA
         boost::mutex::scoped_lock lock(mutex);
 #else
         std::lock_guard<std::mutex> lock(mutex);
@@ -73,7 +75,8 @@ public:
     // For all pages in affected range, decrease lock count
     void UnlockRange(void* p, size_t size)
     {
-#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
+// #ifdef WIN32  // remove when mingw win32 pthread link problems fixed
+#ifndef BUILD_ONLY_LIBNEXA
         boost::mutex::scoped_lock lock(mutex);
 #else
         std::lock_guard<std::mutex> lock(mutex);
@@ -100,7 +103,8 @@ public:
     // Get number of locked pages for diagnostics
     int GetLockedPageCount()
     {
-#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
+//#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
+#ifndef BUILD_ONLY_LIBNEXA
         boost::mutex::scoped_lock lock(mutex);
 #else
         std::lock_guard<std::mutex> lock(mutex);
@@ -110,7 +114,8 @@ public:
 
 private:
     Locker locker;
-#ifdef WIN32
+//#ifdef WIN32
+#ifndef BUILD_ONLY_LIBNEXA
     boost::mutex mutex;
 #else
     std::mutex mutex;
@@ -155,7 +160,8 @@ class LockedPageManager : public LockedPageManagerBase<MemoryPageLocker>
 public:
     static LockedPageManager& Instance()
     {
-#ifdef WIN32
+//#ifdef WIN32
+#ifndef BUILD_ONLY_LIBNEXA
         boost::call_once(LockedPageManager::CreateInstance, LockedPageManager::init_flag);
 #else
         std::call_once(LockedPageManager::init_flag, LockedPageManager::CreateInstance);
@@ -178,7 +184,8 @@ private:
     }
 
     static LockedPageManager* _instance;
-#ifdef WIN32
+// #ifdef WIN32
+#ifndef BUILD_ONLY_LIBNEXA
     static boost::once_flag init_flag;
 #else
     static std::once_flag init_flag;

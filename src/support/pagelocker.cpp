@@ -30,7 +30,8 @@
 #endif
 
 LockedPageManager* LockedPageManager::_instance = nullptr;
-#ifdef WIN32
+// #ifdef WIN32
+#ifndef BUILD_ONLY_LIBNEXA
 boost::once_flag LockedPageManager::init_flag = BOOST_ONCE_INIT;
 #else
 std::once_flag LockedPageManager::init_flag;

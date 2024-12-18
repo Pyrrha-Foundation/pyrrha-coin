@@ -1074,8 +1074,12 @@ AM_CONDITIONAL([BUILD_NEXA_LIBS], [test x$build_nexa_libs = xyes])
 AC_MSG_RESULT($build_nexa_libs)
 
 AC_MSG_CHECKING([whether to build only libraries])
-AM_CONDITIONAL([BUILD_ONLY_LIBNEXA], [test x$build_only_libnexa = xyes])
-AC_MSG_RESULT($build_only_libnexa)
+
+if test x$build_only_libnexa = xyes; then
+    AM_CONDITIONAL([BUILD_ONLY_LIBNEXA], [test x$build_only_libnexa = xyes])
+    AC_DEFINE_UNQUOTED([BUILD_ONLY_LIBNEXA],[1],[Define to 1 to enable only libnexa compilation])
+    AC_MSG_RESULT(yes)
+fi
 
 AC_LANG_POP
 

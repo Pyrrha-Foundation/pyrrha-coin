@@ -18,7 +18,6 @@
 #include "utilstrencodings.h"
 #include "utiltranslate.h"
 
-
 #include <stdio.h>
 
 #include <event2/buffer.h>
@@ -27,6 +26,8 @@
 #include <event2/keyvalq_struct.h>
 
 #include <univalue.h>
+
+#include <boost/thread.hpp>
 
 #ifdef DEBUG_LOCKORDER
 std::atomic<bool> lockdataDestructed{false};
