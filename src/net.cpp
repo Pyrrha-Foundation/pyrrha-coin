@@ -57,6 +57,7 @@ extern bool fBlocksOnly;
 #include <miniupnpc/upnperrors.h>
 #endif
 
+#include <boost/filesystem.hpp>
 #include <chrono>
 #include <thread>
 
