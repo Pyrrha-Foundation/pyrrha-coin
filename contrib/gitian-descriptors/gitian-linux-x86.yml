@@ -147,9 +147,10 @@ script: |
         cp src/rostrum ${INSTALLPATH}/bin/rostrum
     fi
     # BU save the executables with debug symbols
-    cp -f src/nexad ${OUTDIR}/nexad-${i}.debug
-    if [ -f src/qt/nexa-qt ]
-    then
+    if [ -f src/nexad ]; then
+      cp -f src/nexad ${OUTDIR}/nexad-${i}.debug
+    fi
+    if [ -f src/qt/nexa-qt ]; then
       cp -f src/qt/nexa-qt ${OUTDIR}/nexa-qt-${i}.debug
     fi
 

@@ -143,7 +143,9 @@ script: |
     make ${MAKEOPTS} -C src check-symbols
     make deploy
     make install-strip
-    cp -f nexa*setup*.exe $OUTDIR/
+    if [ -f nexa*setup*.exe ]; then
+      cp -f nexa*setup*.exe $OUTDIR/
+    fi
     cd installed
     # fix up the name; its being generated as libnexa-0.dll
     (cd */bin; mv libnexa-0.dll libnexa.dll)
