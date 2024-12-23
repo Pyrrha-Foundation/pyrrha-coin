@@ -35,9 +35,13 @@ files: []
 script: |
   set -e -o pipefail
 
+  if [ "${ONLY_LIBNEXA_ARG}" != "--enable-only-libnexa" ]; then
+    JAVA_LIBNEXA="--enable-javalibnexa"
+  fi
+
   WRAP_DIR=$HOME/wrapped
   HOSTS="x86_64-linux-gnu"
-  CONFIGFLAGS="--enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-gui-tests --disable-tests --enable-shared --enable-javalibnexa ${ONLY_LIBNEXA_ARG}"
+  CONFIGFLAGS="--enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-gui-tests --disable-tests --enable-shared ${JAVA_LIBNEXA} ${ONLY_LIBNEXA_ARG}"
   FAKETIME_HOST_PROGS=""
   FAKETIME_PROGS="date ar ranlib nm strip"
   HOST_CFLAGS="-O2 -g"

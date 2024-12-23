@@ -193,13 +193,13 @@ AC_ARG_ENABLE([gprof],
 
 AC_ARG_ENABLE([javalibnexa],
   [AS_HELP_STRING([--enable-javalibnexa],
-  [enable java bindings for libnexa (default is no)])],
+  [enable java bindings for libnexa (default is no). incompatible with --enable-only-libnexa])],
   [use_javalibnexa=yes],
   [use_javalibnexa=no])
 
 AC_ARG_ENABLE([only-libnexa],
   [AS_HELP_STRING([--enable-only-libnexa],
-  [compile only libnexa (default is no)])],
+  [compile only libnexa (default is no). incompatible with --enable-javalibnexa])],
   [build_only_libnexa=$enableval],
   [build_only_libnexa=no])
 
@@ -223,6 +223,10 @@ AC_ARG_ENABLE([asm],
 
 if test "x$use_asm" = xyes; then
   AC_DEFINE(USE_ASM, 1, [Define this symbol to build in assembly routines])
+fi
+
+if test "x$build_only_libnexa$use_javalibnexa" = xyesyes; then
+  AC_MSG_ERROR("--enable-javalibnexa and --enable-only-libnexa are incompatible")
 fi
 
 AC_ARG_WITH([system-univalue],
@@ -1074,11 +1078,10 @@ AM_CONDITIONAL([BUILD_NEXA_LIBS], [test x$build_nexa_libs = xyes])
 AC_MSG_RESULT($build_nexa_libs)
 
 AC_MSG_CHECKING([whether to build only libraries])
-
+AM_CONDITIONAL([BUILD_ONLY_LIBNEXA], [test x$build_only_libnexa = xyes])
 if test x$build_only_libnexa = xyes; then
-    AM_CONDITIONAL([BUILD_ONLY_LIBNEXA], [test x$build_only_libnexa = xyes])
-    AC_DEFINE_UNQUOTED([BUILD_ONLY_LIBNEXA],[1],[Define to 1 to enable only libnexa compilation])
-    AC_MSG_RESULT(yes)
+  AC_DEFINE_UNQUOTED([BUILD_ONLY_LIBNEXA],[1],[Define to 1 to enable only libnexa compilation])
+  AC_MSG_RESULT(yes)
 fi
 
 AC_LANG_POP

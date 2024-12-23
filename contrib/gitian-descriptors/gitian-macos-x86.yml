@@ -38,9 +38,13 @@ files:
 script: |
   set -e -o pipefail
 
+  if [ "${ONLY_LIBNEXA_ARG}" != "--enable-only-libnexa" ]; then
+    JAVA_LIBNEXA="--enable-javalibnexa"
+  fi
+
   WRAP_DIR=$HOME/wrapped
   HOSTS="x86_64-apple-darwin"
-  CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-gui-tests --disable-tests --enable-shared --enable-javalibnexa ${ONLY_LIBNEXA_ARG} GENISOIMAGE=$WRAP_DIR/genisoimage"
+  CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-gui-tests --disable-tests --enable-shared ${JAVA_LIBNEXA} ${ONLY_LIBNEXA_ARG} GENISOIMAGE=$WRAP_DIR/genisoimage"
   FAKETIME_HOST_PROGS=""
   FAKETIME_PROGS="ar ranlib date dmg genisoimage"
 
