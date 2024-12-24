@@ -145,11 +145,13 @@ script: |
     make V=1 ${MAKEOPTS}
     make ${MAKEOPTS} -C src check-security
     make ${MAKEOPTS} -C src check-symbols
-    make deploy
-    make install-strip
-    if [ -f nexa*setup*.exe ]; then
-      cp -f nexa*setup*.exe $OUTDIR/
+    if [ "${ONLY_LIBNEXA_ARG}" != "--enable-only-libnexa" ]; then
+      make deploy
+      if [ -f nexa*setup*.exe ]; then
+        cp -f nexa*setup*.exe $OUTDIR/
+      fi
     fi
+    make install-strip
     cd installed
     # fix up the name; its being generated as libnexa-0.dll
     (cd */bin; mv libnexa-0.dll libnexa.dll)
