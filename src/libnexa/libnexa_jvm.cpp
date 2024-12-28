@@ -1059,7 +1059,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_nexa_libnexakotlin_Native_verifyD
     return pubkey.VerifySchnorr(messageHash, sig.vec());
 }
 
-
+#ifndef BUILD_ONLY_LIBNEXA
 extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_capdSolve(JNIEnv *env,
     jobject ths,
     jbyteArray jmessage)
@@ -1128,6 +1128,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_capdH
     jbyteArray ret = makeJByteArray(env, hash);
     return ret;
 }
+#endif // #ifndef BUILD_ONLY_LIBNEXA
 
 extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_cryptAES256CBC(JNIEnv *env,
     jobject ths,

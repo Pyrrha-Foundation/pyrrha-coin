@@ -56,7 +56,7 @@ static const int32_t LIBNEXA_VERSION = LIBNEXA_MAJOR(1) + LIBNEXA_MINOR(2) + LIB
 // libnexa version
 SLAPI int libnexaVersion();
 
-// returns the error code of the last error 
+// returns the error code of the last error
 SLAPI unsigned int get_libnexa_error();
 // puts the last error in the buffer. if the buffer is not large enough to hold the error,
 // the buffer will be filled but may not contain the entire error message
@@ -263,9 +263,11 @@ SLAPI int extractFromMerkleBlock(int numTxes, const unsigned char *merkleProofPa
                                  const unsigned char *hashIn, int numHashes,
                                  unsigned char *result, int resultLen);
 
+#ifndef BUILD_ONLY_LIBNEXA
 SLAPI int capdSolve(const unsigned char *message, unsigned int msgLen, unsigned char *result, unsigned int resultLen);
 SLAPI int capdCheck(const unsigned char *message, unsigned int msgLen);
 SLAPI int capdHash(const unsigned char *message, unsigned int msgLen, unsigned char *result, unsigned int resultLen);
+#endif
 
 // encrypt must be 1 (encrypt) or 0 (decrypt).
 // len must be a multiple of 16

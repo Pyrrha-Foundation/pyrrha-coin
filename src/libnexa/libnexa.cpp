@@ -759,6 +759,7 @@ SLAPI int signMessage(const unsigned char *message,
     return (int)sz;
 }
 
+#ifndef BUILD_ONLY_LIBNEXA
 SLAPI int capdSolve(const unsigned char *message, unsigned int msgLen, unsigned char *result, unsigned int resultLen)
 {
     CDataStream dataStrm((char *)message, (char *)message + msgLen, SER_NETWORK, PROTOCOL_VERSION);
@@ -851,7 +852,7 @@ SLAPI int capdHash(const unsigned char *message, unsigned int msgLen, unsigned c
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return (int)sz;
 }
-
+#endif
 
 SLAPI int verifyMessage(const unsigned char *message,
     unsigned int msgLen,
