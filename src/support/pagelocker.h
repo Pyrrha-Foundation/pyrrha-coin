@@ -7,10 +7,15 @@
 #ifndef BITCOIN_SUPPORT_PAGELOCKER_H
 #define BITCOIN_SUPPORT_PAGELOCKER_H
 
+#if defined(HAVE_CONFIG_H)
+#include "nexa-config.h"
+#endif
+
 #include "support/cleanse.h"
 
 #include <assert.h>
 #include <map>
+
 #ifdef BUILD_ONLY_LIBNEXA
 #include <mutex>
 #else
