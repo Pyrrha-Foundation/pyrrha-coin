@@ -1059,7 +1059,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_nexa_libnexakotlin_Native_verifyD
     return pubkey.VerifySchnorr(messageHash, sig.vec());
 }
 
-#ifndef BUILD_ONLY_LIBNEXA
+#ifdef BUILD_ONLY_LIBNEXA
+#else
 extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_capdSolve(JNIEnv *env,
     jobject ths,
     jbyteArray jmessage)

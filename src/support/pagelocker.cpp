@@ -30,11 +30,10 @@
 #endif
 
 LockedPageManager* LockedPageManager::_instance = nullptr;
-// #ifdef WIN32
-#ifndef BUILD_ONLY_LIBNEXA
-boost::once_flag LockedPageManager::init_flag = BOOST_ONCE_INIT;
-#else
+#ifdef BUILD_ONLY_LIBNEXA
 std::once_flag LockedPageManager::init_flag;
+#else
+boost::once_flag LockedPageManager::init_flag = BOOST_ONCE_INIT;
 #endif
 
 /** Determine system page size in bytes */

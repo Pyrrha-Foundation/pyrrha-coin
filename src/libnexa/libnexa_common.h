@@ -37,7 +37,8 @@
 #include "utilstrencodings.h"
 #include "wallet/grouptokencache.h"
 
-#ifndef BUILD_ONLY_LIBNEXA
+#ifdef BUILD_ONLY_LIBNEXA
+#else
 #include "capd/capd.h"
 #endif
 

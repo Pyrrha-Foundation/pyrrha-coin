@@ -11,12 +11,13 @@
 
 #include <assert.h>
 #include <map>
-//#ifdef WIN32  // std::once has undefined symbol link problems in win32, but is better for android and fine for linux
-#ifndef BUILD_ONLY_LIBNEXA
+#ifdef BUILD_ONLY_LIBNEXA
+#include <mutex>
+#else
 #include <boost/thread/once.hpp>
 #include <boost/thread/mutex.hpp>
 #endif
-#include <mutex>
+
 
 /**
  * Thread-safe class to keep track of locked (ie, non-swappable) memory pages.
@@ -48,11 +49,10 @@ public:
     // For all pages in affected range, increase lock count
     void LockRange(void* p, size_t size)
     {
-//#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
-#ifndef BUILD_ONLY_LIBNEXA
-        boost::mutex::scoped_lock lock(mutex);
-#else
+#ifdef BUILD_ONLY_LIBNEXA
         std::lock_guard<std::mutex> lock(mutex);
+#else
+        boost::mutex::scoped_lock lock(mutex);
 #endif
         if (!size)
             return;
@@ -76,10 +76,10 @@ public:
     void UnlockRange(void* p, size_t size)
     {
 // #ifdef WIN32  // remove when mingw win32 pthread link problems fixed
-#ifndef BUILD_ONLY_LIBNEXA
-        boost::mutex::scoped_lock lock(mutex);
-#else
+#ifdef BUILD_ONLY_LIBNEXA
         std::lock_guard<std::mutex> lock(mutex);
+#else
+        boost::mutex::scoped_lock lock(mutex);
 #endif
         if (!size)
             return;
@@ -103,22 +103,20 @@ public:
     // Get number of locked pages for diagnostics
     int GetLockedPageCount()
     {
-//#ifdef WIN32  // remove when mingw win32 pthread link problems fixed
-#ifndef BUILD_ONLY_LIBNEXA
-        boost::mutex::scoped_lock lock(mutex);
-#else
+#ifdef BUILD_ONLY_LIBNEXA
         std::lock_guard<std::mutex> lock(mutex);
+#else
+        boost::mutex::scoped_lock lock(mutex);
 #endif
         return histogram.size();
     }
 
 private:
     Locker locker;
-//#ifdef WIN32
-#ifndef BUILD_ONLY_LIBNEXA
-    boost::mutex mutex;
-#else
+#ifdef BUILD_ONLY_LIBNEXA
     std::mutex mutex;
+#else
+    boost::mutex mutex;
 #endif
     size_t page_size, page_mask;
     // map of page base address to lock count
@@ -160,11 +158,10 @@ class LockedPageManager : public LockedPageManagerBase<MemoryPageLocker>
 public:
     static LockedPageManager& Instance()
     {
-//#ifdef WIN32
-#ifndef BUILD_ONLY_LIBNEXA
-        boost::call_once(LockedPageManager::CreateInstance, LockedPageManager::init_flag);
-#else
+#ifdef BUILD_ONLY_LIBNEXA
         std::call_once(LockedPageManager::init_flag, LockedPageManager::CreateInstance);
+#else
+        boost::call_once(LockedPageManager::CreateInstance, LockedPageManager::init_flag);
 #endif
         return *LockedPageManager::_instance;
     }
@@ -184,11 +181,10 @@ private:
     }
 
     static LockedPageManager* _instance;
-// #ifdef WIN32
-#ifndef BUILD_ONLY_LIBNEXA
-    static boost::once_flag init_flag;
-#else
+#ifdef BUILD_ONLY_LIBNEXA
     static std::once_flag init_flag;
+#else
+    static boost::once_flag init_flag;
 #endif
 };
 
