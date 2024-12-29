@@ -113,7 +113,7 @@ private:
     unsigned int entryHeight; //! Chain height when entering the mempool
     CAmount inChainInputValue; //! Sum of all txin values that are already in blockchain
     bool spendsCoinbase; //! keep track of transactions that spend a coinbase
-    unsigned int sigOpCount; //! Sig ops
+    unsigned int sigOpCount; //! Sig ops as calculated by the script machine
     int64_t feeDelta; //! Used for determining the priority of the transaction for mining in a block
     LockPoints lockPoints; //! Track the height and time at which tx was final
 
