@@ -309,7 +309,7 @@ build-ubuntu-tests-nodeps-nowallet-qt:
     extends: .ubuntu_ccache_scripts
     cache:
         <<: *global_cache_settings
-        key: ubuntu_cache
+        key: ubuntu_cache-only-libnexa
         paths:
             - ccache/
             - depends/sources
