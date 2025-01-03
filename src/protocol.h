@@ -649,6 +649,7 @@ public:
 enum
 {
     // CInv types
+    MSG_FIRST_TYPE = 1,
     MSG_TX = 1,
     MSG_BLOCK = 2,
     // Nodes may always request a MSG_FILTERED_BLOCK/MSG_CMPCT_BLOCK in a getdata, however,
@@ -665,11 +666,13 @@ enum
     MSG_THINBLOCK = MSG_CMPCT_BLOCK,
 
     MSG_DOUBLESPENDPROOF = 7,
+    MSG_LAST_TYPE = 7,
 
     // CExtInv types.  They begin at 100 to allow room to add more CInv types without affect CExtInv types.
+    MSG_FIRST_EXT_TYPE = 100,
     MSG_TOKENINFO = 100,
     MSG_EXT_TX = 101,
-
+    MSG_LAST_EXT_TYPE = 101
 };
 
 #endif // NEXA_PROTOCOL_H

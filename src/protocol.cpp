@@ -288,7 +288,7 @@ CInv::CInv(const std::string &strType, const uint256 &hashIn)
 }
 
 bool operator<(const CInv &a, const CInv &b) { return (a.type < b.type || (a.type == b.type && a.hash < b.hash)); }
-bool CInv::IsKnownType() const { return (type >= 1 && type <= 7); }
+bool CInv::IsKnownType() const { return (type >= MSG_FIRST_TYPE && type <= MSG_LAST_TYPE); }
 const char *CInv::GetCommand() const
 {
     if (!IsKnownType())
@@ -328,7 +328,7 @@ CInv2::CInv2(const std::string &strType, const uint256 &hashIn)
 }
 
 bool operator<(const CInv2 &a, const CInv2 &b) { return (a.type < b.type || (a.type == b.type && a.hash < b.hash)); }
-bool CInv2::IsKnownType() const { return (type >= 1 && type <= 7); }
+bool CInv2::IsKnownType() const { return (type >= MSG_FIRST_TYPE && type <= MSG_LAST_TYPE); }
 const char *CInv2::GetCommand() const
 {
     if (!IsKnownType())
@@ -376,7 +376,7 @@ CExtInv::CExtInv(const std::string &strType, const std::vector<uint8_t> &hashIn)
     hash = hashIn;
 }
 
-bool CExtInv::IsKnownType() const { return (type >= 100 && type <= 101); }
+bool CExtInv::IsKnownType() const { return (type >= MSG_FIRST_EXT_TYPE && type <= MSG_LAST_EXT_TYPE); }
 const char *CExtInv::GetCommand() const
 {
     if (!IsKnownType())
