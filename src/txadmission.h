@@ -157,8 +157,8 @@ typedef boost::multi_index_container<CTxCommitData,
             hashed_non_unique<boost::multi_index::tag<txid_shortid>, commitdata_txshortid, commitdata_txshortid_hash>,
         // sequenced by time of entry.
         boost::multi_index::sequenced<boost::multi_index::tag<entry_time> > > >
-    indexed_commitq;
-extern indexed_commitq *txCommitQ;
+    CIndexedCommitQ;
+extern CIndexedCommitQ *txCommitQ;
 
 // returns a transaction ref, if the transaction id exists in the commitQ
 CTransactionRef CommitQGet(const uint256 hash);

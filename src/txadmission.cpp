@@ -97,7 +97,7 @@ std::vector<CTransactionRef> CommitQGet(const uint64_t cheaphash)
 void InitTxAdmission()
 {
     if (txCommitQ == nullptr)
-        txCommitQ = new indexed_commitq();
+        txCommitQ = new CIndexedCommitQ();
 }
 
 void StartTxAdmissionThreads()
@@ -451,7 +451,7 @@ void _CommitTxToMempool()
     // To do so, before the transactions are finally commited to the mempool the txCommitQ pointer is copied
     // to txCommitQFinal so that the lock on txCommitQ can be released and processing can continue.
     // However, the incomingConflicts detector is not reset until all the transactions are committed to the mempool.
-    indexed_commitq *txCommitQFinal = nullptr;
+    CIndexedCommitQ *txCommitQFinal = nullptr;
 
     {
         std::vector<CTransactionRef> vWhatChanged;
@@ -464,7 +464,7 @@ void _CommitTxToMempool()
             LOCK(cs_commitQ);
             avgCommitBatchSize = (avgCommitBatchSize * 24 + txCommitQ->size()) / 25;
             txCommitQFinal = txCommitQ;
-            txCommitQ = new indexed_commitq();
+            txCommitQ = new CIndexedCommitQ();
         }
 
         // These transactions have already been validated so store them directly into the mempool.

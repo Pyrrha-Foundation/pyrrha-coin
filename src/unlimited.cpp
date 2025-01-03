@@ -1580,7 +1580,7 @@ UniValue validateblocktemplate(const UniValue &params, bool fHelp)
 extern std::vector<std::string> vUseDNSSeeds;
 extern std::list<CNode *> vNodesDisconnected;
 extern std::set<CNetAddr> setservAddNodeAddresses;
-extern indexed_commitq *txCommitQ;
+extern CIndexedCommitQ *txCommitQ;
 extern std::queue<CTxInputData> txDeferQ;
 extern std::queue<CTxInputData> txInQ;
 extern UniValue getstructuresizes(const UniValue &params, bool fHelp)
