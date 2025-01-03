@@ -1234,7 +1234,7 @@ void CRequestManager::SendTxnRequests(OdMap &mapTxns)
             }
             iter.first.get()->PushMessageWithCookie(NetMsgType::EXTGETDATA, getCookie(), iter.second);
             LOG(REQ, "Sent batched request with %d transactions to node %s\n", iter.second.size(),
-                iter.first.get()->GetLogName().c_str());
+                iter.first.get()->GetLogName());
         }
 
         mapBatchTxnRequestsInv2.clear();
