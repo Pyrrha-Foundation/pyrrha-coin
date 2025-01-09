@@ -895,6 +895,10 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const UniValue &pa
         std::string strError = strprintf("Parameter \"%s\" is not a URL, missing colon", url);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
+    else if (url.empty())
+    {
+        url = "";
+    }
     ret.push_back(std::vector<unsigned char>(url.begin(), url.end()));
 
     curparam++;
@@ -922,9 +926,16 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const UniValue &pa
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
 
-    uint256 docHash;
-    docHash.SetHex(hexDocHash);
-    ret.push_back(std::vector<unsigned char>(docHash.begin(), docHash.end()));
+    if (!hexDocHash.empty())
+    {
+        uint256 docHash;
+        docHash.SetHex(hexDocHash);
+        ret.push_back(std::vector<unsigned char>(docHash.begin(), docHash.end()));
+    }
+    else
+    {
+        ret.push_back(std::vector<unsigned char>());
+    }
 
     curparam++;
     if (curparam < params.size())
