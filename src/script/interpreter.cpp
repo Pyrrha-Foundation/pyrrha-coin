@@ -891,16 +891,7 @@ bool ScriptMachine::Step()
                         {
                             return set_error(serror, SCRIPT_ERR_UNBALANCED_CONDITIONAL);
                         }
-                        if (!enableExtBignum)
-                        {
-                            const valtype &vch = stacktop(-1);
-                            fValue = CastToBool(vch);
-                        }
-                        else
-                        {
-                            const StackItem &arg = stackItemAt(-1);
-                            fValue = CastToBool(arg);
-                        }
+                        fValue = enableExtBignum ? CastToBool(stackItemAt(-1)) : CastToBool(stacktop(-1));
                         if (opcode == OP_NOTIF)
                         {
                             fValue = !fValue;
