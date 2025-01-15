@@ -19,6 +19,7 @@
 #include "arith_uint256.h"
 #include "base58.h"
 #include "bloom.h"
+#include "capd/capd.h"
 #include "cashaddrenc.h"
 #include "chainparams.h"
 #include "coins.h"
@@ -37,10 +38,6 @@
 #include "utilstrencodings.h"
 #include "wallet/grouptokencache.h"
 
-#ifdef BUILD_ONLY_LIBNEXA
-#else
-#include "capd/capd.h"
-#endif
 
 enum class LIBNEXA_ERROR : uint32_t
 {

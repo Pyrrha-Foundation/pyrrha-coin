@@ -115,6 +115,8 @@ include builders/$(build_os).mk
 include builders/default.mk
 include packages/packages.mk
 
+boost_headers_packages = $(boost_header_packages)
+
 qt_packages_$(NO_QT) = $(qt_packages) $(qt_$(host_os)_packages) $(qt_$(host_arch)_$(host_os)_packages)
 
 boost_packages_$(NO_BOOST) = $(boost_packages)
@@ -132,6 +134,10 @@ packages += $($(host_arch)_$(host_os)_packages) $($(host_os)_packages) $(boost_p
 
 # this line is macos specific, it adds the darwin_native_packages to the build
 native_packages += $($(host_arch)_$(host_os)_native_packages) $($(host_os)_native_packages)
+
+ifeq ($(boost_packages_),)
+packages += $(boost_headers_packages)
+endif
 
 ifneq ($(boost_packages_),)
 native_packages += $($(host_arch)_$(host_os)_native_boost_packages) $($(host_os)_native_boost_packages)

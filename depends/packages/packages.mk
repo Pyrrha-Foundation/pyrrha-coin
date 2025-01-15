@@ -4,6 +4,8 @@ openssl_packages:=openssl
 
 boost_packages:=boost
 
+boost_header_packages:=boost_headers
+
 libevent_packages:=libevent
 
 zeromq_packages:=zeromq

@@ -263,11 +263,9 @@ SLAPI int extractFromMerkleBlock(int numTxes, const unsigned char *merkleProofPa
                                  const unsigned char *hashIn, int numHashes,
                                  unsigned char *result, int resultLen);
 
-#ifndef BUILD_ONLY_LIBNEXA
 SLAPI int capdSolve(const unsigned char *message, unsigned int msgLen, unsigned char *result, unsigned int resultLen);
 SLAPI int capdCheck(const unsigned char *message, unsigned int msgLen);
 SLAPI int capdHash(const unsigned char *message, unsigned int msgLen, unsigned char *result, unsigned int resultLen);
-#endif
 
 // encrypt must be 1 (encrypt) or 0 (decrypt).
 // len must be a multiple of 16

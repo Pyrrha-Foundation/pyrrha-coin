@@ -413,6 +413,8 @@ libnexa_a_common_SOURCES = \
   base58.h \
   merkleblock.cpp \
   merkleblock.h \
+  capd/capdmsg.cpp \
+  capd/capd.h \
   config.cpp \
   config.h \
   chainparams.cpp \
@@ -499,13 +501,6 @@ libnexa_a_SOURCES = \
   libnexa/libnexa.h \
   libnexa/libnexa_jvm.cpp \
   $(libnexa_a_common_SOURCES)
-
-# building libnexa only does not build capd due to boost multicontainer
-if !BUILD_ONLY_LIBNEXA
-libnexa_a_SOURCES += \
-  capd/capdmsg.cpp \
-  capd/capd.h
-endif
 
 
 # crypto primitives library
