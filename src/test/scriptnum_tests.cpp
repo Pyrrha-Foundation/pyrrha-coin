@@ -757,16 +757,7 @@ void testScriptU(bool upgraded, const CScript &s, bool expectedStackTF)
     else
     {
         BOOST_CHECK(ret);
-
-        if (sm.getStack().size() != 1)
-        {
-            printf("stack problem\n");
-        }
         BOOST_CHECK(sm.getStack().size() == 1);
-        if (((bool)sm.getStack()[0]) != expectedStackTF)
-        {
-            printf("incorrect result\n");
-        }
         BOOST_CHECK(((bool)sm.getStack()[0]) == expectedStackTF);
     }
 }
@@ -781,7 +772,7 @@ void bignumscript(uint32_t flags, bool upgraded)
 
     bool trueIfUpgraded = upgraded;
 
-    // Check IF and NOTIF
+    // Check IF
     testScriptU(upgraded, CScript() << bns(100) << OP_BIN2BIGNUM << OP_IF << OP_1 << OP_ELSE << OP_0 << OP_ENDIF,
         trueIfUpgraded);
     testScriptU(upgraded,
@@ -790,7 +781,10 @@ void bignumscript(uint32_t flags, bool upgraded)
     testScriptU(
         upgraded, CScript() << bns(0) << OP_BIN2BIGNUM << OP_IF << OP_0 << OP_ELSE << OP_1 << OP_ENDIF, trueIfUpgraded);
 
+    // Check NOTIF
     testScriptU(upgraded, CScript() << bns(100) << OP_BIN2BIGNUM << OP_NOTIF << OP_0 << OP_ELSE << OP_1 << OP_ENDIF,
+        trueIfUpgraded);
+    testScriptU(upgraded, CScript() << bns(0) << OP_BIN2BIGNUM << OP_NOTIF << OP_1 << OP_ELSE << OP_0 << OP_ENDIF,
         trueIfUpgraded);
     testScriptU(upgraded, CScript() << bns(0) << OP_BIN2BIGNUM << OP_NOTIF << OP_1 << OP_ELSE << OP_0 << OP_ENDIF,
         trueIfUpgraded);
@@ -845,22 +839,24 @@ void bignumscript(uint32_t flags, bool upgraded)
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_ABS << OP_10 << OP_NUMEQUAL, trueIfUpgraded);
 
 
-    // Check NOT / 0NOTEQUAL
+    // Check NOT
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_NOT, false);
     testScriptU(upgraded, CScript() << OP_10 << OP_NEGATE << OP_BIN2BIGNUM << OP_NOT, false);
     testScriptU(upgraded, CScript() << OP_0 << OP_BIN2BIGNUM << OP_NOT, trueIfUpgraded);
+    testScriptU(upgraded, CScript() << bns(100) << OP_BIN2BIGNUM << OP_NOT << OP_NOT, trueIfUpgraded);
+
+    // Check 0NOTEQUAL
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_0NOTEQUAL, trueIfUpgraded);
     testScriptU(upgraded, CScript() << OP_10 << OP_NEGATE << OP_BIN2BIGNUM << OP_0NOTEQUAL, trueIfUpgraded);
     testScriptU(upgraded, CScript() << OP_0 << OP_BIN2BIGNUM << OP_0NOTEQUAL, false);
 
-
     // check WITHIN
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_10 << OP_11 << OP_WITHIN, trueIfUpgraded);
+    testScriptU(upgraded, CScript() << OP_10 << OP_10 << OP_BIN2BIGNUM << OP_11 << OP_WITHIN, trueIfUpgraded);
+    testScriptU(upgraded, CScript() << OP_10 << OP_10 << OP_11 << OP_BIN2BIGNUM << OP_WITHIN, trueIfUpgraded);
     testScriptU(upgraded,
         CScript() << OP_10 << OP_BIN2BIGNUM << OP_10 << OP_BIN2BIGNUM << OP_11 << OP_BIN2BIGNUM << OP_WITHIN,
         trueIfUpgraded);
-    testScriptU(upgraded, CScript() << OP_10 << OP_10 << OP_BIN2BIGNUM << OP_11 << OP_WITHIN, trueIfUpgraded);
-    testScriptU(upgraded, CScript() << OP_10 << OP_10 << OP_11 << OP_BIN2BIGNUM << OP_WITHIN, trueIfUpgraded);
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_10 << OP_10 << OP_WITHIN, false);
 
     testScriptU(upgraded,
@@ -878,6 +874,12 @@ void bignumscript(uint32_t flags, bool upgraded)
         CScript() << bns(0xa5a5a5a5a5) << OP_BIN2BIGNUM << bns(0x5a5a5a) << OP_BIN2BIGNUM << OP_OR << bns(0xa5a5ffffff)
                   << OP_BIN2BIGNUM << OP_NUMEQUAL,
         trueIfUpgraded);
+    // ORing negative bignums is disallowed
+    auto bigNumNegativeBitOpErr = upgraded ? SCRIPT_ERR_INVALID_NUMBER_RANGE : SCRIPT_ERR_BAD_OPERATION_ON_TYPE;
+    testScript(
+        CScript() << OP_1 << OP_NEGATE << OP_BIN2BIGNUM << OP_1 << OP_OR << OP_DROP << OP_1, bigNumNegativeBitOpErr);
+    testScript(
+        CScript() << OP_1 << OP_BIN2BIGNUM << OP_1 << OP_NEGATE << OP_OR << OP_DROP << OP_1, bigNumNegativeBitOpErr);
 
     // check AND
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_9 << OP_AND << OP_8 << OP_NUMEQUAL, trueIfUpgraded);
@@ -885,6 +887,11 @@ void bignumscript(uint32_t flags, bool upgraded)
         CScript() << bns(0xa5a5a5a5a5) << OP_BIN2BIGNUM << bns(0x5a5aff) << OP_BIN2BIGNUM << OP_AND << bns(0xa5)
                   << OP_BIN2BIGNUM << OP_NUMEQUAL,
         trueIfUpgraded);
+    // ANDing negative bignums is disallowed
+    testScript(
+        CScript() << OP_1 << OP_NEGATE << OP_BIN2BIGNUM << OP_1 << OP_AND << OP_DROP << OP_1, bigNumNegativeBitOpErr);
+    testScript(
+        CScript() << OP_1 << OP_BIN2BIGNUM << OP_1 << OP_NEGATE << OP_AND << OP_DROP << OP_1, bigNumNegativeBitOpErr);
 
     // check xor
     testScriptU(upgraded, CScript() << OP_10 << OP_BIN2BIGNUM << OP_9 << OP_XOR << OP_3 << OP_NUMEQUAL, trueIfUpgraded);
@@ -895,6 +902,12 @@ void bignumscript(uint32_t flags, bool upgraded)
         CScript() << bns(0xa5a5a5a5a5) << OP_BIN2BIGNUM << bns(0x5a5aff) << OP_BIN2BIGNUM << OP_XOR << bns(0xa5a5ffff5a)
                   << OP_BIN2BIGNUM << OP_NUMEQUAL,
         trueIfUpgraded);
+    // XORing negative bignums is disallowed
+    testScript(
+        CScript() << OP_1 << OP_NEGATE << OP_BIN2BIGNUM << OP_1 << OP_XOR << OP_DROP << OP_1, bigNumNegativeBitOpErr);
+    testScript(
+        CScript() << OP_1 << OP_BIN2BIGNUM << OP_1 << OP_NEGATE << OP_XOR << OP_DROP << OP_1, bigNumNegativeBitOpErr);
+
 
     // check 64 bit scriptnums
     testScript(CScript() << bns(0x7fff00000000ULL) << OP_BIN2BIGNUM << *(CScriptNum::fromInt(0x7fff00000000LL))

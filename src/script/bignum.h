@@ -143,6 +143,8 @@ public:
     BigNum operator&(const BigNum &p) const
     {
         BigNum ret;
+        if (mpz_sgn(n) < 0 || mpz_sgn(p.n) < 0)
+            throw OutOfBounds("bitwise and with negative number");
         mpz_and(ret.n, n, p.n);
         return ret.checkLimits();
     }
@@ -150,6 +152,8 @@ public:
     BigNum operator|(const BigNum &p) const
     {
         BigNum ret;
+        if (mpz_sgn(n) < 0 || mpz_sgn(p.n) < 0)
+            throw OutOfBounds("bitwise or with negative number");
         mpz_ior(ret.n, n, p.n);
         return ret.checkLimits();
     }
@@ -157,6 +161,8 @@ public:
     BigNum operator^(const BigNum &p) const
     {
         BigNum ret;
+        if (mpz_sgn(n) < 0 || mpz_sgn(p.n) < 0)
+            throw OutOfBounds("bitwise xor with negative number");
         mpz_xor(ret.n, n, p.n);
         return ret.checkLimits();
     }
