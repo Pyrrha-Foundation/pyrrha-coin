@@ -348,9 +348,10 @@ public:
         }
 
         // Do the insert
-        const uint32_t *pos = (const uint32_t *)hash.begin();
         const uint32_t *pos_salt = (const uint32_t *)salt.begin();
-        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos++, pos_salt++)
+        const uint32_t *pos = ((const uint32_t *)hash.begin()) + ((*pos_salt) & 7);
+        const uint32_t *end = (const uint32_t *)hash.end();
+        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos_salt++)
         {
             uint32_t val = *pos ^ *pos_salt;
             uint32_t idx = val & (FILTER_SIZE - 1);
@@ -359,6 +360,9 @@ public:
 
             vData[idx >> 3] |= (1 << (idx & 7));
             vData[idx2 >> 3] |= (1 << (idx2 & 7));
+            pos++;
+            if (pos == end)
+                pos = ((const uint32_t *)hash.begin());
         }
 
         // Increment the counter
@@ -369,12 +373,13 @@ public:
     {
         std::lock_guard<std::mutex> lock(cs_rollingfilter);
 
-        const uint32_t *pos = (const uint32_t *)hash.begin();
         const uint32_t *pos_salt = (const uint32_t *)salt.begin();
+        const uint32_t *pos = ((const uint32_t *)hash.begin()) + ((*pos_salt) & 7);
+        const uint32_t *end = (const uint32_t *)hash.end();
         bool unset = 0; // If any position is not set, then this will be true
         bool unset2 = 0; // If any position is not set, then this will be true
         bool unset3 = 0; // If any position is not set, then this will be true
-        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos++, pos_salt++)
+        for (unsigned int i = 0; i < NUM_HASH_FNS / 2; i++, pos_salt++)
         {
             uint32_t val = *pos ^ *pos_salt;
             uint32_t idx = val & (FILTER_SIZE - 1);
@@ -389,7 +394,9 @@ public:
 
             unset3 |= (0 == (vData3[idx >> 3] & (1 << (idx & 7))));
             unset3 |= (0 == (vData3[idx2 >> 3] & (1 << (idx2 & 7))));
-
+            pos++;
+            if (pos == end)
+                pos = ((const uint32_t *)hash.begin());
             if (unset && unset2 && unset3)
             {
                 return false;
