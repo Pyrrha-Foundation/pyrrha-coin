@@ -2519,6 +2519,10 @@ CAmount CWallet::GetBalance()
 CAmount CWallet::GetUnconfirmedBalance() const
 {
     CAmount nTotal = 0;
+#ifdef DEBUG
+    CAmount nTotal2 = 0;
+#endif
+
     {
         LOCK(cs_wallet);
         for (MapWallet::const_iterator it = mapWalletUnspent.begin(); it != mapWalletUnspent.end(); ++it)
@@ -2538,7 +2542,6 @@ CAmount CWallet::GetUnconfirmedBalance() const
 
 #ifdef DEBUG
         // Make sure the new and old method have matching totals
-        CAmount nTotal2 = 0;
         for (MapWallet::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
         {
             const CWalletTxRef ptx = it->second.tx;
@@ -2555,12 +2558,53 @@ CAmount CWallet::GetUnconfirmedBalance() const
 #endif
     }
 
+#ifdef DEBUG
+    if (nTotal != nTotal2)
+    {
+        // The totals calculated above may be inconsistent due to parent transactions entering the txpool, because
+        // we "trust" our own transactions ONLY once they are admitted to the txpool.
+        //
+        // We cannot lock and flush the TxAdmission queue here or anyone taking cs_wallet above this function will
+        // deadlock.  Instead, recalculate ignoring whether the balance is trusted or not.
+        LOCK(cs_wallet);
+        CAmount nTotal3 = 0;
+        for (MapWallet::const_iterator it = mapWalletUnspent.begin(); it != mapWalletUnspent.end(); ++it)
+        {
+            const CWalletTxRef ptx = it->second.tx;
+            if (ptx->IsCoinBase() && ptx->GetBlocksToMaturity() > 0)
+                continue;
+
+            if (!IsSpent(it->first) && (GetGroupToken(it->second.GetScriptPubKey()) == NoGroup))
+            {
+                CAmount tmp = GetCredit(it->second.GetTxOut(), ISMINE_SPENDABLE);
+                nTotal3 += tmp;
+            }
+        }
+        CAmount nTotal4 = 0;
+        for (MapWallet::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTxRef ptx = it->second.tx;
+            if (it->first.hash == ptx->GetId()) // If its the tx record
+            {
+                CAmount tmp = ptx->GetAvailableCredit(false);
+                nTotal4 += tmp;
+            }
+        }
+        if (nTotal3 != nTotal4)
+            LOGA("Balance inconsistency: unspent: %d  mapWallet: %d", nTotal3, nTotal4);
+        DbgAssert(nTotal3 == nTotal4, );
+    }
+#endif
+
     return nTotal;
 }
 
 CAmount CWallet::GetImmatureBalance() const
 {
     CAmount nTotal = 0;
+#ifdef DEBUG
+    CAmount nTotal2 = 0;
+#endif
     {
         LOCK(cs_wallet);
         for (MapWallet::const_iterator it = mapWalletUnspent.begin(); it != mapWalletUnspent.end(); ++it)
@@ -2574,7 +2618,6 @@ CAmount CWallet::GetImmatureBalance() const
 
 #ifdef DEBUG
         // Make sure the new and old method have matching totals
-        CAmount nTotal2 = 0;
         for (MapWallet::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
         {
             const CWalletTxRef ptx = it->second.tx;
@@ -2586,6 +2629,44 @@ CAmount CWallet::GetImmatureBalance() const
         assert(nTotal == nTotal2);
 #endif
     }
+
+#ifdef DEBUG
+    if (nTotal != nTotal2)
+    {
+        // The totals calculated above may be inconsistent due to parent transactions entering the txpool, because
+        // we "trust" our own transactions ONLY once they are admitted to the txpool.
+        //
+        // We cannot lock and flush the TxAdmission queue here or anyone taking cs_wallet above this function will
+        // deadlock.  Instead, recalculate ignoring whether the balance is trusted or not.
+        LOCK(cs_wallet);
+        CAmount nTotal3 = 0;
+        for (MapWallet::const_iterator it = mapWalletUnspent.begin(); it != mapWalletUnspent.end(); ++it)
+        {
+            const CWalletTxRef ptx = it->second.tx;
+            if (ptx->IsCoinBase() && ptx->GetBlocksToMaturity() > 0 && ptx->IsInMainChain())
+                continue;
+
+            if (!IsSpent(it->first) && (GetGroupToken(it->second.GetScriptPubKey()) == NoGroup))
+            {
+                CAmount tmp = GetCredit(it->second.GetTxOut(), ISMINE_SPENDABLE);
+                nTotal3 += tmp;
+            }
+        }
+        CAmount nTotal4 = 0;
+        for (MapWallet::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTxRef ptx = it->second.tx;
+            if (it->first.hash == ptx->GetId()) // If its the tx record
+            {
+                CAmount tmp = ptx->GetAvailableCredit(false);
+                nTotal4 += tmp;
+            }
+        }
+        if (nTotal3 != nTotal4)
+            LOGA("Balance inconsistency: unspent: %d  mapWallet: %d", nTotal3, nTotal4);
+        DbgAssert(nTotal3 == nTotal4, );
+    }
+#endif
 
     return nTotal;
 }
