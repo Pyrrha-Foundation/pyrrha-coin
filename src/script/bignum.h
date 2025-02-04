@@ -354,7 +354,7 @@ public:
 #endif
 };
 
-inline BigNum operator"" _BN(const char *str)
+inline BigNum operator""_BN(const char *str)
 {
     if (str[1] == 'x')
         return BigNum(str + 2, 16);
