@@ -27,29 +27,37 @@ rm -rf armv7a-linux-androideabi
 rm -rf i686-linux-android
 rm -rf x86_64-linux-android
 rm -rf riscv64-linux-android
-cd built
-rm -rf aarch64-linux-android
-rm -rf armv7a-linux-androideabi
-rm -rf i686-linux-android
-rm -rf x86_64-linux-android
-rm -rf riscv64-linux-android
-cd .. # out of built into depends folder
+if [ -d "built" ]; then
+    cd built
+    rm -rf aarch64-linux-android
+    rm -rf armv7a-linux-androideabi
+    rm -rf i686-linux-android
+    rm -rf x86_64-linux-android
+    rm -rf riscv64-linux-android
+    cd .. # out of built into depends folder
+fi
+if [ -d "work" ]; then
 cd work
-cd build
-rm -rf aarch64-linux-android
-rm -rf armv7a-linux-androideabi
-rm -rf i686-linux-android
-rm -rf x86_64-linux-android
-rm -rf riscv64-linux-android
-cd .. # out of build into work folder
-cd staging
-rm -rf aarch64-linux-android
-rm -rf armv7a-linux-androideabi
-rm -rf i686-linux-android
-rm -rf x86_64-linux-android
-rm -rf riscv64-linux-android
-cd .. # out of staging into work folder
-cd .. # out of work folder into depends folder
+    if [ -d "build" ]; then
+        cd build
+        rm -rf aarch64-linux-android
+        rm -rf armv7a-linux-androideabi
+        rm -rf i686-linux-android
+        rm -rf x86_64-linux-android
+        rm -rf riscv64-linux-android
+        cd .. # out of build into work folder
+    fi
+    if [ -d "staging" ]; then
+        cd staging
+        rm -rf aarch64-linux-android
+        rm -rf armv7a-linux-androideabi
+        rm -rf i686-linux-android
+        rm -rf x86_64-linux-android
+        rm -rf riscv64-linux-android
+        cd .. # out of staging into work folder
+    fi
+    cd .. # out of work folder into depends folder
+fi
 cd .. # out of depends folder into root dir
 # end clean up
 
