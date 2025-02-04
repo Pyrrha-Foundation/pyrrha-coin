@@ -6,6 +6,8 @@ BUILD_I686=1
 BUILD_X86_64=1
 BUILD_RISCV64=1
 
+NDK_VERSION=27.2.12479018
+
 # check for -h or --help in the args
 for var in "$@"
 do
@@ -15,8 +17,8 @@ do
     fi
 done
 
-export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
 
 # clean up possible directories from a previous build, could probably use make clean
 cd depends
@@ -57,8 +59,8 @@ if [ $BUILD_AARCH64 -eq 1 ]; then
     # build aarch64
     cd depends
     # set the compiler stuff, this is the default location on ubuntu 24
-    export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
-    export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang++
+    export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
+    export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang++
     make HOST=aarch64-linux-android NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
     cd ..
     ./autogen.sh
@@ -76,8 +78,8 @@ if [ $BUILD_ARMV7A -eq 1 ]; then
     # build armv7a
     cd depends
     # set the compiler stuff, this is the default location on ubuntu 24
-    export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang
-    export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang++
+    export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang
+    export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang++
     make HOST=armv7a-linux-androideabi NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
     cd ..
     ./autogen.sh
@@ -96,8 +98,8 @@ if [ $BUILD_I686 -eq 1 ]; then
     # build i686-linux-android
     cd depends
     # set the compiler stuff, this is the default location on ubuntu 24
-    export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang
-    export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang++
+    export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang
+    export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang++
     make HOST=i686-linux-android NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
     cd ..
     ./autogen.sh
@@ -120,8 +122,8 @@ if [ $BUILD_X86_64 -eq 1 ]; then
     # build x86_64-linux-android
     cd depends
     # set the compiler stuff, this is the default location on ubuntu 24
-    export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang
-    export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang++
+    export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang
+    export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang++
     make HOST=x86_64-linux-android NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
     cd ..
     ./autogen.sh
@@ -140,8 +142,8 @@ if [ $BUILD_RISCV64 -eq 1 ]; then
     # build riscv64-linux-android
     cd depends
     # set the compiler stuff, this is the default location on ubuntu 24
-    export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang
-    export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang++
+    export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang
+    export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang++
     make HOST=riscv64-linux-android NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
     cd ..
     ./autogen.sh

@@ -961,6 +961,8 @@ build-debian-nodeps-qt:
 ######################################################
 .ubuntu24_base:
     image: bchunlimited/nexa:ubuntu24.04
+    variables:
+        NDK_VERSION: 27.2.12479018
 
 .ubuntu24_ccache_scripts:
     extends: .ubuntu24_base
@@ -1027,10 +1029,10 @@ build-android-aarch64-depends:
     stage: build_depends
     extends: .cache-android-aarch64
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang++
         - cd depends
         - make HOST=aarch64-linux-android -j `nproc` NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
         - ccache --show-stats
@@ -1045,10 +1047,10 @@ build-android-aarch64:
     extends: .cache-android-aarch64
     needs: ["build-android-aarch64-depends"]
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang++
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --prefix=$PWD/../depends/aarch64-linux-android --enable-only-libnexa --host=aarch64-linux-android
@@ -1074,10 +1076,10 @@ build-android-armv7a-depends:
     stage: build_depends
     extends: .cache-android-armv7a
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang++
         - cd depends
         - make HOST=armv7a-linux-androideabi -j `nproc` NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
         - ccache --show-stats
@@ -1092,10 +1094,10 @@ build-android-armv7a:
     extends: .cache-android-armv7a
     needs: ["build-android-armv7a-depends"]
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi35-clang++
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --prefix=$PWD/../depends/armv7a-linux-androideabi --enable-only-libnexa --host=armv7a-linux-androideabi
@@ -1121,10 +1123,10 @@ build-android-i686-depends:
     stage: build_depends
     extends: .cache-android-i686
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang++
         - cd depends
         - make HOST=i686-linux-android -j `nproc` NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
         - ccache --show-stats
@@ -1139,10 +1141,10 @@ build-android-i686:
     extends: .cache-android-i686
     needs: ["build-android-i686-depends"]
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android35-clang++
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --prefix=$PWD/../depends/i686-linux-android --enable-only-libnexa --host=i686-linux-android
@@ -1168,10 +1170,10 @@ build-android-x86_64-depends:
     stage: build_depends
     extends: .cache-android-x86_64
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang++
         - cd depends
         - make HOST=x86_64-linux-android -j `nproc` NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
         - ccache --show-stats
@@ -1186,10 +1188,10 @@ build-android-x86_64:
     extends: .cache-android-x86_64
     needs: ["build-android-x86_64-depends"]
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang++
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --prefix=$PWD/../depends/x86_64-linux-android --enable-only-libnexa --host=x86_64-linux-android
@@ -1215,10 +1217,10 @@ build-android-riscv64-depends:
     stage: build_depends
     extends: .cache-android-riscv64
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang++
         - cd depends
         - make HOST=riscv64-linux-android -j `nproc` NO_QT=1 NO_WALLET=1 NO_RUST=1 ONLY_LIBNEXA=1
         - ccache --show-stats
@@ -1233,10 +1235,10 @@ build-android-riscv64:
     extends: .cache-android-riscv64
     needs: ["build-android-riscv64-depends"]
     script:
-        - export AR=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-        - export RANLIB=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
-        - export CC=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang
-        - export CXX=/usr/lib/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang++
+        - export AR=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+        - export RANLIB=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+        - export CC=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang
+        - export CXX=/usr/lib/android-sdk/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/riscv64-linux-android35-clang++
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --prefix=$PWD/../depends/riscv64-linux-android --enable-only-libnexa --host=riscv64-linux-android
