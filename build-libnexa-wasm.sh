@@ -94,7 +94,8 @@ if ! emmake make -j`nproc`; then
 fi
 
 cd src
-emcc -o libnexa.js ./.libs/libnexa.a ./secp256k1/.libs/libsecp256k1.a ../.libs/libgmp.a -s EXPORTED_FUNCTIONS='["_malloc", "_free",
+emcc -o libnexa.js ./.libs/libnexa.a ./secp256k1/.libs/libsecp256k1.a ../.libs/libgmp.a \
+-sEXPORTED_FUNCTIONS='["_malloc", "_free",
 "_libnexaVersion", "_get_libnexa_error", "_get_libnexa_error_string", "_encode64", "_decode64", "_Bin2Hex",
 "_hd44DeriveChildKey", "_GetPubKey", "_SignHashEDCSA", "_txid", "_txidem", "_blockHash",
 "_SignTxECDSA", "_signBchTxOneInputUsingSchnorr", "_signTxOneInputUsingSchnorr", "_SignTxSchnorr",
@@ -107,7 +108,8 @@ emcc -o libnexa.js ./.libs/libnexa.a ./secp256k1/.libs/libsecp256k1.a ../.libs/l
 "_capdCheck", "_capdHash", "_cryptAES256CBC", "_verifyDataSchnorr", "_verifyHashSchnorr", "_RandomBytes",
 "_CreateNoContextScriptMachine", "_CreateScriptMachine", "_CreateScriptMachine", "_SmRelease", "_SmClone",
 "_SmEval", "_SmBeginStep", "_SmStep", "_SmPos", "_SmEndStep", "_SmReset", "_SmSetStackItem",
-"_SmGetStackItem", "_SmGetError"]'
+"_SmGetStackItem", "_SmGetError"]' \
+-sEXPORTED_RUNTIME_METHODS='["UTF8ToString", "stringToUTF8", "setValue", "getValue"]'
 
 
 exit 0
