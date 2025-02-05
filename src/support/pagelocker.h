@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <map>
 
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
 #include <mutex>
 #else
 #include <boost/thread/once.hpp>
@@ -54,7 +54,7 @@ public:
     // For all pages in affected range, increase lock count
     void LockRange(void* p, size_t size)
     {
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
         std::lock_guard<std::mutex> lock(mutex);
 #else
         boost::mutex::scoped_lock lock(mutex);
@@ -81,7 +81,7 @@ public:
     void UnlockRange(void* p, size_t size)
     {
 // #ifdef WIN32  // remove when mingw win32 pthread link problems fixed
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
         std::lock_guard<std::mutex> lock(mutex);
 #else
         boost::mutex::scoped_lock lock(mutex);
@@ -108,7 +108,7 @@ public:
     // Get number of locked pages for diagnostics
     int GetLockedPageCount()
     {
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
         std::lock_guard<std::mutex> lock(mutex);
 #else
         boost::mutex::scoped_lock lock(mutex);
@@ -118,7 +118,7 @@ public:
 
 private:
     Locker locker;
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
     std::mutex mutex;
 #else
     boost::mutex mutex;
@@ -163,7 +163,7 @@ class LockedPageManager : public LockedPageManagerBase<MemoryPageLocker>
 public:
     static LockedPageManager& Instance()
     {
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
         std::call_once(LockedPageManager::init_flag, LockedPageManager::CreateInstance);
 #else
         boost::call_once(LockedPageManager::CreateInstance, LockedPageManager::init_flag);
@@ -186,7 +186,7 @@ private:
     }
 
     static LockedPageManager* _instance;
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
     static std::once_flag init_flag;
 #else
     static boost::once_flag init_flag;

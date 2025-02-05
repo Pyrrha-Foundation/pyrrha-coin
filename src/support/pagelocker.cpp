@@ -30,7 +30,7 @@
 #endif
 
 LockedPageManager* LockedPageManager::_instance = nullptr;
-#if defined(BUILD_ONLY_LIBNEXA) || defined(ANDROID) || defined(__APPLE__)
+#if defined(BUILD_ONLY_LIBNEXA)
 std::once_flag LockedPageManager::init_flag;
 #else
 boost::once_flag LockedPageManager::init_flag = BOOST_ONCE_INIT;
