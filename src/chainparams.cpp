@@ -442,6 +442,8 @@ public:
         // Two days (in seconds)
         consensus.nASERTHalfLife = 2 * 24 * 60 * 60;
 
+        consensus.nextForkActivationTime = 1739361600;  // Feb 12, 2025 at 12:00:00 GMT
+
         std::vector<unsigned char> nonce;
         std::vector<unsigned char> hardCodedNonce;
         nonce = hardCodedNonce = ParseHex("132a25");
@@ -547,6 +549,8 @@ public:
         // difficulty is cut in half. Doubled if blocks are ahead of schedule.
         // Two days (in seconds)
         consensus.nASERTHalfLife = 2 * 24 * 60 * 60;
+
+        consensus.nextForkActivationTime = NEXT_FORK_ACTIVATION_TIME;
 
         std::vector<unsigned char> nonce; // TODO make this difficulty higher and hard code solution
         std::vector<unsigned char> hardCodedNonce;
