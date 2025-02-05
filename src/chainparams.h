@@ -17,9 +17,6 @@
 // Fork configuration
 /** This specifies the MTP time of the next fork */
 extern uint64_t nMiningForkTime;
-/** Next protocol upgrade will be activated once MTP >= 12:00:00 PM, March 31st 2025, GMT
- */
-const uint64_t NEXT_FORK_ACTIVATION_TIME = 1743422400;
 
 /** Default for -minrelaytxfee, minimum relay fee for transactions */
 static const unsigned int DEFAULT_MIN_RELAY_TX_FEE = 1000;
