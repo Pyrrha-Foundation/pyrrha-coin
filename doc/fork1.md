@@ -26,7 +26,7 @@ This 2 phase activation allows us to cleanly apply the new rule set to pending t
 * Read-only inputs
 * Limited legacy output scripts
 * Limited template script args hash
-* Data in inputs and outputs via OP_RETURN 
+* Data in inputs and outputs via OP_RETURN
 
 
 
@@ -58,7 +58,7 @@ This 2 phase activation allows us to cleanly apply the new rule set to pending t
 * OP_STORE / OP_LOAD
 
   see (Nexa Spec:OP_STORE)[https://spec.nexa.org/script/op-codes/op_store/]
-  and (Nexa Spec:OP_STORE)[https://spec.nexa.org/script/op-codes/op_load/]
+  and (Nexa Spec:OP_LOAD)[https://spec.nexa.org/script/op-codes/op_load/]
 
 
 # New transaction functionality
@@ -99,4 +99,4 @@ By constraining arbitrary scripts in the outputs, we minimize the size of the UT
 TX_PUBKEYHASH remains available so legacy libraries can be used with Nexa with minimal work.
 
   * TX_NULL_DATA (OP_RETURN) is fully supported and is the expected way to include data (that is not meant for the UTXO) in a transaction
-  
+
