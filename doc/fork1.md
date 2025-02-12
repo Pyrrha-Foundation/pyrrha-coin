@@ -42,7 +42,7 @@ This 2 phase activation allows us to cleanly apply the new rule set to pending t
 
 * `OP_JUMP`
 
-  see [Nexa Spec:OP_JUMP](https://spec.nexa.org/script/op-codes/op_jump/]
+  see [Nexa Spec:OP_JUMP](https://spec.nexa.org/script/op-codes/op_jump/)
 
 * `OP_MERKLEROOT`
 
@@ -59,7 +59,8 @@ This 2 phase activation allows us to cleanly apply the new rule set to pending t
 * `OP_STORE` / `OP_LOAD`
 
   see [Nexa Spec:OP_STORE](https://spec.nexa.org/script/op-codes/op_store/)
-  and [Nexa Spec:OP_LOAD](https://spec.nexa.org/scrip(t/op-codes/op_load/)
+
+  and [Nexa Spec:OP_LOAD](https://spec.nexa.org/script/op-codes/op_load/)
 
 
 # New transaction functionality
@@ -79,15 +80,15 @@ This 2 phase activation allows us to cleanly apply the new rule set to pending t
 
 * Script Machine limits changed.
 
-See [Nexa Script Machine](https://spec.nexa.org/script/nexa-script-machine)
+  See [Nexa Script Machine](https://spec.nexa.org/script/nexa-script-machine)
 
 * Template script args hash is limited to 0, 20 or 32 bytes.  Previously this was allowed onchain, but is unspendable.
 
-This change prevents accidental creating of unspendable templates, and leaves other sizes open for future use.
+  This change prevents accidental creating of unspendable templates, and leaves other sizes open for future use.
 
 * Legacy (non-script template) outputs formats are tightly constrained.
 
-By constraining arbitrary scripts in the outputs, we minimize the size of the UTXO and prevent a variety of DoS/scalability attacks that historically caused Bitcoin to adopt the "IsStandard" design idea.
+  By constraining arbitrary scripts in the outputs, we minimize the size of the UTXO and prevent a variety of DoS/scalability attacks that historically caused Bitcoin to adopt the "IsStandard" design idea.
 
 * All non-standard outputs are now disallowed by consensus.  Pay-to-script-template MUST be used for arbitrary contracts.
 
