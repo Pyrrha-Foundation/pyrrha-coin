@@ -346,12 +346,20 @@ static CAmount AmountFromIntegralValue(const UniValue &value)
         throw std::runtime_error("Amount is not a number or string");
     }
     const std::string val_str = value.getValStr();
-    // check for very large number
-    if (val_str.size() > 19 || (std::strcmp(val_str.c_str(), MAX_SATOSHI.c_str()) > 0))
+    // check for very large number, anything with 19+ digits is too big
+    if (val_str.size() > 19)
     {
         throw std::runtime_error(
             "Number of satoshis to mint is too large. Maximum accepted value is 9223372036854775807");
     }
+    // check for a number that might be too large and run a strcmp, anything with 17 digits or less
+    // is always small enough to be a valid number
+    else if (val_str.size() == 18 && std::strcmp(val_str.c_str(), MAX_SATOSHI.c_str()) > 0)
+    {
+        throw std::runtime_error(
+            "Number of satoshis to mint is too large. Maximum accepted value is 9223372036854775807");
+    }
+
     int64_t val = 0;
     float float_val = 0;
     try
