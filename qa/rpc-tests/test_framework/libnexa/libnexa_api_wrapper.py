@@ -55,7 +55,7 @@ class ChainSelector(IntEnum):
     AddrBlockchainBchRegtest = 6
 
 REGTEST = ChainSelector.AddrBlockchainRegtest
-    
+
 class Error(BaseException):
     pass
 
