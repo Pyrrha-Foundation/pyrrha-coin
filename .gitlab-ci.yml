@@ -155,12 +155,6 @@ check-formatting:
     extends: .ubuntu_cache-linting
     needs: []
     script:
-        - apt-get install -y wget gpg-agent
-        - wget https://apt.llvm.org/llvm.sh
-        - chmod +x llvm.sh
-        - ./llvm.sh 15
-        - apt-get update
-        - apt-get install -y clang-format-15
         - ./autogen.sh
         - ./configure --enable-glibc-back-compat --enable-reduce-exports
         - make check-formatting
@@ -556,9 +550,9 @@ test-ubuntu-qa-rostrum:
     rules:
       - if: $CI_PIPELINE_SOURCE != "schedule"
 
-######################################################
-######## nexad clang (no depend, only system lib installed via apt)
-######################################################
+#####################################################################
+######## nexad clang (no depends, only system libs installed via apt)
+#####################################################################
 .cache-ubuntu-clang:
     extends: .ubuntu_ccache_scripts
     cache:
@@ -568,8 +562,8 @@ test-ubuntu-qa-rostrum:
 .ubuntu-clang-env:
     extends: .cache-ubuntu-clang
     variables:
-        CC: clang-12
-        CXX: clang++-12
+        CC: clang
+        CXX: clang++
 
 build-ubuntu-clang:
     stage: build
