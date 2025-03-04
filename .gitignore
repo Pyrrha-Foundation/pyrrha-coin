@@ -159,3 +159,8 @@ src/.vs/
 # Rostrum
 rostrum
 src/rostrum
+
+# Files generated when building libnexa for wasm
+gmp-6.3.0
+boost_1_86_0
+build-libnexa-wasm

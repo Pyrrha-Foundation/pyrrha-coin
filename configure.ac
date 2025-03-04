@@ -197,6 +197,12 @@ AC_ARG_ENABLE([javalibnexa],
   [use_javalibnexa=yes],
   [use_javalibnexa=no])
 
+AC_ARG_ENABLE([libnexa-wasm],
+  [AS_HELP_STRING([--enable-libnexa-wasm],
+  [compile libnexa for wasm (default is no)])],
+  [build_libnexa_wasm=$enableval],
+  [build_libnexa_wasm=no])
+
 AC_ARG_ENABLE([only-libnexa],
   [AS_HELP_STRING([--enable-only-libnexa],
   [compile only libnexa (default is no). incompatible with --enable-javalibnexa])],
@@ -779,7 +785,11 @@ fi
 
 AC_CHECK_HEADERS([endian.h sys/endian.h byteswap.h stdio.h stdlib.h unistd.h strings.h sys/types.h sys/stat.h sys/select.h sys/prctl.h])
 
-AC_CHECK_LIB(gmp, __gmpz_init, , [AC_MSG_ERROR([GNU multiprecision not found, see https://gmplib.org/])])
+# AC_CHECK_LIB for libgmp does not work when compiling libnexa for wasm with emscripten. skip it
+
+if test "x$build_libnexa_wasm" = xno; then
+  AC_CHECK_LIB(gmp, __gmpz_init, , [AC_MSG_ERROR([GNU multiprecision not found, see https://gmplib.org/])])
+fi
 
 AC_CHECK_DECLS([strnlen])
 
