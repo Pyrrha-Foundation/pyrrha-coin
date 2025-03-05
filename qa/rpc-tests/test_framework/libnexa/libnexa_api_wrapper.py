@@ -189,7 +189,7 @@ def signBchTxOneInputUsingSchnorr(tx_data: bytes, input_index: int,
                 input_amount: int, prevout_script: bytes, hash_type: int,
                 privkey_bytes: bytes) -> bytes:
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
-    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
+    res_size = libnexa.signBchTxOneInputUsingSchnorr(tx_data, len(tx_data), input_index, input_amount,
                                     prevout_script, len(prevout_script), hash_type,
                                     privkey_bytes, res_buf, C_STR_BUF_SIZE)
     if res_size <= 0:
@@ -200,9 +200,11 @@ def signBchTxOneInputUsingSchnorr(tx_data: bytes, input_index: int,
 def signTxOneInputUsingSchnorr(tx_data: bytes, input_index: int,
                 input_amount: int, prevout_script: bytes, hash_type: int,
                 privkey_bytes: bytes) -> bytes:
+    if type(hash_type) == int:
+        hash_type = bytes([hash_type])
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
-    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
-                                    prevout_script, len(prevout_script), hash_type,
+    res_size = libnexa.signTxOneInputUsingSchnorr(tx_data, len(tx_data), input_index, input_amount,
+                                    prevout_script, len(prevout_script), hash_type, len(hash_type),
                                     privkey_bytes, res_buf, C_STR_BUF_SIZE)
     if res_size <= 0:
         return None
@@ -210,9 +212,11 @@ def signTxOneInputUsingSchnorr(tx_data: bytes, input_index: int,
 
 def SignTxSchnorr(tx_data: bytes, input_index: int, input_amount: int,
                 prevout_script: bytes, hash_type: int, privkey_bytes: bytes) -> bytes:
+    if type(hash_type) == int:
+        hash_type = bytes([hash_type])
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
-    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
-                                    prevout_script, len(prevout_script), hash_type,
+    res_size = libnexa.SignTxSchnorr(tx_data, len(tx_data), input_index, input_amount,
+                                    prevout_script, len(prevout_script), hash_type, len(hash_type),
                                     privkey_bytes, res_buf, C_STR_BUF_SIZE)
     if res_size <= 0:
         return None
@@ -290,7 +294,8 @@ def encodeCashAddr(chain: int, type: int, data: bytes) -> bytes:
 
 def decodeCashAddr(chain: int, addr: str) -> (int, bytes):
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
-    res_size = libnexa.decodeCashAddr(chain, addr, res_buf, C_STR_BUF_SIZE)
+    utf8_addr = addr.encode("UTF-8")
+    res_size = libnexa.decodeCashAddr(chain, utf8_addr, res_buf, C_STR_BUF_SIZE)
     if res_size <= 0:
         return None
     return int(res_buf.raw[0]), res_buf.raw[1:res_size]
@@ -298,7 +303,8 @@ def decodeCashAddr(chain: int, addr: str) -> (int, bytes):
 def decodeCashAddrContent(chain: int, addr: str) -> (bytes, bytes):
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
     addr_type = create_string_buffer(1)
-    res_size = libnexa.decodeCashAddrContent(chain, addr, res_buf, C_STR_BUF_SIZE, addr_type)
+    utf8_addr = addr.encode("UTF-8")
+    res_size = libnexa.decodeCashAddrContent(chain, utf8_addr, res_buf, C_STR_BUF_SIZE, addr_type)
     if res_size <= 0:
         return None, None
     return addr_type.raw[0:1], res_buf.raw[0:res_size]
