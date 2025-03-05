@@ -49,23 +49,23 @@ class Error(BaseException):
     pass
 
 
-def init(libbitcoincashfile=None):
+def init(libnexa_file=None):
     global libnexa
-    if libbitcoincashfile is None:
-        libbitcoincashfile = "libnexa.so"
+    if libnexa_file is None:
+        libnexa_file = "libnexa.so"
         try:
-            libnexa = CDLL(libbitcoincashfile)
-            print("Loaded %s" % libbitcoincashfile)
+            libnexa = CDLL(libnexa_file)
+            print("Loaded %s" % libnexa_file)
         except OSError:
             import os
             dir_path = os.path.dirname(os.path.realpath(__file__))
-            libnexa = CDLL(dir_path + os.sep + libbitcoincashfile)
-            print("Loaded %s" % (dir_path + os.sep + libbitcoincashfile))
+            libnexa = CDLL(dir_path + os.sep + libnexa_file)
+            print("Loaded %s" % (dir_path + os.sep + libnexa_file))
     else:
-        libnexa = CDLL(libbitcoincashfile)
-        print("Loaded %s" % libbitcoincashfile)
+        libnexa = CDLL(libnexa_file)
+        print("Loaded %s" % libnexa_file)
     if libnexa is None:
-        raise Error("Cannot find %s shared library", libbitcoincashfile)
+        raise Error("Cannot find %s shared library", libnexa_file)
     libnexa.CreateNoContextScriptMachine.restype = c_void_p
     libnexa.CreateScriptMachine.restype = c_void_p
     libnexa.CreateScriptMachine.argtypes = [ c_int, c_int, c_char_p, c_int, c_char_p, c_int ]
@@ -81,3 +81,341 @@ def init(libbitcoincashfile=None):
     libnexa.SmEndStep.argtypes = [ c_void_p ]
     libnexa.SmGetStackItem.argtypes = [ c_void_p, c_int, c_int, c_char_p, c_char_p ]
     libnexa.SmSetStackItem.argtypes = [ c_void_p, c_int, c_int, c_int, c_char_p, c_int ]
+
+# hacky fix for creating response buffers, nothing should ever be this big
+C_STR_BUF_SIZE = 1000
+
+class LIBNEXA_ERROR(IntEnum):
+    SUCCESS_NO_ERROR = 0,   # success
+    INVALID_ARG = 1,        # an arg is either NULL or has an invalid size
+    DECODE_FAILURE = 2,     # failed to decode some array of bytes passed in
+    RETURN_FAILURE = 3,     # unable to return the result for some reason
+    INTERNAL_ERROR = 4,     # critical logic or implementation error somewhere
+
+# Hack to get script machine to work without edits for now
+def get_libnexa():
+    return libnexa
+
+def libnexaVersion():
+    version = libnexa.libnexaVersion()
+    return version
+
+def get_libnexa_error():
+    res = libnexa.get_libnexa_error()
+    return res
+
+def get_libnexa_error_string():
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    libnexa.get_libnexa_error_string(res_buf, C_STR_BUF_SIZE)
+    res = res_buf.raw.decode("UTF-8").strip()
+    return res
+
+def encode64(input_data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.encode64(input_data, len(input_data), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def decode64(input_data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.decode64(input_data, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def Bin2Hex(input_data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.Bin2Hex(input_data, len(input_data), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def hd44DeriveChildKey(seed: bytes, purpose: int, coin_type: int, account: int, change: bool, index: int) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    null_ptr = POINTER(c_char)()
+    res_size = libnexa.hd44DeriveChildKey(seed, len(seed), purpose, coin_type, account, change, index, res_buf, null_ptr)
+    # secret returned is always assumed to be 32 bytes
+    return res_buf.raw[0:32]
+
+def GetPubKey(privkey_bytes: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.GetPubKey(privkey_bytes, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def SignHashEDCSA(input_data: bytes, privkey_bytes: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.SignHashEDCSA(input_data, len(input_data), privkey_bytes, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def txid(input_data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.txid(input_data, len(input_data), res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def txidem(input_data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.txidem(input_data, len(input_data), res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def blockHash(input_data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.blockHash(input_data, len(input_data), res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+
+def SignTxECDSA(tx_data: bytes, input_index: int, input_amount: int,
+                prevout_script: bytes, hash_type: int, privkey_bytes: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
+                                    prevout_script, len(prevout_script), hash_type,
+                                    privkey_bytes, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+
+def signBchTxOneInputUsingSchnorr(tx_data: bytes, input_index: int,
+                input_amount: int, prevout_script: bytes, hash_type: int,
+                privkey_bytes: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
+                                    prevout_script, len(prevout_script), hash_type,
+                                    privkey_bytes, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+
+def signTxOneInputUsingSchnorr(tx_data: bytes, input_index: int,
+                input_amount: int, prevout_script: bytes, hash_type: int,
+                privkey_bytes: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
+                                    prevout_script, len(prevout_script), hash_type,
+                                    privkey_bytes, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def SignTxSchnorr(tx_data: bytes, input_index: int, input_amount: int,
+                prevout_script: bytes, hash_type: int, privkey_bytes: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.SignTxECDSA(tx_data, len(tx_data), input_index, input_amount,
+                                    prevout_script, len(prevout_script), hash_type,
+                                    privkey_bytes, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def signHashSchnorr(hash: bytes, privkey: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.signHashSchnorr(hash, privkey, res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def signHashSchnorrWithNonce(hash: bytes, privkey: bytes, nonce: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.signHashSchnorrWithNonce(hash, privkey, nonce, res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def parseGroupDescription(op_return: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.parseGroupDescription(op_return, len(op_return), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def getArgsHashFromScriptPubkey(serailised_pubkey: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.getArgsHashFromScriptPubkey(serailised_pubkey, len(serailised_pubkey), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def getTemplateHashFromScriptPubkey(serailised_pubkey: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.getTemplateHashFromScriptPubkey(serailised_pubkey, len(serailised_pubkey), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def getGroupTokenInfoFromScriptPubkey(serialised_pubkey: bytes) -> (bytes, int, int):
+    group_id_buf = create_string_buffer(C_STR_BUF_SIZE)
+    group_flags = c_ulonglong(0)
+    group_amount = c_longlong(0)
+    group_id_size = libnexa.getGroupTokenInfoFromScriptPubkey(serailised_pubkey, len(serailised_pubkey),
+                            group_id_buf, C_STR_BUF_SIZE, pointer(group_flags), pointer(group_amount))
+    if group_id_size <= 0:
+        return None, None, None
+    return group_id_buf.raw[0:group_id_size], group_amount.value, group_flags.value
+
+def signMessage(privkey: bytes , msg: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.signMessage(msg, len(msg), privkey, len(privkey), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def verifyMessage(addr: bytes, msg: bytes, sig: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.verifyMessage(msg, len(msg), addr, len(addr), sig, len(sig), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def verifyBlockHeader(chain: int, serialised_header: bytes) -> bool:
+    res = libnexa.verifyBlockHeader(chain, serialised_header, len(serialised_header))
+    return res
+
+def encodeCashAddr(chain: int, type: int, data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.encodeCashAddr(chain, type, data, len(data), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def decodeCashAddr(chain: int, addr: str) -> (int, bytes):
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.decodeCashAddr(chain, addr, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return int(res_buf.raw[0]), res_buf.raw[1:res_size]
+
+def decodeCashAddrContent(chain: int, addr: str) -> (bytes, bytes):
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    addr_type = create_string_buffer(1)
+    res_size = libnexa.decodeCashAddrContent(chain, addr, res_buf, C_STR_BUF_SIZE, addr_type)
+    if res_size <= 0:
+        return None, None
+    return addr_type.raw[0:1], res_buf.raw[0:res_size]
+
+def serializeScript(script: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.serializeScript(script, len(script), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def pubkeyToScriptTemplate(pubkey: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.pubkeyToScriptTemplate(pubkey, len(pubkey), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def groupIdFromAddr(chain: int, addr: str) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.groupIdFromAddr(chain, addr, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def groupIdToAddr(chain: int, group_id: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.groupIdToAddr(chain, group_id, len(group_id), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def decodeWifPrivateKey(chain: int, wif_string: str) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.decodeWifPrivateKey(chain, wif_string, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def sha256(data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    libnexa.sha256(data, len(data), res_buf)
+    return res_buf.raw[0:32]
+
+def hash256(data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    libnexa.hash256(data, len(data), res_buf)
+    return res_buf.raw[0:32]
+
+def hash160(data: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    libnexahash160(data, len(data), res_buf)
+    return res_buf.raw[0:20]
+
+def getWorkFromDifficultyBits(bits: int) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    c_bits = c_ulong(bits)
+    libnexa.getWorkFromDifficultyBits(c_bits, res_buf)
+    return res_buf.raw[0:32]
+
+def getDifficultyBitsFromWork(work_bytes: bytes) -> int:
+    res = libnexa.getDifficultyBitsFromWork(work_bytes)
+    return res
+
+def createBloomFilter(data: bytes, false_pos_rate: float, capacity: int, max_size: int, flags: int, tweak: int) -> bytes:
+    res_buf = create_string_buffer(max_size)
+    res_size = libnexa.createBloomFilter(data, len(data), false_pos_rate, capacity, max_size, flags, tweak, res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def extractFromMerkleBlock(num_txes: int, merkle_proof_path: bytes, hash_in: bytes, num_hashes: int) -> (int, bytes):
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res = libnexa.extractFromMerkleBlock(num_txes, merkle_proof_path, len(merkle_proof_path),
+                                        hash_in, len(hash_in), num_hashes, res_buf, C_STR_BUF_SIZE)
+    return int(res), res_buf.raw[0:(res*32)]
+
+def capdSolve(message: bytes) -> bytes:
+    res_size_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res = libnexa.capdSolve(message, len(message), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def capdCheck(message: bytes) -> bool:
+    return libnexa.capdCheck(message, len(message))
+
+def capdHash(message: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.capdHash(message, len(message), res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def capdSetPowTargetHarderThanPriority(message: bytes, priority: float) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.capdSetPowTargetHarderThanPriority(message, len(message), priority, res_buf, C_STR_BUF_SIZE)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def cryptAES256CBC(encrypt: int, data: bytes, privkey: bytes, iv: bytes) -> bytes:
+    res_buf = create_string_buffer(C_STR_BUF_SIZE)
+    res_size = libnexa.cryptAES256CBC(encrypt, data, len(data), privkey, iv, res_buf)
+    if res_size <= 0:
+        return None
+    return res_buf.raw[0:res_size]
+
+def verifyDataSchnorr(message: bytes, pubkey: bytes, signature: bytes) -> bool:
+    res = libnexa.verifyDataSchnorr(message, len(message), pubkey, len(pubkey), signature)
+    return bool(res)
+
+def verifyHashSchnorr(hash: bytes, pubkey: bytes, signature: bytes) -> bool:
+    res = libnexa.verifyHashSchnorr(hash, pubkey, len(pubkey), signature)
+    return bool(res)
+
+def RandomBytes(num_bytes: int) -> bytes:
+    res_buf = create_string_buffer(num_bytes)
+    res_size = libnexa.RandomBytes(res_buf, num_bytes)
+    return res_buf.raw[0:res_size]
