@@ -541,18 +541,17 @@ public:
 
         consensus.nSubsidyHalvingInterval = 210000 * 5; // 2 minute blocks rather than 10 min -> * 5
         //uint32_t tgtBits = 4033820160;
-        uint32_t tgtBits = 0x1e0fffff;
-        // uint32_t tgtBits = 0x207fffff;
+        //uint32_t tgtBits = 0x1e0fffff;
+        uint32_t tgtBits = 0x200000ff;
         bool fNegative;
         bool fOverflow;
         arith_uint256 tmp;
         tmp.SetCompact(tgtBits, &fNegative, &fOverflow);
         consensus.powLimit = ArithToUint256(tmp);
-        // consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        // consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        // consensus.powLimit = uint256S("0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetSpacing = 2 * 60;
-        consensus.fPowAllowMinDifficultyBlocks = false;
-        consensus.fPowNoRetargeting = false;
+        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowNoRetargeting = true;
         consensus.powAlgorithm = 1;
         consensus.initialSubsidy = 10 * 1000000 * COIN;
         consensus.coinbaseMaturity = COINBASE_MATURITY;
