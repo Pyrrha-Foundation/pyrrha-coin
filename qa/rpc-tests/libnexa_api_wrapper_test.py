@@ -414,6 +414,8 @@ class LibnexaTest(BitcoinTestFramework):
                 print(test_method_name)
             assert test_method_name in libnexa_tested_methods
 
+        assert libnexa_test_coverage.test_api_wrapper_arg_res_types(libnexa_methods) == True
+
         self.test_libnexaVersion()
         self.test_get_libnexa_error()
         self.test_get_libnexa_error_string()

@@ -66,6 +66,8 @@ def init(libnexa_file=None):
         print("Loaded %s" % libnexa_file)
     if libnexa is None:
         raise Error("Cannot find %s shared library", libnexa_file)
+    # NOTE: None, integers, bytes objects and (unicode) strings are the only native
+    # Python objects that can directly be used as parameters in these function calls
     libnexa.CreateNoContextScriptMachine.restype = c_void_p
     libnexa.CreateScriptMachine.restype = c_void_p
     libnexa.CreateScriptMachine.argtypes = [ c_int, c_int, c_char_p, c_int, c_char_p, c_int ]
@@ -81,6 +83,104 @@ def init(libnexa_file=None):
     libnexa.SmEndStep.argtypes = [ c_void_p ]
     libnexa.SmGetStackItem.argtypes = [ c_void_p, c_int, c_int, c_char_p, c_char_p ]
     libnexa.SmSetStackItem.argtypes = [ c_void_p, c_int, c_int, c_int, c_char_p, c_int ]
+
+    libnexa.libnexaVersion.restype = c_int
+    libnexa.libnexaVersion.argtypes = [ ]
+    libnexa.get_libnexa_error.restype = c_int
+    libnexa.get_libnexa_error.argtypes = [ ]
+    libnexa.get_libnexa_error_string.restype = None
+    libnexa.get_libnexa_error_string.argtypes = [ c_char_p, c_uint64 ]
+    libnexa.encode64.restype = c_int
+    libnexa.encode64.argtypes = [ c_char_p, c_int, c_char_p, c_int ]
+    libnexa.decode64.restype = c_int
+    libnexa.decode64.argtypes = [ c_char_p, c_char_p, c_int ]
+    libnexa.Bin2Hex.restype = c_int
+    libnexa.Bin2Hex.argtypes = [ c_char_p, c_int, c_char_p, c_uint ]
+    libnexa.hd44DeriveChildKey.restype = c_int
+    libnexa.hd44DeriveChildKey.argtypes = [ c_char_p, c_uint, c_uint, c_uint, c_uint, c_bool, c_uint, c_char_p, c_char_p ]
+    libnexa.GetPubKey.restype = c_int
+    libnexa.GetPubKey.argtypes = [ c_char_p, c_char_p, c_uint ]
+    libnexa.SignHashEDCSA.restype = c_int
+    libnexa.SignHashEDCSA.argtypes = [ c_char_p, c_int, c_char_p, c_char_p, c_int ]
+    libnexa.txid.restype = c_int
+    libnexa.txid.argtypes = [ c_char_p, c_int, c_char_p ]
+    libnexa.txidem.restype = c_int
+    libnexa.txidem.argtypes = [ c_char_p, c_int, c_char_p ]
+    libnexa.blockHash.restype = c_int
+    libnexa.blockHash.argtypes = [ c_char_p, c_int, c_char_p ]
+    libnexa.SignTxECDSA.restype = c_int
+    libnexa.SignTxECDSA.argtypes = [ c_char_p, c_int, c_uint, c_int64, c_char_p, c_uint32, c_uint32, c_char_p, c_char_p, c_uint ]
+    libnexa.signBchTxOneInputUsingSchnorr.restype = c_int
+    libnexa.signBchTxOneInputUsingSchnorr.argtypes = [ c_char_p, c_int, c_uint, c_int64, c_char_p, c_uint32, c_uint32, c_char_p, c_char_p, c_uint ]
+    libnexa.signTxOneInputUsingSchnorr.restype = c_int
+    libnexa.signTxOneInputUsingSchnorr.argtypes = [ c_char_p, c_int, c_uint, c_int64, c_char_p, c_uint32, c_char_p, c_uint, c_char_p, c_char_p, c_uint ]
+    libnexa.SignTxSchnorr.restype = c_int
+    libnexa.SignTxSchnorr.argtypes = [ c_char_p, c_int, c_uint, c_int64, c_char_p, c_uint32, c_char_p, c_uint, c_char_p, c_char_p, c_uint ]
+    libnexa.signHashSchnorr.restype = c_int
+    libnexa.signHashSchnorr.argtypes = [ c_char_p, c_char_p, c_char_p ]
+    libnexa.signHashSchnorrWithNonce.restype = c_int
+    libnexa.signHashSchnorrWithNonce.argtypes = [ c_char_p, c_char_p, c_char_p, c_char_p ]
+    libnexa.parseGroupDescription.restype = c_int
+    libnexa.parseGroupDescription.argtypes = [ c_char_p, c_uint64, c_char_p, c_uint64 ]
+    libnexa.getArgsHashFromScriptPubkey.restype = c_int
+    libnexa.getArgsHashFromScriptPubkey.argtypes = [ c_char_p, c_uint64, c_char_p, c_uint64 ]
+    libnexa.getTemplateHashFromScriptPubkey.restype = c_int
+    libnexa.getTemplateHashFromScriptPubkey.argtypes = [ c_char_p, c_uint64, c_char_p, c_uint64 ]
+    libnexa.getGroupTokenInfoFromScriptPubkey.restype = c_int
+    libnexa.getGroupTokenInfoFromScriptPubkey.argtypes = [ c_char_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint64), POINTER(c_int64) ]
+    libnexa.signMessage.restype = c_int
+    libnexa.signMessage.argtypes = [ c_char_p, c_uint, c_char_p, c_uint, c_char_p, c_uint ]
+    libnexa.verifyMessage.restype = c_int
+    libnexa.verifyMessage.argtypes = [ c_char_p, c_uint, c_char_p, c_uint, c_char_p, c_uint, c_char_p, c_uint ]
+    libnexa.verifyBlockHeader.restype = c_bool
+    libnexa.verifyBlockHeader.argtypes = [ c_int, c_char_p, c_int ]
+    libnexa.encodeCashAddr.restype = c_int
+    libnexa.encodeCashAddr.argtypes = [ c_int, c_int, c_char_p, c_int, c_char_p, c_int ]
+    libnexa.decodeCashAddr.restype = c_int
+    libnexa.decodeCashAddr.argtypes = [ c_int, c_char_p, c_char_p, c_int ]
+    libnexa.decodeCashAddrContent.restype = c_int
+    libnexa.decodeCashAddrContent.argtypes = [ c_int, c_char_p, c_char_p, c_int, c_char_p ]
+    libnexa.serializeScript.restype = c_int
+    libnexa.serializeScript.argtypes = [ c_char_p, c_uint, c_char_p, c_int ]
+    libnexa.pubkeyToScriptTemplate.restype = c_int
+    libnexa.pubkeyToScriptTemplate.argtypes = [ c_char_p, c_int, c_char_p, c_int ]
+    libnexa.groupIdFromAddr.restype = c_int
+    libnexa.groupIdFromAddr.argtypes = [ c_int, c_char_p, c_char_p, c_int ]
+    libnexa.groupIdToAddr.restype = c_int
+    libnexa.groupIdToAddr.argtypes = [ c_int, c_char_p, c_int, c_char_p, c_int ]
+    libnexa.decodeWifPrivateKey.restype = c_int
+    libnexa.decodeWifPrivateKey.argtypes = [ c_int, c_char_p, c_char_p, c_int ]
+    libnexa.sha256.restype = None
+    libnexa.sha256.argtypes = [ c_char_p, c_uint, c_char_p ]
+    libnexa.hash256.restype = None
+    libnexa.hash256.argtypes = [ c_char_p, c_uint, c_char_p ]
+    libnexa.hash160.restype = None
+    libnexa.hash160.argtypes = [ c_char_p, c_uint, c_char_p ]
+    libnexa.getWorkFromDifficultyBits.restype = None
+    libnexa.getWorkFromDifficultyBits.argtypes = [ c_ulong, c_char_p ]
+    libnexa.getDifficultyBitsFromWork.restype = c_uint
+    libnexa.getDifficultyBitsFromWork.argtypes = [ c_char_p ]
+    libnexa.createBloomFilter.restype = c_int
+    libnexa.createBloomFilter.argtypes = [ c_char_p, c_uint, c_double, c_int, c_int, c_int, c_int, c_char_p ]
+    libnexa.extractFromMerkleBlock.restype = c_int
+    libnexa.extractFromMerkleBlock.argtypes = [ c_int, c_char_p, c_int, c_char_p, c_int, c_char_p, c_int ]
+    libnexa.capdSolve.restype = c_int
+    libnexa.capdSolve.argtypes = [ c_char_p, c_uint, c_char_p, c_uint ]
+    libnexa.capdCheck.restype = c_int
+    libnexa.capdCheck.argtypes = [ c_char_p, c_uint ]
+    libnexa.capdHash.restype = c_int
+    libnexa.capdHash.argtypes = [ c_char_p, c_uint, c_char_p, c_uint ]
+    libnexa.capdSetPowTargetHarderThanPriority.restype = c_int
+    libnexa.capdSetPowTargetHarderThanPriority.argtypes = [ c_char_p, c_uint, c_double, c_char_p, c_uint ]
+    libnexa.cryptAES256CBC.restype = c_int
+    libnexa.cryptAES256CBC.argtypes = [ c_uint, c_char_p, c_uint, c_char_p, c_char_p, c_char_p]
+    libnexa.verifyDataSchnorr.restype = c_bool
+    libnexa.verifyDataSchnorr.argtypes = [ c_char_p, c_uint, c_char_p, c_int, c_char_p ]
+    libnexa.verifyHashSchnorr.restype = c_bool
+    libnexa.verifyHashSchnorr.argtypes = [ c_char_p, c_char_p, c_int, c_char_p ]
+    libnexa.RandomBytes.restype = c_int
+    libnexa.RandomBytes.argtypes = [ c_char_p, c_int ]
+
 
 # hacky fix for creating response buffers, nothing should ever be this big
 C_STR_BUF_SIZE = 1000
@@ -104,7 +204,7 @@ def get_libnexa_error():
     res = libnexa.get_libnexa_error()
     return res
 
-def get_libnexa_error_string():
+def get_libnexa_error_string() -> str:
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
     libnexa.get_libnexa_error_string(res_buf, C_STR_BUF_SIZE)
     res = res_buf.raw.decode("UTF-8").strip()
