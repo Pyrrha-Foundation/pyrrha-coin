@@ -43,7 +43,7 @@ void CapdMsgPool::clear()
     size = 0;
 }
 
-void CapdMsgPool::remove(const uint256 &hash) 
+void CapdMsgPool::remove(const uint256 &hash)
 {
     WRITELOCK(csMsgPool);
     MsgIter i = msgs.find(hash);
