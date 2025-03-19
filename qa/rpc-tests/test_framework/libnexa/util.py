@@ -184,7 +184,7 @@ def addrbin(pubkey):
     libnexa.hash160(pubkey, len(pubkey), result)
     return bytes(result)
 
-def txid(txbin):
+def GetTxid(txbin):
     """Return a transaction id, given a transaction in hex, object or binary form.
        The returned binary txid is not reversed.  Do: hexlify(libnexa.txid(txhex)[::-1]).decode("utf-8") to convert to
        bitcoind's hex format.
@@ -202,7 +202,7 @@ def txid(txbin):
     # Bitcoin/BitcoinCash
     # return sha256(sha256(txbin))
 
-def txidem(txbin):
+def GetTxidem(txbin):
     """Return a transaction id, given a transaction in hex, object or binary form.
        The returned binary txid is not reversed.  Do: hexlify(libnexa.txid(txhex)[::-1]).decode("utf-8") to convert to
        bitcoind's hex format.
