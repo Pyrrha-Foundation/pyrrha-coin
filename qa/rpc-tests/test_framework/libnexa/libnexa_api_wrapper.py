@@ -456,7 +456,7 @@ def hash256(data: bytes) -> bytes:
 
 def hash160(data: bytes) -> bytes:
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
-    libnexahash160(data, len(data), res_buf)
+    libnexa.hash160(data, len(data), res_buf)
     return res_buf.raw[0:20]
 
 def getWorkFromDifficultyBits(bits: int) -> bytes:

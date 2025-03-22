@@ -14,6 +14,9 @@ import decimal
 import platform
 import os
 
+from .libnexa_api_wrapper import ChainSelector, PayAddressType, Error
+from . import libnexa_api_wrapper as libnexa_api
+
 # How many sats make a nex
 NEX = 100
 
@@ -28,10 +31,9 @@ def strToChainSelector(s):
 
 def bin2hex(data):
     """convert the passed binary data to hex"""
-    assert type(data) is bytes, "libnexa.bintohex requires parameter of type bytes"
-    l = len(data)
-    result = create_string_buffer(2 * l + 1)
-    if libnexa.Bin2Hex(data, l, result, 2 * l + 1):
+    assert type(data) is bytes, "bintohex requires parameter of type bytes"
+    result = libnexa_api.Bin2Hex(data)
+    if result:
         return result.value.decode("utf-8")
     raise Error("libnexa bin2hex error")
 
@@ -40,9 +42,7 @@ def signData(data, key):
         data = unhexlify(data)
     elif type(data) != bytes:
         data = data.serialize()
-    result = create_string_buffer(100)
-    siglen = libnexa.SignData(data,len(data),key, result, 100)
-    return result.raw[0:siglen]
+    return libnexa_api.SignData(data)
 
 def templateToAddress(chainSelector, templateScript, constraintArgs=None, publicArgs=None, group=None, groupQty=None):
     if publicArgs is None: publicArgs = []
@@ -62,26 +62,22 @@ def lockingScriptToAddress(chainSelector, addrType, data):
         data = data.serialize()
     if addrType == PayAddressType.PayAddressTypeTEMPLATE:
         data = ser_bytes(data)
-    result = create_string_buffer(10000)
-    ok = libnexa.encodeCashAddr(chainSelector, addrType, data,len(data), result, 10000)
-    if ok==0: return None
-    return result.raw[0:ok].decode()
+    res = libnexa_api.encodeCashAddr(chainSelector, addrType, data)
+    if not res:
+        return None
+    return res.decode()
 
 def addressToBin(addrStr):
     """Convert an address to its binary representation (the locking script for script template addresses)"""
     blockchainStr = addrStr.split(":")[0]
-    addr = addrStr.split(":")[1].encode("utf-8")
+    addr = addrStr.split(":")[1]
     chain = strToChainSelector(blockchainStr)
-    result = create_string_buffer(len(addrStr))  # Binary representation is going to be smaller than the text rep
-    typ = create_string_buffer(1)
-    # resultlen = libnexa.decodeCashAddrContent(chain.value, addr, result, len(addrStr), typ)
-    resultlen = libnexa.decodeCashAddr(chain.value, addr, result, len(addrStr), typ)
-    if resultlen==0:
-        print(libnexa.get_libnexa_error())
+    typ, result = libnexa_api.decodeCashAddr(chain.value, addr)
+    if not result:
+        print(libnexa_api.get_libnexa_error())
     # first byte is the type, 2nd byte is the script length (for small scripts anyway -- compact int encoded)
-    scriptlen = result.raw[1]
-    data = result.raw[2:2+scriptlen]
-    return data
+    scriptlen = result[0]
+    return result[1:1+scriptlen]
 
 def signTxInputECDSA(tx, inputIdx, inputAmount, prevoutScript, key, sigHashType=BTCBCH_SIGHASH_FORKID | BTCBCH_SIGHASH_ALL):
     """Signs one input of a transaction.  Signature is returned.  You must use this signature to construct the spend script
@@ -103,12 +99,10 @@ def signTxInputECDSA(tx, inputIdx, inputAmount, prevoutScript, key, sigHashType=
     if type(inputAmount) is decimal.Decimal:
         inputAmount = int(inputAmount * NEX)
 
-    result = create_string_buffer(100)
-    siglen = libnexa.SignTxECDSA(tx, len(tx), inputIdx, c_longlong(inputAmount), prevoutScript,
-                            len(prevoutScript), sigHashType, key, result, 100)
-    if siglen == 0:
+    sig = libnexa_api.SignTxECDSA(tx, inputIdx, inputAmount, prevoutScript, sigHashType, key)
+    if not siglen:
         raise Error("libnexa signtx error")
-    return result.raw[0:siglen]
+    return sig
 
 def signTxInput(tx, inputIdx, inputAmount, prevoutScript, key, sigHashType=SIGHASH_ALL):
     """Default signing is now Schnorr"""
@@ -124,8 +118,6 @@ def signTxInputSchnorr(tx, inputIdx, inputAmount, prevoutScript, key, sigHashTyp
     key: sign using this private key in binary format
     sigHashType: bytes describing which parts of the transaction are signed.  If a single byte sighashtype is used, an integer can be passed
     """
-    if type(sigHashType) == int:  # As a convenience allow 1 byte sighashtypes to be passed as an integer
-        sigHashType = bytes([sigHashType])
     if type(tx) == str:
         tx = unhexlify(tx)
     elif type(tx) != bytes:
@@ -135,14 +127,12 @@ def signTxInputSchnorr(tx, inputIdx, inputAmount, prevoutScript, key, sigHashTyp
     if type(inputAmount) is decimal.Decimal:
         inputAmount = int(inputAmount * NEX)
 
-    result = create_string_buffer(100)
-    siglen = libnexa.SignTxSchnorr(tx, len(tx), inputIdx, c_longlong(inputAmount), prevoutScript,
-        len(prevoutScript), sigHashType, len(sigHashType), key, result, 100)
-    if siglen == 0:
+    sig = libnexa_api.SignTxSchnorr(tx, inputIdx, inputAmount, prevoutScript, sigHashType, key)
+    if not sig:
         raise Error("libnexa signtx error")
-    return result.raw[0:siglen]
+    return sig
 
-def signHashSchnorr(key, hsh):
+def SignHashSchnorr(key, hsh):
     """Signs a 32 byte message (presumably the hash of something).  A Schnorr signature is returned.  You must use this signature to construct the spend script
     Parameters:
     hsh: 32 bytes of data, hex, binary, or object (contains serialize member) format
@@ -154,49 +144,51 @@ def signHashSchnorr(key, hsh):
     elif type(hsh) != bytes:
         hsh = hsh.serialize()
 
-    result = create_string_buffer(100)
     assert len(hsh) == 32
-    siglen = libnexa.SignHashSchnorr(hsh, key, result, 100)
-    if siglen == 0:
+    sig = libnexa_api.signHashSchnorr(hsh, key)
+    if not sig:
         raise Error("libnexa signtx error")
-    return result.raw[0:siglen]
+    return sig
 
 
 def randombytes(length):
     """Get cryptographically acceptable pseudorandom bytes from the OS"""
-    result = create_string_buffer(length)
-    worked = libnexa.RandomBytes(result, length)
-    if worked != length:
-        raise Error("libnexa randombytes error")
-    return result.raw
+    ret_bytes = bytearray()
+    i = length
+    while i > 0:
+        x = i
+        if x > 32:
+            x = 32
+        result = libnexa_api.RandomBytes(x)
+        if len(result) != x:
+            raise Error("libnexa randombytes error")
+        ret_bytes.extend(result)
+        i = i - x
+    return bytes(ret_bytes)
 
 
 def pubkey(key):
     """Given a private key, return its public key"""
-    result = create_string_buffer(65)
-    l = libnexa.GetPubKey(key, result, 65)
-    return result.raw[0:l]
+    pubkey = libnexa_api.GetPubKey(key)
+    return pubkey
 
 
 def addrbin(pubkey):
     """Given a public key, in binary format, return its binary form address (just the bytes, no type or checksum)"""
-    result = create_string_buffer(20)
-    libnexa.hash160(pubkey, len(pubkey), result)
-    return bytes(result)
+    return libnexa_api.hash160(pubkey)
 
 def GetTxid(txbin):
     """Return a transaction id, given a transaction in hex, object or binary form.
-       The returned binary txid is not reversed.  Do: hexlify(libnexa.txid(txhex)[::-1]).decode("utf-8") to convert to
+       The returned binary txid is not reversed.  Do: hexlify(libnexa_api.txid(txhex)[::-1]).decode("utf-8") to convert to
        bitcoind's hex format.
     """
     if type(txbin) == str:
         txbin = unhexlify(txbin)
     elif type(txbin) != bytes:
         txbin = txbin.serialize()
-    result = create_string_buffer(32)
-    ret = libnexa.txid(txbin, len(txbin), result)
-    if ret:
-        return bytes(result)
+    ret = libnexa_api.txid(txbin)
+    if ret is not None:
+        return ret
     assert ret, "transaction decode error"
 
     # Bitcoin/BitcoinCash
@@ -204,17 +196,16 @@ def GetTxid(txbin):
 
 def GetTxidem(txbin):
     """Return a transaction id, given a transaction in hex, object or binary form.
-       The returned binary txid is not reversed.  Do: hexlify(libnexa.txid(txhex)[::-1]).decode("utf-8") to convert to
+       The returned binary txid is not reversed.  Do: hexlify(libnexa_api.txid(txhex)[::-1]).decode("utf-8") to convert to
        bitcoind's hex format.
     """
     if type(txbin) == str:
         txbin = unhexlify(txbin)
     elif type(txbin) != bytes:
         txbin = txbin.serialize()
-    result = create_string_buffer(32)
-    ret = libnexa.txidem(txbin, len(txbin), result)
-    if ret:
-        return bytes(result)
+    ret = libnexa_api.txidem(txbin)
+    if ret is not None:
+        return ret
     assert ret, "transaction decode error"
 
 

@@ -150,7 +150,7 @@ class ScriptMachine:
             self.smId = None
         else:
             if tx is None:
-                self.smId = libnexa.CreateNoContextScriptMachine(self.flags)
+                self.smId = get_libnexa().CreateNoContextScriptMachine(self.flags)
             else:
                 # If string (assumes hex) or object convert to binary serialization
                 if type(tx) == str:
@@ -166,7 +166,7 @@ class ScriptMachine:
                 else:
                     prevoutsbin = prevouts
 
-                self.smId = libnexa.CreateScriptMachine(self.flags, inputIdx, txbin, len(txbin), prevoutsBin, len(prevoutsBin))
+                self.smId = get_libnexa().CreateScriptMachine(self.flags, inputIdx, txbin, len(txbin), prevoutsBin, len(prevoutsBin))
         self.curPos = 0
         self.script = None
 
@@ -176,7 +176,7 @@ class ScriptMachine:
 
     def clone(self):
         sm = ScriptMachine(self.flags, nocreate=True)
-        sm.smId = libnexa.SmClone(self.smId)
+        sm.smId = get_libnexa().SmClone(self.smId)
         sm.curPos = self.curPos
         sm.script = self.script
         return sm
@@ -184,21 +184,21 @@ class ScriptMachine:
     def cleanup(self):
         """Call to explicitly free the resources used by this script machine"""
         if self.smId:
-            libnexa.SmRelease(self.smId)
+            get_libnexa().SmRelease(self.smId)
             self.smId = 0
         else:
             raise Error("accessed inactive script machine")
 
     def reset(self):
         if self.smId==0: raise Error("accessed inactive script machine")
-        libnexa.SmReset(self.smId)
+        get_libnexa().SmReset(self.smId)
         self.curPos = 0
 
     def eval(self, script):
         if self.smId==0: raise Error("accessed inactive script machine")
         if type(script) == str:
             script = unhexlify(script)
-        ret = libnexa.SmEval(self.smId, script, len(script))
+        ret = get_libnexa().SmEval(self.smId, script, len(script))
         return ret
 
     def begin(self, script):
@@ -206,7 +206,7 @@ class ScriptMachine:
         if self.smId==0: raise Error("accessed inactive script machine")
         if type(script) == str:
             script = unhexlify(script)
-        ret = libnexa.SmBeginStep(self.smId, script, len(script))
+        ret = get_libnexa().SmBeginStep(self.smId, script, len(script))
         self.curPos = 0
         self.script = script
         return ret
@@ -216,15 +216,15 @@ class ScriptMachine:
         if self.smId==0: raise Error("accessed inactive script machine")
         if self.curPos >= len(self.script):
             raise Error("stepped beyond end of script")
-        ret = libnexa.SmStep(self.smId)
+        ret = get_libnexa().SmStep(self.smId)
         if ret == 0:
             raise Error("execution error")
-        self.curPos = libnexa.SmPos(self.smId)
+        self.curPos = get_libnexa().SmPos(self.smId)
         return self.curPos
 
     def error(self):
         if self.smId==0: raise Error("accessed inactive script machine")
-        return (ScriptError(libnexa.SmGetError(self.smId)), libnexa.SmPos(self.smId))
+        return (ScriptError(get_libnexa().SmGetError(self.smId)), get_libnexa().SmPos(self.smId))
 
     def pos(self):
         return self.curPos
@@ -232,7 +232,7 @@ class ScriptMachine:
     def end(self):
         """Call when script is complete to do final script checks"""
         if self.smId==0: raise Error("accessed inactive script machine")
-        ret = libnexa.SmEndStep(self.smId)
+        ret = get_libnexa().SmEndStep(self.smId)
         return ret
 
     def altstack(self):
@@ -247,7 +247,7 @@ class ScriptMachine:
         item = create_string_buffer(MAX_STACK_ITEM_LENGTH)
         itemType = create_string_buffer(1)
         while 1:
-            result = libnexa.SmGetStackItem(self.smId, which, idx, itemType, item)
+            result = get_libnexa().SmGetStackItem(self.smId, which, idx, itemType, item)
             if result == -1: break
             if itemType[0] == b'\x00':
                 itemTyp = StackItemType.BYTES
@@ -267,4 +267,4 @@ class ScriptMachine:
         """Set an item on the stack to a value, index 0 is the top.  index -1 means push"""
         if self.smId==0: raise Error("accessed inactive script machine")
         if which is None: which = self.STACK
-        libnexa.SmSetStackItem(self.smId, which, idx, int(itemType), value, len(value))
+        get_libnexa().SmSetStackItem(self.smId, which, idx, int(itemType), value, len(value))
