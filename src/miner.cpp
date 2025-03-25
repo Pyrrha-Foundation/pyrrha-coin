@@ -346,18 +346,6 @@ bool BlockAssembler::TestPackageSigOps(uint64_t packageSize, unsigned int packag
     return true;
 }
 
-// Block size and sigops have already been tested.  Check that all transactions
-// are final.
-bool BlockAssembler::TestPackageFinality(const CTxMemPool::setEntries &package)
-{
-    for (const CTxMemPool::TxIdIter it : package)
-    {
-        if (!IsFinalTx(it->GetSharedTx(), nHeight, nLockTimeCutoff))
-            return false;
-    }
-    return true;
-}
-
 // Return true if incremental tx or txs in the block with the given size and sigop count would be
 // valid, and false otherwise.  If false, blockFinished and lastFewTxs are updated if appropriate.
 bool BlockAssembler::IsIncrementallyGood(uint64_t nExtraSize, unsigned int nExtraSigOps)
@@ -395,9 +383,6 @@ bool BlockAssembler::IsIncrementallyGood(uint64_t nExtraSize, unsigned int nExtr
 
 bool BlockAssembler::TestForBlock(CTxMemPool::TxIdIter iter)
 {
-    if (!IsFinalTx(iter->GetSharedTx(), nHeight, nLockTimeCutoff))
-        return false;
-
     if (!IsIncrementallyGood(iter->GetTxSize(), iter->GetSigOpCount()))
         return false;
 
@@ -567,31 +552,6 @@ bool BlockAssembler::addPackageTxs(std::vector<const CTxMemPoolEntry *> *vtxe, b
         // Test that the package does not exceed sigops limits
         if (!TestPackageSigOps(packageSize, packageSigOps))
         {
-            continue;
-        }
-
-        // Test if all tx's are Final
-        if (!TestPackageFinality(ancestors))
-        {
-            // If package is not final we have to remove any descendents we may
-            // have added to the block that are final, otherwise we'll end up
-            // mining a partial chain and fail the block validation.
-            {
-                CTxMemPool::setEntries setAllRemoves;
-                for (auto it : ancestors)
-                {
-                    mempool._CalculateDescendants(it, setAllRemoves);
-                }
-                // add to global set all removes
-                nonFinalChains.insert(setAllRemoves.begin(), setAllRemoves.end());
-                // nonFinalChains.insert(ancestors.begin(), ancestors.end());
-
-                for (auto iter2 : nonFinalChains)
-                {
-                    RemoveFromBlock(vtxe, iter2);
-                }
-            }
-
             continue;
         }
 
