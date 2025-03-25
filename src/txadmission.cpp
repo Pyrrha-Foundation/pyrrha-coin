@@ -957,6 +957,7 @@ bool ParallelAcceptToMemoryPool(CTxMemPool &pool,
         }
         else
         {
+            *pfMissingInputs = true;
             return state.DoS(0, false, REJECT_NONSTANDARD, "non-final");
         }
     }
@@ -1612,18 +1613,7 @@ bool CheckFinalTx(const CTransaction *tx, int flags)
     // evaluated is what is used. Thus if we want to know if a
     // transaction can be part of the *next* block, we need to call
     // IsFinalTx() with one more than chainActive.Height().
-    //
-    // If we are processing a block then we have to increase the block height allowed for non-final
-    // transactions again by one. This is because transactions could be processing while the block
-    // is also processing and therefore the chaintip will not yet have been updated whereas on some
-    // other peer they could have received the block and already sent new transactions at that block height.
-    int nBlockHeightDelta = 0;
-    if (PV->NumBlocksValidating() > 0)
-    {
-        nBlockHeightDelta = 1;
-        // LOG(MEMPOOL, "CheckFinalTx() block height was increased by 1\n");
-    }
-    const int64_t nBlockHeight = chainActive.Height() + 1 + nBlockHeightDelta;
+    const int64_t nBlockHeight = chainActive.Height() + 1;
 
     // BIP113 will require that time-locked transactions have nLockTime set to
     // less than the median time of the previous block they're contained in.

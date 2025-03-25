@@ -236,32 +236,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript &sc
                 // Dump all contents of txpool into the block
                 for (auto iter = mempool.mapTx.begin(); iter != mempool.mapTx.end(); iter++)
                 {
-                    // Although in theory we do not allow non final txns into the txpool during txadmission,
-                    // in practice, it is possible that one might get in during block validation, so we
-                    // have to make this additional check to be sure we don't add a non-final to the block template.
-                    if (IsFinalTx(iter->GetSharedTx(), nHeight, nLockTimeCutoff))
-                    {
-                        AddToBlock(&vtxe, iter);
-                    }
-                    else
-                    {
-                        // Check for theoretical DOS attack.
-                        //
-                        // Check if there are descendents and if so then break from the fast template
-                        // creation, clear the block and start and start a slow template creation by
-                        // resetting the flag to false.  This would cover a very rare and theoretical
-                        // attack where someone created a chain where one txn was non-final, but the following
-                        // ones were final, and then injected this chain into the txpool during a block validation
-                        // (It's only during block validation where non-final txns can enter the txpool).
-                        auto setChildren = mempool.GetMemPoolChildren(iter);
-                        if (!setChildren.empty())
-                        {
-                            fCreateFastTemplate = false;
-                            resetBlock(scriptPubKeyIn, coinbaseSize);
-                            vtxe.clear();
-                            break;
-                        }
-                    }
+                    AddToBlock(&vtxe, iter);
                 }
             }
             else
