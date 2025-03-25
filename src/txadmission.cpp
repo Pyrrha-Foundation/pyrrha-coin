@@ -701,7 +701,7 @@ void ThreadTxAdmission()
                             state.GetRejectCode(), fMissingInputs ? "orphan" : "", state.GetDebugMessage(),
                             txd.nodeName, tx->GetId().ToString());
 
-                        if (fMissingInputs)
+                        if (fMissingInputs || state.GetRejectCode() == REJECT_NONFINAL)
                         {
                             WRITELOCK(orphanpool.cs_orphanpool);
                             orphanpool.AddOrphanTx(tx, txd.nodeId);
@@ -957,8 +957,7 @@ bool ParallelAcceptToMemoryPool(CTxMemPool &pool,
         }
         else
         {
-            *pfMissingInputs = true;
-            return state.DoS(0, false, REJECT_NONSTANDARD, "non-final");
+            return state.DoS(0, false, REJECT_NONFINAL, "non-final");
         }
     }
 
