@@ -41,8 +41,12 @@ public:
         uint64_t nOrphanTxSize;
     };
 
+    // Used for storing and tracking orphans
     std::map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_orphanpool);
     std::map<uint256, std::set<uint256> > mapOrphanTransactionsByPrev GUARDED_BY(cs_orphanpool);
+
+    // Used for storing and tracking non-final txns
+    std::map<uint256, COrphanTx> mapNonFinals GUARDED_BY(cs_orphanpool);
 
     // Used for syncronizing post block processing of the orphan pool
     CCriticalSection cs_blockprocessing;
@@ -56,12 +60,14 @@ public:
     //! Do we already have this orphan in the orphan pool
     bool AlreadyHaveOrphan(const uint256 &txid);
 
-    //! Add a transaction to the orphan pool
+    //! Add a transaction to the orphan pool - these can be true orphans or non-final txns.
     bool AddOrphanTx(const CTransactionRef ptx, NodeId peer);
+    bool AddNonFinalTx(const CTransactionRef ptx, NodeId peer);
 
-    //! Erase an ophan tx from the orphan pool
+    //! Erase an orphan or non-final tx from the orphan pool
     //! @return true if an orphan matching the hash was found in the orphanpool and successfully erased.
     bool EraseOrphanTx(const uint256 &hash);
+    bool EraseNonFinalTx(const uint256 &hash);
 
     //! Expire old orphans from the orphan pool
     void EraseOrphansByTime();
@@ -84,7 +90,7 @@ public:
     uint64_t GetOrphanPoolSize()
     {
         READLOCK(cs_orphanpool);
-        return mapOrphanTransactions.size();
+        return mapOrphanTransactions.size() + mapNonFinals.size();
     }
 
     //! Orphan pool bytes used
@@ -103,6 +109,7 @@ public:
         WRITELOCK(cs_orphanpool);
         mapOrphanTransactions.clear();
         mapOrphanTransactionsByPrev.clear();
+        mapNonFinals.clear();
         nBytesOrphanPool = 0;
     }
 

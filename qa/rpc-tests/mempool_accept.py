@@ -652,11 +652,16 @@ class MyTest (BitcoinTestFramework):
         # After the blocks are processed there should only be
         # the transactions that were sent "after" the block was mined.
         self.sync_blocks()
+
+        # check that all orphans and non-finals were promoted to the txpool.
+        waitFor(waitTime, lambda: self.nodes[0].getorphanpoolinfo()["size"] == 0)
+        waitFor(waitTime, lambda: self.nodes[1].getorphanpoolinfo()["size"] == 0)
+        waitFor(waitTime, lambda: self.nodes[2].getorphanpoolinfo()["size"] == 0)
+        waitFor(waitTime, lambda: self.nodes[3].getorphanpoolinfo()["size"] == 0)
         waitFor(waitTime, lambda: self.nodes[0].gettxpoolinfo()["size"] == 10)
         waitFor(waitTime, lambda: self.nodes[1].gettxpoolinfo()["size"] == 10)
         waitFor(waitTime, lambda: self.nodes[2].gettxpoolinfo()["size"] == 10)
         waitFor(waitTime, lambda: self.nodes[3].gettxpoolinfo()["size"] == 10)
-
 
 if __name__ == '__main__':
         MyTest().main()
