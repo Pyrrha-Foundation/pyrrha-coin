@@ -61,7 +61,7 @@ extern CChainParams *libnexaParams;
 
 // Must match the equivalent object in calling language code (e.g. PayAddressType)
 // Matches the CashAddrType enum used for address types in cashaddrenc.h with the addition of NONE
-typedef enum
+typedef enum : int32_t
 {
     PayAddressTypeP2PKH = 0,
     PayAddressTypeP2SH = 1,
@@ -71,7 +71,7 @@ typedef enum
 } PayAddressType;
 
 // Must match the equivalent object in calling language code (e.g. ChainSelector)
-typedef enum
+typedef enum : int32_t
 {
     AddrBlockchainNexa = 1,
     AddrBlockchainTestnet = 2,

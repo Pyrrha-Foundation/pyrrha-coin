@@ -54,13 +54,19 @@ static const int32_t LIBNEXA_VERSION = LIBNEXA_MAJOR(1) + LIBNEXA_MINOR(2) + LIB
 // clang-format on
 
 // libnexa version
-SLAPI int libnexaVersion();
+SLAPI int32_t libnexaVersion();
+SLAPI uint32_t libnexa_version();
 
 // returns the error code of the last error
-SLAPI unsigned int get_libnexa_error();
+SLAPI uint32_t get_libnexa_error();
 // puts the last error in the buffer. if the buffer is not large enough to hold the error,
 // the buffer will be filled but may not contain the entire error message
 SLAPI void get_libnexa_error_string(char *buf, uint64_t buflen);
+
+// frees a pointer returned by libnexa
+SLAPI void libnexa_free(void* ptr);
+
+// Begin v1 API
 
 /** Returns 0 if invalid, -sizeNeeded if you did not give a large enough buffer, or the length of the result if it
     worked.
@@ -324,5 +330,227 @@ SLAPI bool verifyHashSchnorr(const unsigned char *hash,
 
 /** Return random bytes from cryptographically acceptable random sources */
 SLAPI int RandomBytes(unsigned char *buf, int num);
+
+// End v1 API
+//
+//
+//
+//
+//
+// Begin v2 API
+
+/** Convert binary data to a hex string.  The provided result buffer must be 2*length+1 bytes.
+ */
+SLAPI char* bin_to_hex(const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen);
+
+SLAPI bool capd_check(const uint8_t *message, const uint32_t messageLen);
+
+SLAPI uint8_t* capd_hash(const uint8_t *message, const uint32_t messageLen, uint32_t *resultLen);
+
+SLAPI uint8_t* capd_set_pow_target_harder_than_priority(const uint8_t *message,
+    const uint32_t messageLen,
+    const double priority,
+    uint32_t *resultLen);
+
+SLAPI uint8_t* capd_solve(const uint8_t *message, const uint32_t messageLen, uint32_t *resultLen);
+
+/** Create a bloom filter */
+SLAPI uint8_t* create_bloom_filter(const uint8_t *data,
+    const uint32_t len,
+    const double falsePositiveRate,
+    const uint32_t capacity,
+    const uint32_t maxSize,
+    const int32_t flags,
+    const int32_t tweak,
+    uint32_t *resultLen);
+
+// result buffer length must be len (or more) bytes, secret must be 32 bytes, iv must be 16 or more bytes, len must be a
+// multiple of 16
+SLAPI uint8_t* crypt_aes_256_cbc(const bool encrypt,
+    const uint8_t *data,
+    const uint32_t len,
+    const uint8_t *secret,
+    const uint8_t *iv,
+    uint32_t *resultLen);
+
+SLAPI char* decode_base64(const char* data, uint32_t *resultLen);
+
+SLAPI uint8_t* decode_cash_addr(const int32_t chain, const char *strAddr, uint32_t *resultLen);
+
+SLAPI uint8_t* decode_cash_addr_content(const int32_t chain,
+    const char *strAddr,
+    uint32_t *resultLen,
+    uint8_t *type);
+
+SLAPI uint8_t* decode_wif_private_key(const int32_t chain, const char *privateKeyWIF, uint32_t *resultLen);
+
+SLAPI char* encode_base64(const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen);
+
+SLAPI char* encode_cash_addr(const int32_t chain, const int32_t typ, const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen);
+
+// Since partial Merkle blocks are just trees of hashes, this structure is the same for Nexa and BCH
+SLAPI uint8_t* extract_from_merkle_block(const int32_t numTxes,
+    const uint8_t *merkleProofPath,
+    const int32_t mppLen,
+    const uint8_t *hashIn,
+    const uint32_t numHashes,
+    uint32_t *resultLen);
+
+SLAPI uint8_t* get_args_hash_from_script_pubkey(const uint8_t *scriptData, const uint32_t scriptDataLen, uint32_t *resultLen);
+
+SLAPI uint32_t get_difficulty_bits_from_work(const uint8_t *work256Bits);
+
+SLAPI uint8_t* get_group_info_from_script_pubkey(const uint8_t *scriptData,
+    const uint32_t scriptDataLen,
+    uint32_t *resultLen,
+    uint64_t *grpFlags,
+    int64_t *grpAmount);
+
+/** Given a private key, return its corresponding public key */
+SLAPI uint8_t* get_pubkey(const uint8_t *keyData, uint32_t *resultLen);
+
+SLAPI uint8_t* get_template_hash_from_script_pubkey(const uint8_t *scriptData, const uint32_t scriptDataLen, uint32_t *resultLen);
+
+SLAPI uint8_t* get_txid(const uint8_t *txData, const uint32_t txDataLen, uint32_t *resultLen);
+
+SLAPI uint8_t* get_txidem(const uint8_t *txData, const uint32_t txDataLen, uint32_t *resultLen);
+
+/** Get work from nbits */
+SLAPI uint8_t* get_work_from_difficulty_bits(const uint32_t numBits, uint32_t *resultLen);
+
+SLAPI uint8_t* group_id_from_addr(const int32_t chain, const char *addr, uint32_t *resultLen);
+
+SLAPI char* group_id_to_addr(const int32_t chain, const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen);
+
+// result must be 20 bytes
+SLAPI uint8_t* hash160(const uint8_t *data, const uint32_t dataLen);
+
+// result must be 32 bytes
+SLAPI uint8_t* hash256(const uint8_t *data, const uint32_t dataLen);
+
+SLAPI uint8_t* hash_block_header(const uint8_t *blockData, const uint32_t blockDataLen, uint32_t *resultLen);
+
+/** Derive a BIP-0044 heirarchial deterministic wallet key */
+SLAPI uint8_t* hd44_derive_child_key(const uint8_t *secretSeed,
+    const uint32_t secretSeedLen,
+    const uint32_t purpose,
+    const uint32_t coinType,
+    const uint32_t account,
+    const bool change,
+    const uint32_t index,
+    uint32_t *resultLen);
+
+SLAPI uint8_t* parse_group_description(const uint8_t *input, const uint32_t inputLen, uint32_t *resultLen);
+
+SLAPI uint8_t* pubkey_to_script_template(const uint8_t *pubkey, const uint32_t pubkeyLen, uint32_t *resultLen);
+
+/** Return random bytes from cryptographically acceptable random sources */
+SLAPI uint8_t* random_bytes(const uint32_t num);
+
+SLAPI uint8_t* recover_pubkey_from_signature(const uint8_t *message,
+    const uint32_t messageLen,
+    const uint8_t *sig,
+    const uint32_t sigLen,
+    uint32_t *resultLen);
+
+SLAPI uint8_t* serialise_script(const uint8_t *script, const uint32_t scriptLen, uint32_t *resultLen);
+
+// result must be 32 bytes
+SLAPI uint8_t* sha256(const uint8_t *data, const uint32_t dataLen);
+
+/** Sign one input of a transaction
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+    Since the sighashtype is appended to the signature, more than 64 bytes should be alloced for the result.
+*/
+SLAPI uint8_t* sign_bch_tx_one_input_using_schnorr(const uint8_t *txData,
+    const uint32_t txDataLen,
+    const uint32_t inputIndex,
+    const int64_t inputAmount,
+    const uint8_t *prevoutScript,
+    const uint32_t prevoutScriptLen,
+    const uint8_t hashType,
+    const uint8_t *privkey,
+    uint32_t *resultLen);
+
+/** Sign data (compatible with BCH OP_CHECKDATASIG) */
+SLAPI uint8_t* sign_hash_ecdsa(const uint8_t *data,
+    const uint32_t dataLen,
+    const uint8_t *secret,
+    uint32_t *resultLen);
+
+/** Sign data via the Schnorr signature algorithm.  hash must be 32 bytes.
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+
+    The returned signature will not have a sighashtype byte.
+*/
+SLAPI uint8_t* sign_hash_schnorr(const uint8_t *hash, const uint8_t *privkey, uint32_t *resultLen);
+
+SLAPI uint8_t* sign_hash_schnorr_with_nonce(const uint8_t *hash, const uint8_t *privkey, const uint8_t *nonce, uint32_t *resultLen);
+
+SLAPI uint8_t* sign_message(const uint8_t *message,
+    const uint32_t messageLen,
+    const uint8_t *secret,
+    const uint32_t secretLen,
+    uint32_t *resultLen);
+
+/** Sign one input of a transaction
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+    Returns length of returned signature.
+*/
+SLAPI uint8_t* sign_tx_ecdsa(const uint8_t *txData,
+    const uint32_t txDataLen,
+    const uint32_t inputIndex,
+    const int64_t inputAmount,
+    const uint8_t *prevoutScript,
+    const uint32_t prevoutScriptLen,
+    const uint8_t hashType,
+    const uint8_t *privkey,
+    uint32_t *resultLen);
+
+/** Sign one input of a transaction
+    All buffer arguments should be in binary-serialized data.
+    The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
+    however, it is not necessary to provide the spend script.
+*/
+SLAPI uint8_t* sign_tx_one_input_using_schnorr(const uint8_t *txData,
+    const uint32_t txDataLen,
+    const uint32_t inputIndex,
+    const int64_t inputAmount,
+    const uint8_t *prevoutScript,
+    const uint32_t prevoutScriptLen,
+    const uint8_t *hashType,
+    const uint32_t hashTypeLen,
+    const uint8_t *privkey,
+    uint32_t *resultLen);
+
+SLAPI bool verify_block_header(const int32_t chain, const uint8_t *serialisedHeader, const uint32_t serialisedHeaderLen);
+
+// sig must be 64 bytes
+SLAPI bool verify_data_schnorr(const uint8_t *message,
+    const uint32_t messageLen,
+    const uint8_t *pubkey,
+    const uint32_t pubkeyLen,
+    const uint8_t *sig);
+
+// sig must be 64 bytes
+SLAPI bool verify_hash_schnorr(const uint8_t *hash,
+    const uint8_t *pubkey,
+    const uint32_t pubkeyLen,
+    const uint8_t *sig);
+
+SLAPI bool verify_message(const uint8_t *message,
+    const uint32_t messageLen,
+    const uint8_t *addr, // TODO - This is not actually addr but hash160 of pubkey?
+    const uint32_t addrLen,
+    const uint8_t *sig,
+    const uint32_t sigLen);
+
+// End v2 API
 
 #endif /* CASHLIB_H */

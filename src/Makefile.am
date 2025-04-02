@@ -492,7 +492,8 @@ libnexa_a_common_SOURCES = \
   streams.h
 
 libnexa_a_SOURCES = \
-  libnexa/libnexa.cpp \
+  libnexa/libnexa_v1.cpp \
+  libnexa/libnexa_v2.cpp \
   libnexa/libnexa.h \
   libnexa/libnexa_jvm.cpp \
   $(libnexa_a_common_SOURCES)
