@@ -127,22 +127,40 @@ def serialize_script_num(value):
         r[-1] |= 0x80
     return r
 
+def anyoneCanSpend():
+    templateScript=CScript([])
+    hashTemplate = hash160(templateScript)
+    return CScript([OP_0, hashTemplate, OP_0])
+
+def spendAnyoneCanSpend():
+    return CScript([CScript([])])
+
+def p2pkt(pubkey):
+    templateScript = CScript([OP_FROMALTSTACK, OP_CHECKSIGVERIFY])
+    hashTemplate = hash160(templateScript)
+    hashedArgs = hash160(CScript([pubkey]))
+    return CScript([OP_0, hashTemplate, hashedArgs])
+
+
 # Create a coinbase transaction, assuming no miner fees.
 # If pubkey is passed in, the coinbase output will be a P2PK output;
 # otherwise an anyone-can-spend output.
 def create_coinbase(height, pubkey = None, scriptPubKey = None):
     assert not (pubkey and scriptPubKey), "cannot both have pubkey and custom scriptPubKey"
     coinbase = CTransaction()
-    coinbaseoutput = CTxOut()
+    coinbaseoutput = TxOut()
     coinbaseoutput.nValue = int(COINBASE_REWARD) * COIN
     halvings = int(height/150) # regtest
     coinbaseoutput.nValue >>= halvings
     if (pubkey != None):
-        coinbaseoutput.scriptPubKey = CScript([pubkey, OP_CHECKSIG])
+        coinbaseoutput.scriptPubKey = p2pkt(pubkey)
+        coinbaseoutput.t = TxOut.TYPE_TEMPLATE
     else:
         if scriptPubKey is None:
-            scriptPubKey = CScript([OP_NOP])
-        coinbaseoutput.scriptPubKey = CScript(scriptPubKey)
+             coinbaseoutput.scriptPubKey = anyoneCanSpend()
+             coinbaseoutput.t = TxOut.TYPE_TEMPLATE
+        else:
+            coinbaseoutput.scriptPubKey = CScript(scriptPubKey)
 
     uniquifier = TxOut(0, 0, CScript([OP_RETURN, height]))
     coinbase.vout = [ coinbaseoutput, uniquifier ]
@@ -158,8 +176,7 @@ def create_coinbase(height, pubkey = None, scriptPubKey = None):
 # Create a transaction with an anyone-can-spend output, that spends the
 # nth output of prevtx.  pass a single integer value to make one output,
 # or a list to create multiple outputs
-PADDED_ANY_SPEND =  b'\x61'*50 # add a bunch of OP_NOPs to make sure this tx is long enough
-def create_transaction(prevtx, n, sig, value, out=PADDED_ANY_SPEND):
+def create_transaction(prevtx, n, sig, value, out=anyoneCanSpend()):
     prevtx.calcIdem()
     if not type(value) is list:
         value = [value]
@@ -168,7 +185,7 @@ def create_transaction(prevtx, n, sig, value, out=PADDED_ANY_SPEND):
     outpt = COutPoint().fromIdemAndIdx(prevtx.GetIdem(), n)
     tx.vin.append(CTxIn(outpt, prevtx.vout[n].nValue, sig, 0xffffffff))
     for v in value:
-        tx.vout.append(CTxOut(v, out))
+        tx.vout.append(TxOut(TxOut.TYPE_TEMPLATE, v, out))
     tx.rehash()
     return tx
 
@@ -223,6 +240,7 @@ def decodeBase58(s):
 
 def createWastefulOutput(btcAddress):
     """ Warning: Creates outputs that can't be spent by bitcoind"""
+    assert False  # will not work on nexa
     data = b"""this is junk data. this is junk data. this is junk data. this is junk data. this is junk data.
 this is junk data. this is junk data. this is junk data. this is junk data. this is junk data.
 this is junk data. this is junk data. this is junk data. this is junk data. this is junk data."""
