@@ -240,11 +240,12 @@ def decodeBase58(s):
 
 def createWastefulOutput(btcAddress):
     """ Warning: Creates outputs that can't be spent by bitcoind"""
-    assert False  # will not work on nexa
+    #assert False  # will not work on nexa
     data = b"""this is junk data. this is junk data. this is junk data. this is junk data. this is junk data.
 this is junk data. this is junk data. this is junk data. this is junk data. this is junk data.
 this is junk data. this is junk data. this is junk data. this is junk data. this is junk data."""
-    ret = CScript([data, OP_DROP, OP_DUP, OP_HASH160, address2bin(btcAddress), OP_EQUALVERIFY, OP_CHECKSIG])
+    # ret = CScript([data, OP_DROP, OP_DUP, OP_HASH160, address2bin(btcAddress), OP_EQUALVERIFY, OP_CHECKSIG])
+    ret = anyoneCanSpend() + CScript([OP_RETURN, data])
     return ret
 
 
@@ -298,13 +299,18 @@ def createrawtransaction(inputs, outputs, outScriptGenerator=p2pkh):
 
     for addr, amount in pairs:
         if callable(addr):
-            tx.vout.append(CTxOut(int(amount * COIN), addr()))
+            tx.vout.append(TxOut(TxOut.TYPE_SATOSCRIPT,int(amount * COIN), addr()))
         elif type(addr) is list:
-            tx.vout.append(CTxOut(int(amount * COIN), CScript(addr)))
+            tx.vout.append(TxOut(TxOut.TYPE_SATOSCRIPT,int(amount * COIN), CScript(addr)))
         elif addr == "data":
-            tx.vout.append(CTxOut(0, CScript([OP_RETURN, unhexlify(amount)])))
+            tx.vout.append(TxOut(TxOut.TYPE_SATOSCRIPT,0, CScript([OP_RETURN, unhexlify(amount)])))
         else:
-            tx.vout.append(CTxOut(int(amount * COIN), outScriptGenerator(addr)))
+            outscript = outScriptGenerator(addr)
+            if outscript[0] == OP_DUP:  # its an allowed legacy script p2pkh
+                out = TxOut(TxOut.TYPE_SATOSCRIPT, int(amount * COIN), outscript)
+            else:
+                out = TxOut(TxOut.TYPE_TEMPLATE, int(amount * COIN), outscript)
+            tx.vout.append(out)
     tx.rehash()
     return hexlify(tx.serialize()).decode("utf-8")
 
