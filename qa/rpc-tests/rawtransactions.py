@@ -567,7 +567,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         amt = utxo["amount"]
         addr = self.nodes[0].getaddressforms(self.nodes[0].getnewaddress("p2pkh"))["legacy"]
         outp = {addr: amt-decimal.Decimal(100)}  # give some fee
-        txn = createrawtransaction([utxo], outp, createWastefulOutput)  # create a nonstandard tx
+        txn = createrawtransaction([utxo], outp, lambda x: CScript([OP_NOP]))  # create a nonstandard tx
         signedtxn = self.nodes[0].signrawtransaction(txn)
         txpool = self.nodes[0].gettxpoolinfo()
         try:
@@ -615,7 +615,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         amt = utxo["amount"]
         addr = self.nodes[0].getaddressforms(self.nodes[0].getnewaddress())["legacy"]
         outp = {addr: amt-decimal.Decimal(100)}  # give some fee
-        txn = createrawtransaction([utxo], outp, createWastefulOutput)  # create a nonstandard tx
+        txn = createrawtransaction([utxo], outp, lambda x: CScript([OP_NOP]))  # create a nonstandard tx
         signedtxn = self.nodes[0].signrawtransaction(txn)
         txpool = self.nodes[0].gettxpoolinfo()
         try:

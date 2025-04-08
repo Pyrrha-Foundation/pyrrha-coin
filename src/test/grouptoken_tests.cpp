@@ -1493,12 +1493,12 @@ BOOST_FIXTURE_TEST_CASE(grouptoken_blockchain, TestChain100Setup)
         auto hasCoin = pcoinsTip->HaveCoin(outpt);
         Coin c;
         auto getCoin = pcoinsTip->GetCoin(outpt, c);
-        printf("%d %d", hasCoin, getCoin);
+        printf("%d %d\n", hasCoin, getCoin);
     }
     CGroupTokenID gid =
         findGroupId(outpt, CScript(), GroupTokenIdFlags::NONE, GroupAuthorityFlags::ACTIVE_FLAG_BITS, nonce);
-    txns[0] = tx1x1(outpt, gp2pkh(gid, grp0AllAuth, nonce), coinbaseTxns[spendCb].vout[0].nValue, coinbaseKey,
-        coinbaseTxns[spendCb].vout[0].scriptPubKey, false);
+    //txns[0] = tx1x1(outpt, gp2pkh(gid, grp0AllAuth, nonce), coinbaseTxns[spendCb].vout[0].nValue, coinbaseKey,
+    //    coinbaseTxns[spendCb].vout[0].scriptPubKey, false);
     ret = tryBlock(txns, p2pkh(a2), tipblk, state);
     if (!ret)
         printf("state: %d:%s, %s\n", state.GetRejectCode(), state.GetRejectReason().c_str(),

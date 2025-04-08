@@ -8,10 +8,11 @@ import binascii
 import random
 import copy
 
-from .script import CScript
+from .script import CScript, anyoneCanSpend, spendAnyoneCanSpend
 from .scriptop import OP_TRUE, OP_CHECKSIG, OP_DROP, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, OP_RETURN, OP_NOP
 from .util import BTC, COINBASE_REWARD, uint256ToRpcHex, rpcHexToUint256
 from .mininode import *
+from .util import *
 
 import test_framework.cashaddr as cashaddr
 
@@ -71,11 +72,11 @@ def gen_return_txouts():
     script_pubkey = "6a4d0200" #OP_RETURN OP_PUSH2 512 bytes
     for i in range(1024):
         script_pubkey = script_pubkey + "01"
-    constraint = bytes.fromhex(script_pubkey) #CScript(script_pubkey)
+    constraint = anyoneCanSpend() + bytes.fromhex(script_pubkey) #CScript(script_pubkey)
     # concatenate 63 txouts of above script_pubkey which we'll insert before the txout for change
     txouts = []
     for k in range(63):
-        tmp = TxOut(0,0,constraint)
+        tmp = TemplateTxOut(0,constraint)
         txouts.append(tmp)
     return txouts
 
@@ -101,6 +102,7 @@ def create_lots_of_big_transactions(node, txouts, utxos, num, feePerKb):
             newtx = tx.serialize().hex()
 
         signresult = node.signrawtransaction(newtx, None, None, "ALL")
+        # print(signresult)
         txids.append(signresult["txid"])
         txidem = node.sendrawtransaction(signresult["hex"], True)
         txidems.append(txidem)
@@ -127,13 +129,6 @@ def serialize_script_num(value):
         r[-1] |= 0x80
     return r
 
-def anyoneCanSpend():
-    templateScript=CScript([])
-    hashTemplate = hash160(templateScript)
-    return CScript([OP_0, hashTemplate, OP_0])
-
-def spendAnyoneCanSpend():
-    return CScript([CScript([])])
 
 def p2pkt(pubkey):
     templateScript = CScript([OP_FROMALTSTACK, OP_CHECKSIGVERIFY])
@@ -152,7 +147,7 @@ def create_coinbase(height, pubkey = None, scriptPubKey = None):
     coinbaseoutput.nValue = int(COINBASE_REWARD) * COIN
     halvings = int(height/150) # regtest
     coinbaseoutput.nValue >>= halvings
-    if (pubkey != None):
+    if pubkey != None:
         coinbaseoutput.scriptPubKey = p2pkt(pubkey)
         coinbaseoutput.t = TxOut.TYPE_TEMPLATE
     else:
@@ -185,7 +180,16 @@ def create_transaction(prevtx, n, sig, value, out=anyoneCanSpend()):
     outpt = COutPoint().fromIdemAndIdx(prevtx.GetIdem(), n)
     tx.vin.append(CTxIn(outpt, prevtx.vout[n].nValue, sig, 0xffffffff))
     for v in value:
-        tx.vout.append(TxOut(TxOut.TYPE_TEMPLATE, v, out))
+        # attempt a do-what-I-meant analysis of the output script.
+        # if it looks like a valid legacy script, then do that
+        if out[0] == OP_RETURN or out[0] == OP_DUP:
+            tx.vout.append(TxOut(TxOut.SATOSCRIPT, v, out))
+        # if it looks like a properly formed template locking script (first byte is no group or a 20 or 32 byte push)
+        elif out[0] == OP_0 or out[0] == 20 or out[0] == 32:
+            tx.vout.append(TxOut(TxOut.TYPE_TEMPLATE, v, out))
+        # assume its a template script that needs the output locking script formed
+        else:
+            tx.vout.append(PayToTemplate(v, out))
     tx.rehash()
     return tx
 
@@ -268,7 +272,7 @@ def spend_coinbase_tx(node, coinbase, to_address, amount, in_amount=None):
     outputs = { to_address : amount }
     rawtx = node.createrawtransaction(inputs, outputs)
     signresult = node.signrawtransaction(rawtx)
-    util.assert_equal(signresult["complete"], True)
+    assert_equal(signresult["complete"], True)
     return signresult["hex"]
 
 
@@ -304,6 +308,8 @@ def createrawtransaction(inputs, outputs, outScriptGenerator=p2pkh):
             tx.vout.append(TxOut(TxOut.TYPE_SATOSCRIPT,int(amount * COIN), CScript(addr)))
         elif addr == "data":
             tx.vout.append(TxOut(TxOut.TYPE_SATOSCRIPT,0, CScript([OP_RETURN, unhexlify(amount)])))
+        elif addr == "any":
+            tx.vout.append(anySpender(int(amount * COIN)))
         else:
             outscript = outScriptGenerator(addr)
             if outscript[0] == OP_DUP:  # its an allowed legacy script p2pkh
@@ -378,8 +384,7 @@ def pad_raw_tx(rawtx_hex, min_size=MIN_TX_SIZE):
     pad_tx(tx, min_size)
     return ToHex(tx)
 
-def create_tx_with_script(prevtx, n, script_sig=b"",
-                          amount=1, script_pub_key=CScript()):
+def create_tx_with_script(prevtx, n, script_sig=spendAnyoneCanSpend(), amount=1, template_script=CScript()):
     """Return one-input, one-output transaction object
        spending the prevtx's n-th output with the given amount.
 
@@ -388,7 +393,7 @@ def create_tx_with_script(prevtx, n, script_sig=b"",
     tx = CTransaction()
     assert(n < len(prevtx.vout))
     tx.vin.append(CTxIn(prevtx.OutpointAt(n), prevtx.vout[n].nValue, script_sig, 0xffffffff))
-    tx.vout.append(CTxOut(amount, script_pub_key))
+    tx.vout.append(PayToTemplate(amount, template_script))
     pad_tx(tx)
     tx.rehash()
     return tx
