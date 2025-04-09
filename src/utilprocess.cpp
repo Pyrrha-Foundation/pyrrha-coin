@@ -185,7 +185,7 @@ void SubProcess::Run()
     THROW_IF_RETERROR(posix_spawn_file_actions_addclose(&action, cerr_pipe[CHILD]));
 
     // Spawn the child process
-    std::string filename = std::filesystem::path(path).filename().string();
+    std::string filename = fs::path(path).filename().string();
     std::vector<char *> cmdargs(1 + args.size() + 1);
     cmdargs[0] = const_cast<char *>(filename.c_str());
     for (size_t i = 0; i < args.size(); ++i)
