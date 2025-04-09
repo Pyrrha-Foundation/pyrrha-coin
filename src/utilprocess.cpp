@@ -32,9 +32,9 @@ std::string this_process_path()
 // with current boost version on linux this adds a linker dependency to libdl.
 #if BOOST_OS_LINUX
     // TODO: Replaced with std::read_symlink with C++17
-    return std::filesystem::read_symlink("/proc/self/exe").string();
+    return fs::read_symlink("/proc/self/exe").string();
 #elif BOOST_OS_BSD_FREE
-    return std::filesystem::read_symlink("/proc/curproc/file").string();
+    return fs::read_symlink("/proc/curproc/file").string();
 #elif BOOST_OS_MACOS
     char buff[PATH_MAX + 1];
     uint32_t buffsize = sizeof buff;
