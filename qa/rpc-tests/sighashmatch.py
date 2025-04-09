@@ -67,7 +67,6 @@ class SigHashMatchTest(BitcoinTestFramework):
         addr = utxo["address"]
         outp = { "any" : amt - 1000}  # give some fee
         hextx = createrawtransaction([utxo], outp)
-        print("rawtx: " + hextx)
         txn = CTransaction().deserialize(hextx)
 
         # create signature manually using txn.SignatureHash() calculation
@@ -88,7 +87,6 @@ class SigHashMatchTest(BitcoinTestFramework):
             fullsig = txn_mansig + hcBytes 
             templateArgs = CScript([pub])
             txn.vin[0].scriptSig = CScript([templateArgs, fullsig])
-            print(txn.toHex())
             analysis = self.nodes[0].validaterawtransaction(txn.toHex())
             assert analysis["isValid"] == True, "Python sighashing problem"
 

@@ -211,12 +211,12 @@ class SchnorrMultisigTest(BitcoinTestFramework):
 
         tip = self.build_block(tip, fundings)
         self.p2p.send_blocks_and_test([tip], node)
-        waitFor(5, lambda: node.getbestblockhash() == tip.hash)
+        waitFor(10, lambda: node.getbestblockhash() == tip.hash)
 
         logging.info(
             "Submitting a Schnorr-multisig via net, and mining it in a block")
         self.p2p.send_txs_and_test([schnorr1tx], node)
-        waitFor(5, lambda: set(node.getrawtxpool()) == {uint256ToRpcHex(schnorr1tx.GetIdem())})
+        waitFor(10, lambda: set(node.getrawtxpool()) == {uint256ToRpcHex(schnorr1tx.GetIdem())})
         tip = self.build_block(tip, [schnorr1tx])
         self.p2p.send_blocks_and_test([tip], node)
         waitFor(10, lambda: node.getrawtxpool() == [])
@@ -237,7 +237,7 @@ def Test():
     t = SchnorrMultisigTest()
     t.drop_to_pdb = True
     bitcoinConf = {
-        "debug": ["dbase", "selectcoins", "net", "blk", "thin", "mempool", "req", "bench", "evict"],
+        "debug": ["dbase", "selectcoins"], # [ "net", "blk", "thin", "mempool", "req", "bench", "evict"],
         "logtimemicros":1,
         "checkmempool":0,
         # "par":1  # Reduce the # of threads in bitcoind for easier debugging

@@ -129,7 +129,6 @@ def serialize_script_num(value):
         r[-1] |= 0x80
     return r
 
-
 def p2pkt(pubkey):
     templateScript = CScript([OP_FROMALTSTACK, OP_CHECKSIGVERIFY])
     hashTemplate = hash160(templateScript)
