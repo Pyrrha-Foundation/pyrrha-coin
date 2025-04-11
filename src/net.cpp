@@ -62,8 +62,6 @@ extern bool fBlocksOnly;
 
 #include <math.h>
 
-#include <bitnodes.h>
-
 // Dump addresses to peers.dat and banlist.dat every 15 minutes (900s)
 #define DUMP_ADDRESSES_INTERVAL 900
 
@@ -1981,47 +1979,6 @@ static void DNSAddressSeed()
     LOGA("%d addresses found from DNS seeds\n", found);
 }
 
-#if 0 // Disabled until compatible "bitnodes" site becomes available
-static void BitnodesAddressSeed()
-{
-    // Get nodes from websites offering Bitnodes API
-    if ((addrman.size() > 0) && (!GetBoolArg("-forcebitnodes", DEFAULT_FORCEBITNODES)))
-    {
-        MilliSleep(11 * 1000);
-        LOCK(cs_vNodes);
-        if (vNodes.size() >= 2)
-        {
-            LOGA("P2P peers available. Skipped Bitnodes seeding.\n");
-            return;
-        }
-    }
-
-    LOGA("Loading addresses from Bitnodes API\n");
-
-    vector<string> vIPs;
-    vector<CAddress> vAdd;
-    bool success = GetLeaderboardFromBitnodes(vIPs);
-    if (success)
-    {
-        int portOut;
-        std::string hostOut = "";
-        for (const string &seed : vIPs)
-        {
-            SplitHostPort(seed, portOut, hostOut);
-            CNetAddr ip(hostOut);
-            CAddress addr = CAddress(CService(ip, portOut));
-            addr.nTime = GetTime();
-            vAdd.push_back(addr);
-        }
-        CService bitnodes;
-        if (Lookup("bitnodes.21.co", bitnodes, 0, true))
-            addrman.Add(vAdd, bitnodes);
-    }
-
-    LOGA("%d addresses found from Bitnodes API\n", vAdd.size());
-}
-#endif
-
 void ThreadAddressSeeding()
 {
     if (!GetBoolArg("-dnsseed", true))
@@ -2031,15 +1988,6 @@ void ThreadAddressSeeding()
         DNSAddressSeed();
     }
 
-    // Bitnodes seeding is intended as a backup in the event that DNS seeding fails and a such is run after.
-    if ((!GetBoolArg("-bitnodes", true)) || (Params().NetworkIDString() != "main"))
-        LOGA("Bitnodes API seeding disabled\n");
-    else
-    {
-        // TODO: re-enable bitnodes seeding once a site is available for the main chain.
-        // BitnodesAddressSeed();
-        LOGA("Bitnodes API seeding temporarily disabled\n");
-    }
 }
 
 
