@@ -303,6 +303,13 @@ void ThreadCommitToMempool()
                     }
                 }
 #endif
+                {
+                    LOCK(orphanpool.cs_processorphans);
+                    if (!orphanpool.vProcessOrphans.empty())
+                    {
+                        break;
+                    }
+                }
             } while (txCommitQ->empty() && txDeferQ.empty());
         }
 
@@ -1454,7 +1461,10 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
             return 0;
         }
 
-        // process non-finals
+        // Process non-finals adding the changes to vWhatChanged.  We have to add these
+        // so that for every non-final added back to the  txpool we can then check to see
+        // whether it has any chained orphans associated with it which could also be promoted
+        // to the txpool.
         for (auto &it : orphanpool.mapNonFinals)
         {
             // Add the non-final to be enqueued later
@@ -1517,7 +1527,9 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
             {
                 // If the orphan was not erased then it must already have been erased/enqueued by another thread
                 // so do not enqueue this orphan again.
-                if (!orphanpool.EraseOrphanTx(it->tx->GetId()) && !orphanpool.EraseNonFinalTx(it->tx->GetId()))
+                bool fErasedOrphan = orphanpool.EraseOrphanTx(it->tx->GetId());
+                bool fErasedNonFinal = orphanpool.EraseNonFinalTx(it->tx->GetId());
+                if (!fErasedOrphan && !fErasedNonFinal)
                     it = vEnqueue.erase(it);
                 else
                     it++;

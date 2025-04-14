@@ -230,11 +230,8 @@ void CTxOrphanPool::RemoveForBlock(const std::vector<CTransactionRef> &vtx)
     for (auto &tx : vtx)
     {
         const uint256 &hash = tx->GetId();
-        if (txRecentlyInBlock.contains(hash))
-        {
-            EraseOrphanTx(hash);
-            EraseNonFinalTx(hash);
-        }
+        EraseOrphanTx(hash);
+        EraseNonFinalTx(hash);
     }
 }
 

@@ -721,12 +721,5 @@ void MainCleanup()
             delete (*it1).second;
         mapBlockIndex.clear();
     }
-
-    {
-        // orphan transactions
-        WRITELOCK(orphanpool.cs_orphanpool);
-        orphanpool.mapOrphans.clear();
-        orphanpool.mapOrphansByPrev.clear();
-        orphanpool.mapNonFinals.clear();
-    }
+    orphanpool.clear();
 }
