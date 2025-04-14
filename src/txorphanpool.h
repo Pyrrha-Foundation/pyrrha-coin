@@ -42,8 +42,8 @@ public:
     };
 
     // Used for storing and tracking orphans
-    std::map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_orphanpool);
-    std::map<uint256, std::set<uint256> > mapOrphanTransactionsByPrev GUARDED_BY(cs_orphanpool);
+    std::map<uint256, COrphanTx> mapOrphans GUARDED_BY(cs_orphanpool);
+    std::map<uint256, std::set<uint256> > mapOrphansByPrev GUARDED_BY(cs_orphanpool);
 
     // Used for storing and tracking non-final txns
     std::map<uint256, COrphanTx> mapNonFinals GUARDED_BY(cs_orphanpool);
@@ -53,7 +53,7 @@ public:
     std::deque<ConstCBlockRef> vPostBlockProcessing GUARDED_BY(cs_blockprocessing);
 
     CCriticalSection cs_processorphans;
-    std::deque<std::vector<CTransactionRef>> vProcessOrphans GUARDED_BY(cs_processorphans);
+    std::deque<std::vector<CTransactionRef> > vProcessOrphans GUARDED_BY(cs_processorphans);
 
     CTxOrphanPool();
 
@@ -78,9 +78,7 @@ public:
     //! Return all the transaction hashes for transactions currently in the orphan pool.
     void QueryIds(std::vector<uint256> &vHashes);
 
-    //! Set the last orphan check time (used primarily in testing)
-    // FIXME SetLastOrphanCheck seems to be used only in unit tests
-    // DoS_tests.cpp and txvalidationcache_tests.cpp
+    //! Set the last orphan check time (used in testing only)
     void _SetLastOrphanCheck(int64_t nTime)
     {
         AssertLockHeld(cs_orphanpool);
@@ -90,7 +88,7 @@ public:
     uint64_t GetOrphanPoolSize()
     {
         READLOCK(cs_orphanpool);
-        return mapOrphanTransactions.size() + mapNonFinals.size();
+        return mapOrphans.size() + mapNonFinals.size();
     }
 
     //! Orphan pool bytes used
@@ -107,8 +105,8 @@ public:
     void clear()
     {
         WRITELOCK(cs_orphanpool);
-        mapOrphanTransactions.clear();
-        mapOrphanTransactionsByPrev.clear();
+        mapOrphans.clear();
+        mapOrphansByPrev.clear();
         mapNonFinals.clear();
         nBytesOrphanPool = 0;
     }

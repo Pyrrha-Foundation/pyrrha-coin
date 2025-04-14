@@ -709,7 +709,7 @@ void ThreadTxAdmission()
                             else
                                 orphanpool.AddNonFinalTx(tx, txd.nodeId);
 
-                            // DoS prevention: do not allow mapOrphanTransactions to grow unbounded
+                            // DoS prevention: do not allow the pool size to grow unbounded
                             const uint64_t nMaxOrphanPoolSize = maxTxPool.Value() * ONE_MEGABYTE / 10;
                             unsigned int nEvicted =
                                 orphanpool.LimitOrphanTxSize(maxOrphanPool.Value(), nMaxOrphanPoolSize);
@@ -1450,9 +1450,9 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
     std::vector<CTxInputData> vEnqueue;
     {
         READLOCK(orphanpool.cs_orphanpool);
-        if (orphanpool.mapOrphanTransactions.empty() && orphanpool.mapNonFinals.empty())
+        if (orphanpool.mapOrphans.empty() && orphanpool.mapNonFinals.empty())
         {
-            DbgAssert(orphanpool.mapOrphanTransactionsByPrev.empty(), );
+            DbgAssert(orphanpool.mapOrphansByPrev.empty(), );
             return 0;
         }
 
@@ -1477,18 +1477,18 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
             for (unsigned int j = 0; j < tx->vout.size(); j++)
             {
                 std::map<uint256, std::set<uint256> >::iterator itByPrev =
-                    orphanpool.mapOrphanTransactionsByPrev.find(tx->OutpointAt(j).hash);
-                if (itByPrev != orphanpool.mapOrphanTransactionsByPrev.end())
+                    orphanpool.mapOrphansByPrev.find(tx->OutpointAt(j).hash);
+                if (itByPrev != orphanpool.mapOrphansByPrev.end())
                 {
                     for (const auto &orphanHash : itByPrev->second)
                     {
                         // Make sure we actually have an entry on the orphan cache. While this should never fail because
-                        // we always erase orphans and any mapOrphanTransactionsByPrev at the same time, still we need
+                        // we always erase orphans and any mapOrphansByPrev at the same time, still we need
                         // to be sure.
                         bool fOk = true;
                         std::map<uint256, CTxOrphanPool::COrphanTx>::iterator iter =
-                            orphanpool.mapOrphanTransactions.find(orphanHash);
-                        DbgAssert(iter != orphanpool.mapOrphanTransactions.end(), fOk = false);
+                            orphanpool.mapOrphans.find(orphanHash);
+                        DbgAssert(iter != orphanpool.mapOrphans.end(), fOk = false);
                         if (!fOk)
                             continue;
 

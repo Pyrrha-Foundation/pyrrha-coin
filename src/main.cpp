@@ -249,8 +249,8 @@ bool GetTransaction(const uint256 &hash,
     CTransactionRef ptx;
     {
         READLOCK(orphanpool.cs_orphanpool);
-        auto mi = orphanpool.mapOrphanTransactions.find(hash);
-        if (mi != orphanpool.mapOrphanTransactions.end())
+        auto mi = orphanpool.mapOrphans.find(hash);
+        if (mi != orphanpool.mapOrphans.end())
         {
             txTime = mi->second.nEntryTime;
             ptx = mi->second.ptx;
@@ -715,7 +715,7 @@ ThresholdState VersionBitsTipState(const Consensus::Params &params, Consensus::D
 void MainCleanup()
 {
     {
-        WRITELOCK(cs_mapBlockIndex); // BU apply the appropriate lock so no contention during destruction
+        WRITELOCK(cs_mapBlockIndex);
         BlockMap::iterator it1 = mapBlockIndex.begin();
         for (; it1 != mapBlockIndex.end(); it1++)
             delete (*it1).second;
@@ -725,7 +725,8 @@ void MainCleanup()
     {
         // orphan transactions
         WRITELOCK(orphanpool.cs_orphanpool);
-        orphanpool.mapOrphanTransactions.clear();
-        orphanpool.mapOrphanTransactionsByPrev.clear();
+        orphanpool.mapOrphans.clear();
+        orphanpool.mapOrphansByPrev.clear();
+        orphanpool.mapNonFinals.clear();
     }
 }

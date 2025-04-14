@@ -745,8 +745,9 @@ void UnloadBlockIndex()
 {
     {
         WRITELOCK(orphanpool.cs_orphanpool);
-        orphanpool.mapOrphanTransactions.clear();
-        orphanpool.mapOrphanTransactionsByPrev.clear();
+        orphanpool.mapOrphans.clear();
+        orphanpool.mapOrphansByPrev.clear();
+        orphanpool.mapNonFinals.clear();
         orphanpool.nBytesOrphanPool = 0;
     }
 
