@@ -743,14 +743,7 @@ bool LoadBlockIndexDB()
 
 void UnloadBlockIndex()
 {
-    {
-        WRITELOCK(orphanpool.cs_orphanpool);
-        orphanpool.mapOrphans.clear();
-        orphanpool.mapOrphansByPrev.clear();
-        orphanpool.mapNonFinals.clear();
-        orphanpool.nPoolBytes = 0;
-    }
-
+    orphanpool.clear();
     nPreferredDownload.store(0);
     nodestate.Clear();
     requester.MapBlocksInFlightClear();
