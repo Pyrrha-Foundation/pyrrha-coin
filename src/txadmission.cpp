@@ -711,8 +711,7 @@ void ThreadTxAdmission()
 
                             // DoS prevention: do not allow the pool size to grow unbounded
                             const uint64_t nMaxOrphanPoolSize = maxTxPool.Value() * ONE_MEGABYTE / 10;
-                            unsigned int nEvicted =
-                                orphanpool.LimitPoolSize(maxOrphanPool.Value(), nMaxOrphanPoolSize);
+                            unsigned int nEvicted = orphanpool.LimitPoolSize(maxOrphanPool.Value(), nMaxOrphanPoolSize);
                             if (nEvicted > 0)
                                 LOG(MEMPOOL, "mapOrphan overflow, removed %u tx\n", nEvicted);
                         }
