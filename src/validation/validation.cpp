@@ -748,7 +748,7 @@ void UnloadBlockIndex()
         orphanpool.mapOrphans.clear();
         orphanpool.mapOrphansByPrev.clear();
         orphanpool.mapNonFinals.clear();
-        orphanpool.nBytesOrphanPool = 0;
+        orphanpool.nPoolBytes = 0;
     }
 
     nPreferredDownload.store(0);

@@ -1605,7 +1605,7 @@ CMemPoolInfo GetGrapheneMempoolInfo()
         LOCK(cs_commitQ);
         nCommitQ = txCommitQ->size();
     }
-    return CMemPoolInfo(mempool.size() + orphanpool.GetOrphanPoolSize() + nCommitQ);
+    return CMemPoolInfo(mempool.size() + orphanpool.GetPoolSize() + nCommitQ);
 }
 
 void RequestFailureRecovery(CNode *pfrom,

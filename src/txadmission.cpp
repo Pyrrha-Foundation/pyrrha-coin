@@ -712,7 +712,7 @@ void ThreadTxAdmission()
                             // DoS prevention: do not allow the pool size to grow unbounded
                             const uint64_t nMaxOrphanPoolSize = maxTxPool.Value() * ONE_MEGABYTE / 10;
                             unsigned int nEvicted =
-                                orphanpool.LimitOrphanTxSize(maxOrphanPool.Value(), nMaxOrphanPoolSize);
+                                orphanpool.LimitPoolSize(maxOrphanPool.Value(), nMaxOrphanPoolSize);
                             if (nEvicted > 0)
                                 LOG(MEMPOOL, "mapOrphan overflow, removed %u tx\n", nEvicted);
                         }
@@ -1445,8 +1445,7 @@ TransactionClass ParseTransactionClass(const std::string &s)
 
 uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
 {
-    // Recursively process any orphan transactions that depended on this one.
-    // NOTE: you must not return early since EraseOrphansByTime() must always be checked
+    // NOTE: you must not return early since EraseByTime() must always be checked
     std::vector<CTxInputData> vEnqueue;
     {
         READLOCK(orphanpool.cs_orphanpool);
@@ -1471,7 +1470,7 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
             }
         }
 
-        // process orphans
+        // Recursively process any orphan transactions that depended on this one.
         for (auto tx : vWorkQueue)
         {
             for (unsigned int j = 0; j < tx->vout.size(); j++)
@@ -1509,7 +1508,7 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
 
     // First delete the orphans before enqueuing them otherwise we may end up putting them
     // in the queue twice.
-    orphanpool.EraseOrphansByTime();
+    orphanpool.EraseByTime();
     if (!vEnqueue.empty())
     {
         {
@@ -1528,7 +1527,7 @@ uint64_t ProcessOrphans(const std::vector<CTransactionRef> &vWorkQueue)
         for (auto &txd : vEnqueue)
             EnqueueTxForAdmission(txd, true);
     }
-    return orphanpool.GetOrphanPoolSize();
+    return orphanpool.GetPoolSize();
 }
 
 

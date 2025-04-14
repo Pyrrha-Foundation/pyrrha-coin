@@ -407,7 +407,7 @@ CMempoolSyncInfo GetMempoolSyncInfo()
         nCommitQ = txCommitQ->size();
     }
 
-    uint64_t nTxInMempool = mempool.size() + orphanpool.GetOrphanPoolSize() + nCommitQ;
+    uint64_t nTxInMempool = mempool.size() + orphanpool.GetPoolSize() + nCommitQ;
     uint64_t nMempoolMaxTxBytes = maxTxPool.Value() * ONE_MEGABYTE;
     uint64_t nSatoshiPerK = minRelayTxFee.GetFeePerK();
 

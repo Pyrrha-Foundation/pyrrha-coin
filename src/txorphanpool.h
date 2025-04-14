@@ -30,8 +30,8 @@ private:
     std::atomic<int64_t> nLastOrphanCheck;
 
 public:
-    //! Current in memory footprint of all txns in the orphan pool.
-    uint64_t nBytesOrphanPool GUARDED_BY(cs_orphanpool);
+    //! Current in memory footprint of all txns in the overall pool of orphans and non-finals
+    uint64_t nPoolBytes GUARDED_BY(cs_orphanpool);
 
     struct COrphanTx
     {
@@ -69,11 +69,11 @@ public:
     bool EraseOrphanTx(const uint256 &hash);
     bool EraseNonFinalTx(const uint256 &hash);
 
-    //! Expire old orphans from the orphan pool
-    void EraseOrphansByTime();
+    //! Expire old orphans and non-finals from the pool
+    void EraseByTime();
 
-    //! Limit the orphan pool size by either number of transactions or the max orphan pool size allowed.
-    unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans, uint64_t nMaxBytes);
+    //! Limit the pool size by either number of transactions (items) or max bytes allowed.
+    unsigned int LimitPoolSize(unsigned int nMaxItems, uint64_t nMaxBytes);
 
     //! Return all the transaction hashes for transactions currently in the orphan pool.
     void QueryIds(std::vector<uint256> &vHashes);
@@ -84,36 +84,36 @@ public:
         AssertLockHeld(cs_orphanpool);
         nLastOrphanCheck = nTime;
     }
-    //! Orphan pool current number of transactions
-    uint64_t GetOrphanPoolSize()
+    //! Current number of transactions in the pool
+    uint64_t GetPoolSize()
     {
         READLOCK(cs_orphanpool);
         return mapOrphans.size() + mapNonFinals.size();
     }
 
-    //! Orphan pool bytes used
-    uint64_t GetOrphanPoolBytes()
+    //! Pool bytes used
+    uint64_t GetPoolBytes()
     {
         READLOCK(cs_orphanpool);
-        return nBytesOrphanPool;
+        return nPoolBytes;
     }
 
-    //! Remove all orphans from the pool that are in this group of transactions
+    //! Remove all orphans and non-finals from the pool that are in this group of transactions
     void RemoveForBlock(const std::vector<CTransactionRef> &vtx);
 
-    //! Clear the orphan pool
+    //! Clear the pool
     void clear()
     {
         WRITELOCK(cs_orphanpool);
         mapOrphans.clear();
         mapOrphansByPrev.clear();
         mapNonFinals.clear();
-        nBytesOrphanPool = 0;
+        nPoolBytes = 0;
     }
 
 private:
     //! Return all the orphan pool data structures so they can be saved to disk
-    std::vector<CTxOrphanPool::COrphanTx> AllTxOrphanPoolInfo() const;
+    std::vector<CTxOrphanPool::COrphanTx> AllTxPoolInfo() const;
 
 public:
     //! Load the orphan pool from disk
