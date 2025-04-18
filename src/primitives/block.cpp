@@ -12,9 +12,9 @@
 #include "hashwrapper.h"
 #include "pow.h"
 #include "streams.h"
+#include "tailstorm.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
-#include "validation/tailstorm.h"
 
 uint256 SatoshiBlockHeader::GetHash() const { return SerializeHash(*this); }
 
@@ -45,11 +45,11 @@ uint256 GetMiningHash(const uint256 &headerCommitment, const std::vector<unsigne
     return r;
 }
 
-uint64_t CBlockHeader::numSubblocks() const
-    {
-        auto subblks = parseMinerData(minerData);
-        return subblks.size();
-    }
+uint64_t CBlockHeader::NumSubblocks() const
+{
+    auto subblks = ParseMinerData(minerData);
+    return subblks.size();
+}
 
 uint256 CBlockHeader::GetHash() const
 {
@@ -76,6 +76,8 @@ uint256 CBlockHeader::GetMiningHash() const
     DbgAssert(size != 0, ); // Size must be properly calculated before we can figure out the hash
     return ::GetMiningHash(GetMiningHeaderCommitment(), nonce);
 }
+
+uint256 CBlockHeader::SubblockId() const { return GetMiningHash(); }
 
 std::string CBlock::ToString() const
 {

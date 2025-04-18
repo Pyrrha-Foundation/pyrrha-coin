@@ -31,7 +31,8 @@ arith_uint256 CalculateASERT(const arith_uint256 &refTarget,
 uint32_t GetNextASERTWorkRequired(const CBlockIndex *pindexPrev,
     const CBlockHeader *pblock,
     const Consensus::Params &params,
-    const CBlockIndex *pindexReferenceBlock) noexcept;
+    const CBlockIndex *pindexReferenceBlock,
+    bool summaryBlock = false) noexcept;
 
 /**
  * ASERT caches a special block index for efficiency. If block indices are
@@ -46,10 +47,17 @@ void ResetASERTAnchorBlockCache() noexcept;
  */
 const CBlockIndex *GetASERTAnchorBlockCache() noexcept;
 
-unsigned int GetNextWorkRequired(const CBlockIndex *pindexLast, const CBlockHeader *pblock, const Consensus::Params &);
+uint32_t GetNextWorkRequired(const CBlockIndex *pindexLast, const CBlockHeader *pblock, const Consensus::Params &);
+uint32_t GetNextSummaryBlockWorkRequired(const CBlockIndex *pindexPrev,
+    const CBlockHeader *pblock,
+    const Consensus::Params &params);
 
 /** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
-bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params &);
+bool CheckProofOfWork(const uint256 &hash, unsigned int nBits, const Consensus::Params &);
+bool CheckProofOfWork(uint256 hash,
+    const arith_uint256 &bnTarget,
+    const Consensus::Params &params,
+    arith_uint256 *hashout);
 /** Get block's work: that is the work equivalent for the nBits of difficulty specified in this block */
 arith_uint256 GetBlockProof(const CBlockIndex &block);
 

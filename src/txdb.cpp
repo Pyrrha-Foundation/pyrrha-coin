@@ -461,9 +461,14 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 // index so just spot check, randomly, once per week.
                 if (nSkip++ == nSkipTo)
                 {
-                    if (!CheckProofOfWork(
-                            pindexNew->header.GetMiningHash(), pindexNew->tgtBits(), Params().GetConsensus()))
-                        return error("LoadBlockIndex(): CheckProofOfWork failed: %s", pindexNew->ToString());
+                    // Old regtest blocks can have bad POW due to prior tests turning mining and tailstorm on and off
+                    // so do not recheck old blocks POW on regtest
+                    if (Params().NetworkIDString() != CBaseChainParams::REGTEST)
+                    {
+                        if (!CheckProofOfWork(
+                                pindexNew->header.GetMiningHash(), pindexNew->tgtBits(), Params().GetConsensus()))
+                            return error("LoadBlockIndex(): CheckProofOfWork failed: %s", pindexNew->ToString());
+                    }
                     nSkip = 0;
                     nSkipTo = std::max((uint64_t)1, ctx.randrange(ONE_WEEK_OF_BLOCKS));
                 }
