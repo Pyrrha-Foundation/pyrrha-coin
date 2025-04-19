@@ -61,7 +61,7 @@ SLAPI uint32_t libnexa_version();
 SLAPI uint32_t get_libnexa_error();
 // puts the last error in the buffer. if the buffer is not large enough to hold the error,
 // the buffer will be filled but may not contain the entire error message
-SLAPI void get_libnexa_error_string(char *buf, uint64_t buflen);
+SLAPI char* get_libnexa_error_string(uint32_t *resultLen);
 
 // frees a pointer returned by libnexa
 SLAPI void libnexa_free(void* ptr);

@@ -50,7 +50,7 @@ enum class LIBNEXA_ERROR : uint32_t
 
 uint32_t get_error_code();
 void set_error(LIBNEXA_ERROR new_err, std::string new_err_str = "");
-void get_error_string(char *buf, uint64_t buflen);
+std::string get_error_string();
 
 // DER-encoded ECDSA is more like 72 but better to be safe
 // Schnorr is only 64, but this must also include a few extra bytes for the sighashtype

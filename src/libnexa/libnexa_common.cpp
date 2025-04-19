@@ -37,19 +37,14 @@ static const std::string error_code_to_string(const LIBNEXA_ERROR _err)
     return "Unknown error";
 }
 
-void get_error_string(char *buf, uint64_t buflen)
+std::string get_error_string()
 {
     std::string str_err = error_code_to_string((LIBNEXA_ERROR)lib_err);
     if (str_lib_err.size() > 0)
     {
         str_err = str_err + ": " + str_lib_err;
     }
-    size_t copyable = str_err.size() + 1; // add one for '\0'
-    if (copyable > buflen)
-    {
-        copyable = buflen;
-    }
-    std::memcpy(buf, str_err.c_str(), copyable);
+    return str_err;
 }
 
 static bool sigInited = false;

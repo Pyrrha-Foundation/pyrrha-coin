@@ -42,6 +42,9 @@ SLAPI char* get_libnexa_error_string(uint32_t *resultLen)
     const size_t errorLen = strError.size() + 1; // +1 for null term
     char *result = (char *)std::calloc(errorLen, 1);
     std::memcpy(result, strError.c_str(), errorLen);
+    set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
+    *resultLen = errorLen;
+    return result;
 }
 
 SLAPI void libnexa_free(void* ptr)
