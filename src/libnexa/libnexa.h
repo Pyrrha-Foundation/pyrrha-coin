@@ -261,15 +261,6 @@ SLAPI int groupIdToAddr(int chainSelector, const unsigned char *data, int len, c
 
 SLAPI int decodeWifPrivateKey(int chainSelector, const char *secretWIF, unsigned char *result, int resultMaxLen);
 
-/** Calculates the sha256 of data, and places it in result.  Result must be 32 bytes */
-SLAPI void sha256(const unsigned char *data, unsigned int len, unsigned char *result);
-
-/** Calculates the double sha256 of data and places it in result. Result must be 32 bytes */
-SLAPI void hash256(const unsigned char *data, unsigned int len, unsigned char *result);
-
-/** Calculates the RIPEMD160 of the SHA256 of data and places it in result. Result must be 20 bytes */
-SLAPI void hash160(const unsigned char *data, unsigned int len, unsigned char *result);
-
 /** Get work from nbits */
 SLAPI void getWorkFromDifficultyBits(unsigned long int nBits, unsigned char *result);
 

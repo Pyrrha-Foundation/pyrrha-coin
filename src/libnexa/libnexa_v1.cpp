@@ -23,10 +23,6 @@ bool CheckBlockHeader(const Consensus::Params &consensusParams,
 
 SLAPI int32_t libnexaVersion() { return LIBNEXA_VERSION; }
 
-SLAPI unsigned int get_libnexa_error() { return get_error_code(); }
-
-SLAPI void get_libnexa_error_string(char *buf, uint64_t buflen) { get_error_string(buf, buflen); }
-
 SLAPI int encode64(const unsigned char *data, int size, char *result, int resultMaxLen)
 {
     auto dataAsStr = EncodeBase64(data, size);
@@ -1276,35 +1272,6 @@ SLAPI int decodeWifPrivateKey(int chainSelector, const char *secretWIF, unsigned
     memcpy(result, static_cast<const uint8_t *>(key.begin()), sz);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return (int)sz;
-}
-
-// result must be 32 bytes
-SLAPI void sha256(const unsigned char *data, unsigned int len, unsigned char *result)
-{
-    CSHA256 sha;
-    sha.Write((const unsigned char *)data, len);
-    sha.Finalize((unsigned char *)result);
-    set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
-}
-
-
-// result must be 32 bytes
-SLAPI void hash256(const unsigned char *data, unsigned int len, unsigned char *result)
-{
-    CHash256 hash;
-    hash.Write((const unsigned char *)data, len);
-    hash.Finalize((unsigned char *)result);
-    set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
-}
-
-
-// result must be 20 bytes
-SLAPI void hash160(const unsigned char *data, unsigned int len, unsigned char *result)
-{
-    CHash160 hash;
-    hash.Write((const unsigned char *)data, len);
-    hash.Finalize((unsigned char *)result);
-    set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
 }
 
 // result buffer length must be len (or more) bytes, secret must be 32 bytes, iv must be 16 or more bytes, len must be a
