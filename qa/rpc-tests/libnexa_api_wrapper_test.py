@@ -91,8 +91,7 @@ class LibnexaTest(BitcoinTestFramework):
         # bytes.fromhex goes from hex to binary, opposite of Bin2Hex
         test_data = bytes.fromhex("5D5478AB")
         res = libnexa.Bin2Hex(test_data)
-        # result is returned with null term char
-        assert res == b"5D5478AB\0"
+        assert res == b"5D5478AB"
         return res
 
     def test_hd44DeriveChildKey(self):

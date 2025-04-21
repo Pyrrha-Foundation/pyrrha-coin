@@ -328,7 +328,7 @@ def Bin2Hex(input_data: bytes) -> bytes:
     res_size = libnexa.Bin2Hex(input_data, len(input_data), res_buf, C_STR_BUF_SIZE)
     if res_size <= 0:
         return None
-    return res_buf.raw[0:res_size]
+    return res_buf.raw[0:res_size - 1]
 
 def hd44DeriveChildKey(seed: bytes, purpose: int, coin_type: int, account: int, change: bool, index: int) -> bytes:
     res_buf = create_string_buffer(C_STR_BUF_SIZE)
