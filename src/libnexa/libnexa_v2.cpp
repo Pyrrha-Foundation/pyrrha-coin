@@ -15,15 +15,13 @@
 #define p(...)
 #endif // DEBUG
 
-#define CHECK_SIZE(nBytes)                                  \
-    if (nBytes > std::numeric_limits<int>::max())           \
-    {                                                       \
-        set_error(LIBNEXA_ERROR::RETURN_FAILURE,            \
-        "number of bytes to be returned is too large \n");  \
-        *resultLen = 0;                                     \
-        return nullptr;                                     \
-    }                                                       \
-
+#define CHECK_SIZE(nBytes)                                                                          \
+    if (nBytes > std::numeric_limits<int>::max())                                                   \
+    {                                                                                               \
+        set_error(LIBNEXA_ERROR::RETURN_FAILURE, "number of bytes to be returned is too large \n"); \
+        *resultLen = 0;                                                                             \
+        return nullptr;                                                                             \
+    }
 
 
 // in headervalidation.cpp
@@ -36,7 +34,7 @@ SLAPI uint32_t libnexa_version() { return LIBNEXA_VERSION; }
 
 SLAPI uint32_t get_libnexa_error() { return get_error_code(); }
 
-SLAPI char* get_libnexa_error_string(uint32_t *resultLen)
+SLAPI char *get_libnexa_error_string(uint32_t *resultLen)
 {
     const std::string strError = get_error_string();
     const size_t errorLen = strError.size() + 1; // +1 for null term
@@ -47,17 +45,16 @@ SLAPI char* get_libnexa_error_string(uint32_t *resultLen)
     return result;
 }
 
-SLAPI void libnexa_free(void* ptr)
+SLAPI void libnexa_free(void *ptr)
 {
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     free(ptr);
 }
 
 
-
 /** Convert binary data to a hex string.  The provided result buffer must be 2*length+1 bytes.
  */
-SLAPI char* bin_to_hex(const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
+SLAPI char *bin_to_hex(const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
 {
     const std::string hexStr = GetHex(data, dataLen);
     const size_t hexStrLen = hexStr.size() + 1; // add one for null term
@@ -87,7 +84,7 @@ SLAPI bool capd_check(const uint8_t *message, const uint32_t messageLen)
     return msg.DoesPowMeetTarget();
 }
 
-SLAPI uint8_t* capd_hash(const uint8_t *message, const uint32_t messageLen, uint32_t *resultLen)
+SLAPI uint8_t *capd_hash(const uint8_t *message, const uint32_t messageLen, uint32_t *resultLen)
 {
     CDataStream stream(message, message + messageLen, SER_NETWORK, PROTOCOL_VERSION);
     CapdMsg msg;
@@ -105,14 +102,14 @@ SLAPI uint8_t* capd_hash(const uint8_t *message, const uint32_t messageLen, uint
     const uint256 hash = msg.CalcHash();
     const size_t sz = hash.size();
     CHECK_SIZE(sz);
-    uint8_t* result = (uint8_t*)std::malloc(sz);
+    uint8_t *result = (uint8_t *)std::malloc(sz);
     std::memcpy(result, hash.begin(), sz);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = sz;
     return result;
 }
 
-SLAPI uint8_t* capd_set_pow_target_harder_than_priority(const uint8_t *message,
+SLAPI uint8_t *capd_set_pow_target_harder_than_priority(const uint8_t *message,
     const uint32_t messageLen,
     const double priority,
     uint32_t *resultLen)
@@ -140,19 +137,19 @@ SLAPI uint8_t* capd_set_pow_target_harder_than_priority(const uint8_t *message,
     {
         p("libnexa capd serialize error");
         set_error(LIBNEXA_ERROR::DECODE_FAILURE, "failed to encode to a capd message\n");
-        *resultLen  = -2;
+        *resultLen = -2;
         return nullptr;
     }
     const size_t returnStreamSize = returnStream.size();
     CHECK_SIZE(returnStreamSize);
-    uint8_t* result = (uint8_t*)std::malloc(returnStreamSize);
+    uint8_t *result = (uint8_t *)std::malloc(returnStreamSize);
     std::memcpy(result, returnStream.data(), returnStreamSize);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = returnStream.size();
     return result;
 }
 
-SLAPI uint8_t* capd_solve(const uint8_t *message, const uint32_t messageLen, uint32_t *resultLen)
+SLAPI uint8_t *capd_solve(const uint8_t *message, const uint32_t messageLen, uint32_t *resultLen)
 {
     CDataStream stream(message, message + messageLen, SER_NETWORK, PROTOCOL_VERSION);
     CapdMsg msg;
@@ -180,7 +177,7 @@ SLAPI uint8_t* capd_solve(const uint8_t *message, const uint32_t messageLen, uin
     if (solved)
     {
         const size_t msgNonceLen = msg.nonce.size();
-        uint8_t* result = (uint8_t*)std::malloc(msgNonceLen);
+        uint8_t *result = (uint8_t *)std::malloc(msgNonceLen);
         std::memcpy(result, msg.nonce.data(), msgNonceLen);
         set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
         *resultLen = msgNonceLen;
@@ -192,7 +189,7 @@ SLAPI uint8_t* capd_solve(const uint8_t *message, const uint32_t messageLen, uin
 }
 
 /** Create a bloom filter */
-SLAPI uint8_t* create_bloom_filter(const uint8_t *data,
+SLAPI uint8_t *create_bloom_filter(const uint8_t *data,
     const uint32_t len,
     const double falsePositiveRate,
     const uint32_t capacity,
@@ -238,7 +235,7 @@ SLAPI uint8_t* create_bloom_filter(const uint8_t *data,
     //    (unsigned int)bloom.vDataSize(), (unsigned int)serializer.size(), (unsigned int)len);
     const size_t sz = serializer.size();
     CHECK_SIZE(sz);
-    uint8_t* result = (uint8_t*)std::malloc(sz);
+    uint8_t *result = (uint8_t *)std::malloc(sz);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     memcpy(result, serializer.data(), sz);
     *resultLen = (uint32_t)sz;
@@ -247,7 +244,7 @@ SLAPI uint8_t* create_bloom_filter(const uint8_t *data,
 
 // result buffer length must be len (or more) bytes, secret must be 32 bytes, iv must be 16 or more bytes, len must be a
 // multiple of 16
-SLAPI uint8_t* crypt_aes_256_cbc(const bool encrypt,
+SLAPI uint8_t *crypt_aes_256_cbc(const bool encrypt,
     const uint8_t *data,
     const uint32_t len,
     const uint8_t *secret,
@@ -257,7 +254,7 @@ SLAPI uint8_t* crypt_aes_256_cbc(const bool encrypt,
     int nBytes = 0;
     // sanity check len
     CHECK_SIZE(len);
-    uint8_t* result = (uint8_t*)std::malloc(len); // aes output always same length as input
+    uint8_t *result = (uint8_t *)std::malloc(len); // aes output always same length as input
     if (encrypt)
     {
         AES256CBCEncrypt crypter(secret, iv, false);
@@ -279,7 +276,7 @@ SLAPI uint8_t* crypt_aes_256_cbc(const bool encrypt,
     return result;
 }
 
-SLAPI char* decode_base64(const char* data, uint32_t *resultLen)
+SLAPI char *decode_base64(const char *data, uint32_t *resultLen)
 {
     bool invalid = true;
     const std::vector<uint8_t> decodedData = DecodeBase64(data, &invalid);
@@ -298,7 +295,7 @@ SLAPI char* decode_base64(const char* data, uint32_t *resultLen)
     return result;
 }
 
-SLAPI uint8_t* decode_cash_addr(const int32_t chain, const char *strAddr, uint32_t *resultLen)
+SLAPI uint8_t *decode_cash_addr(const int32_t chain, const char *strAddr, uint32_t *resultLen)
 {
     const CChainParams *cp = GetChainParams((ChainSelector)chain);
     if (cp == nullptr)
@@ -312,17 +309,14 @@ SLAPI uint8_t* decode_cash_addr(const int32_t chain, const char *strAddr, uint32
     std::visit(PubkeyExtractor(resultv, *cp), dst);
     const int sz = resultv.size();
     CHECK_SIZE(sz);
-    uint8_t* result = (uint8_t*)std::malloc(sz);
+    uint8_t *result = (uint8_t *)std::malloc(sz);
     memcpy(result, &resultv[0], sz);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)sz;
     return result;
 }
 
-SLAPI uint8_t* decode_cash_addr_content(const int32_t chain,
-    const char *strAddr,
-    uint32_t *resultLen,
-    uint8_t *type)
+SLAPI uint8_t *decode_cash_addr_content(const int32_t chain, const char *strAddr, uint32_t *resultLen, uint8_t *type)
 {
     const CChainParams *cp = GetChainParams((ChainSelector)chain);
     if (cp == nullptr)
@@ -333,7 +327,7 @@ SLAPI uint8_t* decode_cash_addr_content(const int32_t chain,
     }
     const CashAddrContent content = DecodeCashAddrContent(strAddr, *cp);
     const size_t hashSize = content.hash.size();
-    uint8_t* result = (uint8_t*)std::malloc(hashSize);
+    uint8_t *result = (uint8_t *)std::malloc(hashSize);
     CHECK_SIZE(hashSize);
     memcpy(result, &content.hash[0], hashSize);
     memcpy(type, &content.type, 1);
@@ -342,7 +336,7 @@ SLAPI uint8_t* decode_cash_addr_content(const int32_t chain,
     return result;
 }
 
-SLAPI uint8_t* decode_wif_private_key(const int32_t chain, const char *privateKeyWIF, uint32_t *resultLen)
+SLAPI uint8_t *decode_wif_private_key(const int32_t chain, const char *privateKeyWIF, uint32_t *resultLen)
 {
     const CChainParams *cp = GetChainParams(static_cast<ChainSelector>(chain));
     if (cp == nullptr)
@@ -368,14 +362,14 @@ SLAPI uint8_t* decode_wif_private_key(const int32_t chain, const char *privateKe
     }
     const size_t sz = key.size();
     CHECK_SIZE(sz);
-    uint8_t* result = (uint8_t*)std::malloc(sz);
+    uint8_t *result = (uint8_t *)std::malloc(sz);
     std::memcpy(result, key.begin(), sz);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)sz;
     return result;
 }
 
-SLAPI char* encode_base64(const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
+SLAPI char *encode_base64(const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
 {
     const std::string encodedData = EncodeBase64(data, dataLen);
     const size_t outSize = encodedData.size() + 1; // +1 for null term
@@ -387,7 +381,11 @@ SLAPI char* encode_base64(const uint8_t *data, const uint32_t dataLen, uint32_t 
     return result;
 }
 
-SLAPI char* encode_cash_addr(const int32_t chain, const int32_t typ, const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
+SLAPI char *encode_cash_addr(const int32_t chain,
+    const int32_t typ,
+    const uint8_t *data,
+    const uint32_t dataLen,
+    uint32_t *resultLen)
 {
     CTxDestination dst = CNoDestination();
 
@@ -446,7 +444,7 @@ SLAPI char* encode_cash_addr(const int32_t chain, const int32_t typ, const uint8
 }
 
 // Since partial Merkle blocks are just trees of hashes, this structure is the same for Nexa and BCH
-SLAPI uint8_t* extract_from_merkle_block(const int32_t numTxes,
+SLAPI uint8_t *extract_from_merkle_block(const int32_t numTxes,
     const uint8_t *merkleProofPath,
     const int32_t mppLen,
     const uint8_t *hashIn,
@@ -469,8 +467,8 @@ SLAPI uint8_t* extract_from_merkle_block(const int32_t numTxes,
 
     const size_t fullSize = (matches.size() + 1) * HASH_LEN;
     CHECK_SIZE(fullSize);
-    const uint32_t sz = (uint32_t) fullSize;
-    uint8_t* result = (uint8_t*)std::malloc(sz);
+    const uint32_t sz = (uint32_t)fullSize;
+    uint8_t *result = (uint8_t *)std::malloc(sz);
     uint8_t *dest = result;
     const uint8_t *end = result + (sz * HASH_LEN);
 
@@ -506,7 +504,9 @@ SLAPI uint8_t* extract_from_merkle_block(const int32_t numTxes,
     return result;
 }
 
-SLAPI uint8_t* get_args_hash_from_script_pubkey(const uint8_t *scriptData, const uint32_t scriptDataLen, uint32_t *resultLen)
+SLAPI uint8_t *get_args_hash_from_script_pubkey(const uint8_t *scriptData,
+    const uint32_t scriptDataLen,
+    uint32_t *resultLen)
 {
     CScript script(scriptData, scriptData + scriptDataLen);
     script.type = ScriptType::TEMPLATE;
@@ -523,7 +523,7 @@ SLAPI uint8_t* get_args_hash_from_script_pubkey(const uint8_t *scriptData, const
     }
     const size_t argsHashLen = argsHash.size();
     CHECK_SIZE(argsHashLen);
-    uint8_t* result = (uint8_t*)std::malloc(argsHashLen);
+    uint8_t *result = (uint8_t *)std::malloc(argsHashLen);
     std::copy(argsHash.begin(), argsHash.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = argsHashLen;
@@ -542,7 +542,7 @@ SLAPI uint32_t get_difficulty_bits_from_work(const uint8_t *work256Bits)
     return work.GetCompact(false);
 }
 
-SLAPI uint8_t* get_group_info_from_script_pubkey(const uint8_t *scriptData,
+SLAPI uint8_t *get_group_info_from_script_pubkey(const uint8_t *scriptData,
     const uint32_t scriptDataLen,
     uint32_t *resultLen,
     uint64_t *grpFlags,
@@ -563,7 +563,7 @@ SLAPI uint8_t* get_group_info_from_script_pubkey(const uint8_t *scriptData,
     }
     const size_t groupIdLen = groupInfo.associatedGroup.bytes().size();
     CHECK_SIZE(groupIdLen);
-    uint8_t* result = (uint8_t*)std::malloc(groupIdLen);
+    uint8_t *result = (uint8_t *)std::malloc(groupIdLen);
     std::copy(groupInfo.associatedGroup.bytes().begin(), groupInfo.associatedGroup.bytes().end(), result);
     *grpFlags = (uint64_t)groupInfo.controllingGroupFlags;
     *grpAmount = groupInfo.quantity;
@@ -573,7 +573,7 @@ SLAPI uint8_t* get_group_info_from_script_pubkey(const uint8_t *scriptData,
 }
 
 /** Given a private key, return its corresponding public key */
-SLAPI uint8_t* get_pubkey(const uint8_t *keyData, uint32_t *resultLen)
+SLAPI uint8_t *get_pubkey(const uint8_t *keyData, uint32_t *resultLen)
 {
     checkSigInit();
     const CKey key = LoadKey(keyData);
@@ -586,14 +586,16 @@ SLAPI uint8_t* get_pubkey(const uint8_t *keyData, uint32_t *resultLen)
     const CPubKey pubkey = key.GetPubKey();
     const size_t pubkeySize = pubkey.size();
     CHECK_SIZE(pubkeySize);
-    uint8_t* result = (uint8_t*)std::malloc(pubkeySize);
+    uint8_t *result = (uint8_t *)std::malloc(pubkeySize);
     std::copy(pubkey.begin(), pubkey.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)pubkeySize;
     return result;
 }
 
-SLAPI uint8_t* get_template_hash_from_script_pubkey(const uint8_t *scriptData, const uint32_t scriptDataLen, uint32_t *resultLen)
+SLAPI uint8_t *get_template_hash_from_script_pubkey(const uint8_t *scriptData,
+    const uint32_t scriptDataLen,
+    uint32_t *resultLen)
 {
     CScript script(scriptData, scriptData + scriptDataLen);
     script.type = ScriptType::TEMPLATE;
@@ -610,14 +612,14 @@ SLAPI uint8_t* get_template_hash_from_script_pubkey(const uint8_t *scriptData, c
     }
     const size_t templateHashLen = templateHash.size();
     CHECK_SIZE(templateHashLen);
-    uint8_t* result = (uint8_t*)std::malloc(templateHashLen);
+    uint8_t *result = (uint8_t *)std::malloc(templateHashLen);
     std::copy(templateHash.begin(), templateHash.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = templateHashLen;
     return result;
 }
 
-SLAPI uint8_t* get_txid(const uint8_t *txData, const uint32_t txDataLen, uint32_t *resultLen)
+SLAPI uint8_t *get_txid(const uint8_t *txData, const uint32_t txDataLen, uint32_t *resultLen)
 {
     CTransaction tx;
     CDataStream stream(txData, txData + txDataLen, SER_NETWORK, PROTOCOL_VERSION);
@@ -633,14 +635,14 @@ SLAPI uint8_t* get_txid(const uint8_t *txData, const uint32_t txDataLen, uint32_
     }
     const uint256 ret = tx.GetId();
     // no need to CHECK_SIZE for retlen, will always be 64
-    uint8_t* result = (uint8_t*)std::malloc(ret.size());
+    uint8_t *result = (uint8_t *)std::malloc(ret.size());
     std::memcpy(result, ret.begin(), ret.size());
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)ret.size();
     return result;
 }
 
-SLAPI uint8_t* get_txidem(const uint8_t *txData, const uint32_t txDataLen, uint32_t *resultLen)
+SLAPI uint8_t *get_txidem(const uint8_t *txData, const uint32_t txDataLen, uint32_t *resultLen)
 {
     CTransaction tx;
     CDataStream stream(txData, txData + txDataLen, SER_NETWORK, PROTOCOL_VERSION);
@@ -656,7 +658,7 @@ SLAPI uint8_t* get_txidem(const uint8_t *txData, const uint32_t txDataLen, uint3
     }
     const uint256 ret = tx.GetIdem();
     // no need to CHECK_SIZE retlen, will always be 64
-    uint8_t* result = (uint8_t*)std::malloc(ret.size());
+    uint8_t *result = (uint8_t *)std::malloc(ret.size());
     std::memcpy(result, ret.begin(), ret.size());
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)ret.size();
@@ -664,19 +666,19 @@ SLAPI uint8_t* get_txidem(const uint8_t *txData, const uint32_t txDataLen, uint3
 }
 
 /** Get work from nbits */
-SLAPI uint8_t* get_work_from_difficulty_bits(const uint32_t numBits, uint32_t *resultLen)
+SLAPI uint8_t *get_work_from_difficulty_bits(const uint32_t numBits, uint32_t *resultLen)
 {
     const arith_uint256 work = GetWorkForDifficultyBits(numBits);
     uint256 ui = ArithToUint256(work);
     ui.reverse();
     // no need to CHECK_SIZE on 32
-    uint8_t* result = (uint8_t*)std::malloc(32);
+    uint8_t *result = (uint8_t *)std::malloc(32);
     std::memcpy(result, ui.begin(), 32);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return result;
 }
 
-SLAPI uint8_t* group_id_from_addr(const int32_t chain, const char *addr, uint32_t *resultLen)
+SLAPI uint8_t *group_id_from_addr(const int32_t chain, const char *addr, uint32_t *resultLen)
 {
     const CChainParams *cp = GetChainParams((ChainSelector)chain);
     if (cp == nullptr)
@@ -700,14 +702,14 @@ SLAPI uint8_t* group_id_from_addr(const int32_t chain, const char *addr, uint32_
         return nullptr;
     }
     CHECK_SIZE(size);
-    uint8_t* result = (uint8_t*)std::malloc(size);
+    uint8_t *result = (uint8_t *)std::malloc(size);
     std::memcpy(result, &gid.bytes().front(), size);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)size;
     return result;
 }
 
-SLAPI char* group_id_to_addr(const int32_t chain, const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
+SLAPI char *group_id_to_addr(const int32_t chain, const uint8_t *data, const uint32_t dataLen, uint32_t *resultLen)
 {
     if (dataLen < 32)
     {
@@ -740,28 +742,28 @@ SLAPI char* group_id_to_addr(const int32_t chain, const uint8_t *data, const uin
 }
 
 // result must be 20 bytes
-SLAPI uint8_t* hash160(const uint8_t *data, uint32_t len)
+SLAPI uint8_t *hash160(const uint8_t *data, uint32_t len)
 {
     CHash160 hash;
     hash.Write(data, len);
-    uint8_t* result = (uint8_t*)std::malloc(CHash160::OUTPUT_SIZE);
+    uint8_t *result = (uint8_t *)std::malloc(CHash160::OUTPUT_SIZE);
     hash.Finalize(result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return result;
 }
 
 // result must be 32 bytes
-SLAPI uint8_t* hash256(const uint8_t *data, uint32_t len)
+SLAPI uint8_t *hash256(const uint8_t *data, uint32_t len)
 {
     CHash256 hash;
     hash.Write((const unsigned char *)data, len);
-    uint8_t* result = (uint8_t*)std::malloc(CHash256::OUTPUT_SIZE);
+    uint8_t *result = (uint8_t *)std::malloc(CHash256::OUTPUT_SIZE);
     hash.Finalize(result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return result;
 }
 
-SLAPI uint8_t* hash_block_header(const uint8_t *blockData, const uint32_t blockDataLen, uint32_t *resultLen)
+SLAPI uint8_t *hash_block_header(const uint8_t *blockData, const uint32_t blockDataLen, uint32_t *resultLen)
 {
     CDataStream stream(blockData, blockData + blockDataLen, SER_NETWORK, PROTOCOL_VERSION);
     CBlockHeader blockHeader;
@@ -778,7 +780,7 @@ SLAPI uint8_t* hash_block_header(const uint8_t *blockData, const uint32_t blockD
     const uint256 hash = blockHeader.GetHash();
     // no need to CHECK_SIZE hashlen, will always be 64
     const size_t hashLen = hash.size();
-    uint8_t* result = (uint8_t*)std::malloc(hashLen);
+    uint8_t *result = (uint8_t *)std::malloc(hashLen);
     std::memcpy(result, hash.begin(), hashLen);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = hashLen;
@@ -786,7 +788,7 @@ SLAPI uint8_t* hash_block_header(const uint8_t *blockData, const uint32_t blockD
 }
 
 /** Derive a BIP-0044 heirarchial deterministic wallet key */
-SLAPI uint8_t* hd44_derive_child_key(const uint8_t *secretSeed,
+SLAPI uint8_t *hd44_derive_child_key(const uint8_t *secretSeed,
     const uint32_t secretSeedLen,
     const uint32_t purpose,
     const uint32_t coinType,
@@ -805,7 +807,7 @@ SLAPI uint8_t* hd44_derive_child_key(const uint8_t *secretSeed,
     checkSigInit();
     Hd44DeriveChildKey(secretSeed, secretSeedLen, purpose, coinType, account, change, index, derivedSecret, nullptr);
     // no need to CHECK_SIZE for 32
-    uint8_t* childKey = (uint8_t*)std::malloc(32);
+    uint8_t *childKey = (uint8_t *)std::malloc(32);
     std::memcpy(childKey, derivedSecret.begin(), 32);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = 32;
@@ -814,7 +816,7 @@ SLAPI uint8_t* hd44_derive_child_key(const uint8_t *secretSeed,
 
 static const std::vector<std::string> descriptionTitles = {"ticker", "name", "url", "hash", "decimals"};
 
-SLAPI uint8_t* parse_group_description(const uint8_t *input, const uint32_t inputLen, uint32_t *resultLen)
+SLAPI uint8_t *parse_group_description(const uint8_t *input, const uint32_t inputLen, uint32_t *resultLen)
 {
     std::vector<std::string> vec_desc;
     const CScript script(input, input + inputLen);
@@ -841,21 +843,21 @@ SLAPI uint8_t* parse_group_description(const uint8_t *input, const uint32_t inpu
     strResult = strResult + "}";
     const size_t resultSize = strResult.size() + 1; // +1 for \0
     CHECK_SIZE(resultSize);
-    uint8_t* result = (uint8_t*)std::malloc(resultSize);
+    uint8_t *result = (uint8_t *)std::malloc(resultSize);
     // copy result into the out buffer
-    std::strncpy((char*)result, strResult.c_str(), resultSize);
+    std::strncpy((char *)result, strResult.c_str(), resultSize);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = resultSize;
     return result;
 }
 
-SLAPI uint8_t* pubkey_to_script_template(const uint8_t *pubkey, const uint32_t pubkeyLen, uint32_t *resultLen)
+SLAPI uint8_t *pubkey_to_script_template(const uint8_t *pubkey, const uint32_t pubkeyLen, uint32_t *resultLen)
 {
     // CScript P2pktOutput(const CPubKey &pubkey, const CGroupTokenID &group = NoGroup, CAmount grpQuantity = 0);
     const CScript scriptTemplate = P2pktOutput(CPubKey(&pubkey[0], &pubkey[0] + pubkeyLen));
     const size_t scriptTemplateSize = scriptTemplate.size();
     CHECK_SIZE(scriptTemplateSize);
-    uint8_t* result = (uint8_t*)std::malloc(scriptTemplateSize);
+    uint8_t *result = (uint8_t *)std::malloc(scriptTemplateSize);
     std::memcpy(result, &scriptTemplate[0], scriptTemplateSize);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)scriptTemplateSize;
@@ -866,9 +868,9 @@ SLAPI uint8_t* pubkey_to_script_template(const uint8_t *pubkey, const uint32_t p
 #include <Security/Security.h>
 // Implement in Android by calling into the java SecureRandom implementation.
 // You must provide this Java API
-SLAPI uint8_t* random_bytes(const uint32_t num, uint32_t *resultLen)
+SLAPI uint8_t *random_bytes(const uint32_t num, uint32_t *resultLen)
 {
-    uint8_t* buf = (uint8_t*)std::malloc(num);
+    uint8_t *buf = (uint8_t *)std::malloc(num);
     const int rc = SecRandomCopyBytes(kSecRandomDefault, num, buf);
     if (rc != 0)
     {
@@ -879,12 +881,12 @@ SLAPI uint8_t* random_bytes(const uint32_t num, uint32_t *resultLen)
     return buf;
 }
 // Implement APIs normally provided by random.cpp calling openssl
-uint8_t* get_rand_bytes(const uint32_t num, uint32_t *resultLen)
+uint8_t *get_rand_bytes(const uint32_t num, uint32_t *resultLen)
 {
     // it would be dangerous to return if we aren't getting random bytes
     while (1)
     {
-        uint8_t* buf = random_bytes(num, resultLen);
+        uint8_t *buf = random_bytes(num, resultLen);
         if (*resultLen == num)
         {
             return buf;
@@ -895,12 +897,12 @@ uint8_t* get_rand_bytes(const uint32_t num, uint32_t *resultLen)
         sleep(100);
     }
 }
-uint8_t* get_strong_rand_bytes(const uint32_t num, uint32_t *resultLen)
+uint8_t *get_strong_rand_bytes(const uint32_t num, uint32_t *resultLen)
 {
     // it would be dangerous to return if we aren't getting random bytes
     while (1)
     {
-        uint8_t* buf = random_bytes(num, resultLen);
+        uint8_t *buf = random_bytes(num, resultLen);
         if (*resultLen == num)
         {
             return buf;
@@ -915,14 +917,14 @@ uint8_t* get_strong_rand_bytes(const uint32_t num, uint32_t *resultLen)
 
 #if !defined(ANDROID) && !defined(IOS)
 /** Return random bytes from cryptographically acceptable random sources */
-SLAPI uint8_t* random_bytes(const uint32_t num)
+SLAPI uint8_t *random_bytes(const uint32_t num)
 {
     if (num > 32)
     {
         set_error(LIBNEXA_ERROR::RETURN_FAILURE, "can only generate up to 32 random bytes at a time \n");
         return nullptr;
     }
-    uint8_t* buf = (uint8_t*)std::malloc(num);
+    uint8_t *buf = (uint8_t *)std::malloc(num);
     GetStrongRandBytes(buf, num);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return buf;
@@ -930,7 +932,7 @@ SLAPI uint8_t* random_bytes(const uint32_t num)
 
 #endif // !defined(ANDROID) && !defined(IOS)
 
-SLAPI uint8_t* recover_pubkey_from_signature(const uint8_t *message,
+SLAPI uint8_t *recover_pubkey_from_signature(const uint8_t *message,
     const uint32_t messageLen,
     const uint8_t *sig,
     const uint32_t sigLen,
@@ -958,21 +960,21 @@ SLAPI uint8_t* recover_pubkey_from_signature(const uint8_t *message,
     //__android_log_print(ANDROID_LOG_INFO, APPNAME, "passedAddr %s\n", passedAddr.GetHex().c_str());
     const size_t sz = pubkey.size();
     CHECK_SIZE(sz);
-    uint8_t* result = (uint8_t*)std::malloc(sz);
+    uint8_t *result = (uint8_t *)std::malloc(sz);
     std::memcpy(result, pubkey.begin(), sz);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = sz;
     return result;
 }
 
-SLAPI uint8_t* serialise_script(const uint8_t *script, const uint32_t scriptLen, uint32_t *resultLen)
+SLAPI uint8_t *serialise_script(const uint8_t *script, const uint32_t scriptLen, uint32_t *resultLen)
 {
     std::vector<uint8_t> vec(script, script + scriptLen);
     CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
     stream << vec;
     const size_t dataSize = stream.size();
     CHECK_SIZE(dataSize);
-    uint8_t* result = (uint8_t*)std::malloc(dataSize);
+    uint8_t *result = (uint8_t *)std::malloc(dataSize);
     std::memcpy(result, stream.data(), dataSize);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)dataSize;
@@ -980,11 +982,11 @@ SLAPI uint8_t* serialise_script(const uint8_t *script, const uint32_t scriptLen,
 }
 
 // result must be 32 bytes
-SLAPI uint8_t* sha256(const uint8_t *data, const uint32_t dataLen)
+SLAPI uint8_t *sha256(const uint8_t *data, const uint32_t dataLen)
 {
     CSHA256 sha;
     sha.Write(data, dataLen);
-    uint8_t* result = (uint8_t*)std::malloc(CSHA256::OUTPUT_SIZE);
+    uint8_t *result = (uint8_t *)std::malloc(CSHA256::OUTPUT_SIZE);
     sha.Finalize(result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     return result;
@@ -996,7 +998,7 @@ SLAPI uint8_t* sha256(const uint8_t *data, const uint32_t dataLen)
     however, it is not necessary to provide the spend script.
     Since the sighashtype is appended to the signature, more than 64 bytes should be alloced for the result.
 */
-SLAPI uint8_t* sign_bch_tx_one_input_using_schnorr(const uint8_t *txData,
+SLAPI uint8_t *sign_bch_tx_one_input_using_schnorr(const uint8_t *txData,
     const uint32_t txDataLen,
     const uint32_t inputIndex,
     const int64_t inputAmount,
@@ -1047,7 +1049,7 @@ SLAPI uint8_t* sign_bch_tx_one_input_using_schnorr(const uint8_t *txData,
     sig.push_back(hashType);
     const size_t sigLen = sig.size();
     CHECK_SIZE(sigLen);
-    uint8_t* result = (uint8_t*)std::malloc(sigLen);
+    uint8_t *result = (uint8_t *)std::malloc(sigLen);
     result[0] = 0;
     std::copy(sig.begin(), sig.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
@@ -1056,10 +1058,7 @@ SLAPI uint8_t* sign_bch_tx_one_input_using_schnorr(const uint8_t *txData,
 }
 
 /** Sign data (compatible with BCH OP_CHECKDATASIG) */
-SLAPI uint8_t* sign_hash_ecdsa(const uint8_t *data,
-    const uint32_t dataLen,
-    const uint8_t *secret,
-    uint32_t *resultLen)
+SLAPI uint8_t *sign_hash_ecdsa(const uint8_t *data, const uint32_t dataLen, const uint8_t *secret, uint32_t *resultLen)
 {
     checkSigInit();
     const CKey key = LoadKey(secret);
@@ -1074,7 +1073,7 @@ SLAPI uint8_t* sign_hash_ecdsa(const uint8_t *data,
     }
     const size_t sigSize = sig.size();
     CHECK_SIZE(sigSize);
-    uint8_t* result = (uint8_t*)std::malloc(sigSize);
+    uint8_t *result = (uint8_t *)std::malloc(sigSize);
     std::copy(sig.begin(), sig.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = (uint32_t)sigSize;
@@ -1088,7 +1087,7 @@ SLAPI uint8_t* sign_hash_ecdsa(const uint8_t *data,
 
     The returned signature will not have a sighashtype byte.
 */
-SLAPI uint8_t* sign_hash_schnorr(const uint8_t *hash, const uint8_t *privkey, uint32_t *resultLen)
+SLAPI uint8_t *sign_hash_schnorr(const uint8_t *hash, const uint8_t *privkey, uint32_t *resultLen)
 {
     const uint256 sigHash(hash);
     std::vector<uint8_t> sig;
@@ -1110,14 +1109,17 @@ SLAPI uint8_t* sign_hash_schnorr(const uint8_t *hash, const uint8_t *privkey, ui
         return nullptr;
     }
     CHECK_SIZE(sigLen);
-    uint8_t* result = (uint8_t*)std::malloc(sigLen);
+    uint8_t *result = (uint8_t *)std::malloc(sigLen);
     std::copy(sig.begin(), sig.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = sigLen;
     return result;
 }
 
-SLAPI uint8_t* sign_hash_schnorr_with_nonce(const uint8_t *hash, const uint8_t *privkey, const uint8_t *nonce, uint32_t *resultLen)
+SLAPI uint8_t *sign_hash_schnorr_with_nonce(const uint8_t *hash,
+    const uint8_t *privkey,
+    const uint8_t *nonce,
+    uint32_t *resultLen)
 {
     const uint256 sigHash(hash);
     std::vector<uint8_t> sig;
@@ -1139,14 +1141,14 @@ SLAPI uint8_t* sign_hash_schnorr_with_nonce(const uint8_t *hash, const uint8_t *
         return nullptr;
     }
     CHECK_SIZE(sigLen);
-    uint8_t* result = (uint8_t*)std::malloc(sigLen);
+    uint8_t *result = (uint8_t *)std::malloc(sigLen);
     std::copy(sig.begin(), sig.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
     *resultLen = sigLen;
     return result;
 }
 
-SLAPI uint8_t* sign_message(const uint8_t *message,
+SLAPI uint8_t *sign_message(const uint8_t *message,
     const uint32_t messageLen,
     const uint8_t *secret,
     const uint32_t secretLen,
@@ -1188,7 +1190,7 @@ SLAPI uint8_t* sign_message(const uint8_t *message,
         return nullptr;
     }
     CHECK_SIZE(sigLen);
-    uint8_t* result = (uint8_t*)std::malloc(sigLen);
+    uint8_t *result = (uint8_t *)std::malloc(sigLen);
     // __android_log_print(ANDROID_LOG_INFO, APPNAME, "signing sigSize %d data %s\n", vchSig.size(),
     // GetHex(vchSig.begin(), vchSig.size()).c_str());
     std::memcpy(result, sig.data(), sigLen);
@@ -1203,7 +1205,7 @@ SLAPI uint8_t* sign_message(const uint8_t *message,
     however, it is not necessary to provide the spend script.
     Returns length of returned signature.
 */
-SLAPI uint8_t* sign_tx_ecdsa(const uint8_t *txData,
+SLAPI uint8_t *sign_tx_ecdsa(const uint8_t *txData,
     const uint32_t txDataLen,
     const uint32_t inputIndex,
     const int64_t inputAmount,
@@ -1249,7 +1251,7 @@ SLAPI uint8_t* sign_tx_ecdsa(const uint8_t *txData,
     sig.push_back(hashType);
     const size_t sigLen = sig.size();
     CHECK_SIZE(sigLen);
-    uint8_t* result = (uint8_t*)std::malloc(sigLen);
+    uint8_t *result = (uint8_t *)std::malloc(sigLen);
     result[0] = 0;
     std::copy(sig.begin(), sig.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
@@ -1263,7 +1265,7 @@ SLAPI uint8_t* sign_tx_ecdsa(const uint8_t *txData,
     The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,
     however, it is not necessary to provide the spend script.
 */
-SLAPI uint8_t* sign_tx_one_input_using_schnorr(const uint8_t *txData,
+SLAPI uint8_t *sign_tx_one_input_using_schnorr(const uint8_t *txData,
     const uint32_t txDataLen,
     const uint32_t inputIndex,
     const int64_t inputAmount,
@@ -1322,7 +1324,7 @@ SLAPI uint8_t* sign_tx_one_input_using_schnorr(const uint8_t *txData,
     sigHashType.appendToSig(sig);
     const size_t sigLen = sig.size();
     CHECK_SIZE(sigLen);
-    uint8_t* result = (uint8_t*)std::malloc(sigLen);
+    uint8_t *result = (uint8_t *)std::malloc(sigLen);
     result[0] = 0;
     std::copy(sig.begin(), sig.end(), result);
     set_error(LIBNEXA_ERROR::SUCCESS_NO_ERROR, "");
