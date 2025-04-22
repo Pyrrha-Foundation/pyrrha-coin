@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(GetBlockProofEquivalentTime_test)
         blocks[i].header.nTime = 1269211443 + i * params.nPowTargetSpacing;
         blocks[i].header.nBits = 0x207fffff; /* target 0x7fffff000... */
         blocks[i].header.SetChainWork(
-            i ? blocks[i - 1].header.aChainWork() + GetBlockProof(blocks[i - 1]) : arith_uint256(0));
+            i ? blocks[i - 1].header.aChainWork() + GetBlockWork(blocks[i - 1]) : arith_uint256(0));
     }
 
     for (int j = 0; j < 1000; j++)
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(GetBlockProofEquivalentTime_test)
         CBlockIndex *p2 = &blocks[InsecureRandRange(10000)];
         CBlockIndex *p3 = &blocks[InsecureRandRange(10000)];
 
-        int64_t tdiff = GetBlockProofEquivalentTime(*p1, *p2, *p3, params);
+        int64_t tdiff = GetBlockWorkEquivalentTime(*p1, *p2, *p3, params);
         BOOST_CHECK_EQUAL(tdiff, p1->GetBlockTime() - p2->GetBlockTime());
     }
 }
@@ -51,7 +51,7 @@ static CBlockIndex GetBlockIndex(CBlockIndex *pindexPrev, int64_t nTimeInterval,
     block.header.nTime = pindexPrev->time() + nTimeInterval;
     block.header.nBits = nBits;
     block.BuildSkip();
-    block.header.SetChainWork(pindexPrev->chainWork() + GetBlockProof(block));
+    block.header.SetChainWork(pindexPrev->chainWork() + GetBlockWork(block));
     return block;
 }
 
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(asert_difficulty_test)
     // trigger an error if it is ever accessed
     blocks[0].header.nBits = 0x0dedbeef;
 
-    blocks[0].header.SetChainWork(GetBlockProof(blocks[0]));
+    blocks[0].header.SetChainWork(GetBlockWork(blocks[0]));
 
     // Block counter.
     size_t i = 1;

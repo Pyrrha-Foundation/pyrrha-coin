@@ -67,8 +67,16 @@ bool CheckProofOfWork(uint256 hash,
     return true;
 }
 
-arith_uint256 GetBlockProof(const CBlockIndex &block) { return GetWorkForDifficultyBits(block.tgtBits()); }
-int64_t GetBlockProofEquivalentTime(const CBlockIndex &to,
+arith_uint256 GetBlockWork(const CBlockIndex &block)
+{
+    // This works for both tailstorm and legacy blocks because for legacy blocks, tgtBits needs to be the full value
+    // and the number of subblocks will be 0.
+    auto work = GetWorkForDifficultyBits(block.tgtBits());
+    work *= block.header.NumSubblocks() + 1;
+    return work;
+}
+
+int64_t GetBlockWorkEquivalentTime(const CBlockIndex &to,
     const CBlockIndex &from,
     const CBlockIndex &tip,
     const Consensus::Params &params)
@@ -84,7 +92,7 @@ int64_t GetBlockProofEquivalentTime(const CBlockIndex &to,
         r = from.chainWork() - to.chainWork();
         sign = -1;
     }
-    r = r * arith_uint256(params.nPowTargetSpacing) / GetBlockProof(tip);
+    r = r * arith_uint256(params.nPowTargetSpacing) / GetBlockWork(tip);
     if (r.bits() > 63)
     {
         return sign * std::numeric_limits<int64_t>::max();
