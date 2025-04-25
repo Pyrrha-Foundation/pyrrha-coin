@@ -745,8 +745,7 @@ void CRequestManager::SendRequests()
     // asking for one at time. We can do this because there will be no XTHIN requests possible during
     // this time.
     bool fBatchBlockRequests = IsInitialBlockDownload();
-    std::map<CNodeRef, std::map<int64_t, CInv2, std::less<int64_t> >, CompareIteratorByNodeRef>
-        mapBatchBlockRequestsInv2;
+    std::map<CNodeRef, std::map<int64_t, CInv2, std::less<int64_t> >, CompareIteratorByNodeRef> mapBatchBlockRequests;
 
     // Get new block requests
     OdMap mapTempBlk;
@@ -837,7 +836,7 @@ void CRequestManager::SendRequests()
                             mapRequestManagerNodeState.find(next.noderef.get()->GetId());
                         if (it == mapRequestManagerNodeState.end())
                         {
-                            mapBatchBlockRequestsInv2.erase(next.noderef);
+                            mapBatchBlockRequests.erase(next.noderef);
                             continue;
                         }
                         CRequestManagerNodeState *state = &it->second;
@@ -851,7 +850,7 @@ void CRequestManager::SendRequests()
 
                     if (fBatchBlockRequests)
                     {
-                        mapBatchBlockRequestsInv2[next.noderef].emplace(item.nEntryTime, CInv2(obj.type, obj.hash));
+                        mapBatchBlockRequests[next.noderef].emplace(item.nEntryTime, CInv2(obj.type, obj.hash));
                     }
                     else
                     {
@@ -897,10 +896,10 @@ void CRequestManager::SendRequests()
         }
     }
     // send batched requests if any.
-    if (fBatchBlockRequests && !mapBatchBlockRequestsInv2.empty())
+    if (fBatchBlockRequests && !mapBatchBlockRequests.empty())
     {
         {
-            for (auto iter : mapBatchBlockRequestsInv2)
+            for (auto iter : mapBatchBlockRequests)
             {
                 if (shutdown_threads.load() == true)
                 {
@@ -921,7 +920,7 @@ void CRequestManager::SendRequests()
             }
         }
 
-        mapBatchBlockRequestsInv2.clear();
+        mapBatchBlockRequests.clear();
     }
 
 
@@ -993,7 +992,7 @@ void CRequestManager::SendTxnRequests(OdMap &mapTxns)
     // Batch any transaction requests when possible. The process of batching and requesting batched transactions
     // is simlilar to batched block requests, however, we don't make the distinction of whether we're in the process
     // of syncing the chain, as we do with block requests.
-    std::map<CNodeRef, std::vector<CExtInv>, CompareIteratorByNodeRef> mapBatchTxnRequestsInv2;
+    std::map<CNodeRef, std::vector<CExtInv>, CompareIteratorByNodeRef> mapBatchTxnRequests;
 
     // Modify retry interval. If we're doing IBD or if Traffic Shaping is ON we want to have a longer interval because
     // those blocks and txns can take much longer to download.
@@ -1093,18 +1092,18 @@ void CRequestManager::SendTxnRequests(OdMap &mapTxns)
                             item.prevRequestNode = next.noderef;
 
                             uint64_t cheaphash = item.obj.hash.GetCheapHash();
-                            mapBatchTxnRequestsInv2[next.noderef].emplace_back(CExtInv(MSG_EXT_TX, cheaphash));
+                            mapBatchTxnRequests[next.noderef].emplace_back(CExtInv(MSG_EXT_TX, cheaphash));
 
                             // If we have 1000 requests for this peer then send them right away.
-                            if (mapBatchTxnRequestsInv2[next.noderef].size() >= 1000)
+                            if (mapBatchTxnRequests[next.noderef].size() >= 1000)
                             {
-                                next.noderef.get()->PushMessageWithCookie(NetMsgType::EXTGETDATA,
-                                    (++requestCookie << 16), mapBatchTxnRequestsInv2[next.noderef]);
+                                next.noderef.get()->PushMessageWithCookie(
+                                    NetMsgType::EXTGETDATA, (++requestCookie << 16), mapBatchTxnRequests[next.noderef]);
 
                                 LOG(REQ, "Sent batched request with %d transactions to node %s\n",
-                                    mapBatchTxnRequestsInv2[next.noderef].size(), next.noderef.get()->GetLogName());
+                                    mapBatchTxnRequests[next.noderef].size(), next.noderef.get()->GetLogName());
 
-                                mapBatchTxnRequestsInv2.erase(next.noderef);
+                                mapBatchTxnRequests.erase(next.noderef);
                             }
                         }
                     }
@@ -1120,9 +1119,9 @@ void CRequestManager::SendTxnRequests(OdMap &mapTxns)
         }
     }
     // send batched requests if any.
-    if (!mapBatchTxnRequestsInv2.empty())
+    if (!mapBatchTxnRequests.empty())
     {
-        for (auto iter : mapBatchTxnRequestsInv2)
+        for (auto iter : mapBatchTxnRequests)
         {
             if (shutdown_threads.load() == true)
             {
@@ -1133,7 +1132,7 @@ void CRequestManager::SendTxnRequests(OdMap &mapTxns)
                 iter.first.get()->GetLogName());
         }
 
-        mapBatchTxnRequestsInv2.clear();
+        mapBatchTxnRequests.clear();
     }
 }
 
