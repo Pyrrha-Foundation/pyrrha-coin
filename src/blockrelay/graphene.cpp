@@ -1368,23 +1368,11 @@ bool IsGrapheneBlockValid(CNode *pfrom, const CBlockHeader &header)
 bool HandleGrapheneBlockRequest(CDataStream &vRecv, CNode *pfrom, uint32_t msgCookie, const CChainParams &chainparams)
 {
     CMemPoolInfo mempoolinfo;
-    CInv inv;
-    CInv2 inv2;
+    CInv2 inv;
     uint256 hash;
-    int invType = 0;
 
-    if (pfrom->fPeerWantsINV2)
-    {
-        vRecv >> inv2 >> mempoolinfo;
-        invType = inv2.type;
-        hash = inv2.hash;
-    }
-    else
-    {
-        vRecv >> inv >> mempoolinfo;
-        invType = inv.type;
-        hash = inv.hash;
-    }
+    vRecv >> inv >> mempoolinfo;
+    hash = inv.hash;
 
     graphenedata.UpdateInBoundMemPoolInfo(::GetSerializeSize(mempoolinfo, SER_NETWORK, PROTOCOL_VERSION));
 
@@ -1392,7 +1380,7 @@ bool HandleGrapheneBlockRequest(CDataStream &vRecv, CNode *pfrom, uint32_t msgCo
     if (hash.IsNull())
     {
         dosMan.Misbehaving(pfrom, 100);
-        return error("invalid GET_GRAPHENE message type=%u hash=%s", invType, hash.ToString());
+        return error("invalid GET_GRAPHENE message type=%u hash=%s", inv.type, hash.ToString());
     }
 
     {
@@ -1408,7 +1396,7 @@ bool HandleGrapheneBlockRequest(CDataStream &vRecv, CNode *pfrom, uint32_t msgCo
             return error("Peer %s requested block %s that cannot be read", pfrom->GetLogName(), hash.ToString());
         }
         else
-            SendGrapheneBlock(pblock, pfrom, msgCookie, invType, mempoolinfo);
+            SendGrapheneBlock(pblock, pfrom, msgCookie, inv.type, mempoolinfo);
     }
 
     return true;
@@ -1638,8 +1626,7 @@ void RequestFailoverBlock(CNode *pfrom, std::shared_ptr<CBlockThinRelay> pblock)
             pfrom->GetLogName());
         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
         CBloomFilter filterMemPool;
-        CInv inv(MSG_XTHINBLOCK, blockhash);
-        CInv2 inv2(MSG_XTHINBLOCK, blockhash);
+        CInv2 inv(MSG_XTHINBLOCK, blockhash);
 
         std::vector<uint256> vOrphanHashes;
         {
@@ -1648,11 +1635,7 @@ void RequestFailoverBlock(CNode *pfrom, std::shared_ptr<CBlockThinRelay> pblock)
                 vOrphanHashes.emplace_back(mi.first);
         }
         BuildSeededBloomFilter(filterMemPool, vOrphanHashes, inv.hash, pfrom);
-        if (pfrom->fPeerWantsINV2)
-            ss << inv2;
-        else
-            ss << inv;
-
+        ss << inv;
         ss << filterMemPool;
         pfrom->PushMessage(NetMsgType::GET_XTHIN, ss);
     }
@@ -1663,21 +1646,10 @@ void RequestFailoverBlock(CNode *pfrom, std::shared_ptr<CBlockThinRelay> pblock)
 
         LOG(GRAPHENE | CMPCT, "Requesting a compactblock %s as failover from peer %s\n", blockhash.ToString(),
             pfrom->GetLogName());
-        CInv inv(MSG_CMPCT_BLOCK, blockhash);
-        CInv2 inv2(MSG_CMPCT_BLOCK, blockhash);
-
-        if (pfrom->fPeerWantsINV2)
-        {
-            std::vector<CInv2> vGetData;
-            vGetData.push_back(inv2);
-            pfrom->PushMessage(NetMsgType::GETDATA, vGetData);
-        }
-        else
-        {
-            std::vector<CInv> vGetData;
-            vGetData.push_back(inv);
-            pfrom->PushMessage(NetMsgType::GETDATA, vGetData);
-        }
+        CInv2 inv(MSG_CMPCT_BLOCK, blockhash);
+        std::vector<CInv2> vGetData;
+        vGetData.push_back(inv);
+        pfrom->PushMessage(NetMsgType::GETDATA, vGetData);
     }
     else
     {

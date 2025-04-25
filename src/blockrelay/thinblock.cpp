@@ -1371,16 +1371,8 @@ void SendXThinBlock(const ConstCBlockRef pblock, uint32_t msgCookie, CNode *pfro
 
 void RequestThinBlock(CNode *pfrom, const uint256 &hash)
 {
-    if (pfrom->fPeerWantsINV2)
-    {
-        CInv2 inv(MSG_THINBLOCK, hash);
-        pfrom->PushMessage(NetMsgType::GET_THIN, inv);
-    }
-    else
-    {
-        CInv inv(MSG_THINBLOCK, hash);
-        pfrom->PushMessage(NetMsgType::GET_THIN, inv);
-    }
+    CInv2 inv(MSG_THINBLOCK, hash);
+    pfrom->PushMessage(NetMsgType::GET_THIN, inv);
 }
 
 bool IsThinBlockValid(CNode *pfrom,
