@@ -898,26 +898,23 @@ void CRequestManager::SendRequests()
     // send batched requests if any.
     if (fBatchBlockRequests && !mapBatchBlockRequests.empty())
     {
+        for (auto iter : mapBatchBlockRequests)
         {
-            for (auto iter : mapBatchBlockRequests)
+            if (shutdown_threads.load() == true)
             {
-                if (shutdown_threads.load() == true)
-                {
-                    return;
-                }
-
-                // iterate through the second map and create the inv message
-                std::vector<CInv2> vInv;
-                for (auto mi : iter.second)
-                {
-                    const uint256 &hash = mi.second.hash;
-                    MarkBlockAsInFlight(iter.first.get()->GetId(), hash);
-                    vInv.push_back(mi.second);
-                }
-                iter.first.get()->PushMessageWithCookie(NetMsgType::GETDATA, getCookie(), vInv);
-                LOG(REQ, "Sent batched request with %d blocks to node %s\n", vInv.size(),
-                    iter.first.get()->GetLogName());
+                return;
             }
+
+            // iterate through the second map and create the inv message
+            std::vector<CInv2> vInv;
+            for (auto mi : iter.second)
+            {
+                const uint256 &hash = mi.second.hash;
+                MarkBlockAsInFlight(iter.first.get()->GetId(), hash);
+                vInv.push_back(mi.second);
+            }
+            iter.first.get()->PushMessageWithCookie(NetMsgType::GETDATA, getCookie(), vInv);
+            LOG(REQ, "Sent batched request with %d blocks to node %s\n", vInv.size(), iter.first.get()->GetLogName());
         }
 
         mapBatchBlockRequests.clear();
