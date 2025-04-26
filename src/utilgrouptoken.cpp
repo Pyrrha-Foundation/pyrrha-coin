@@ -134,6 +134,28 @@ bool ParseNRC1and2Description(const CScript &script, std::vector<std::string> &_
     return true;
 }
 
+bool ParseNRC3Description(const CScript &script, std::vector<std::string> &_vDesc, CScript::const_iterator &pc)
+{
+    opcodetype op;
+    std::vector<unsigned char> vchRet;
+    // get the url
+    script.GetOp(pc, op, vchRet);
+    std::string str_url(vchRet.begin(), vchRet.end());
+    // TODO - validate the URL is valid?
+    _vDesc.push_back(str_url);
+
+    // get the hash
+    script.GetOp(pc, op, vchRet);
+    if (vchRet.size() != 32)
+    {
+        // hash size must be 32
+        return false;
+    }
+    uint256 hash(&vchRet.data()[0]);
+    _vDesc.push_back(hash.ToString());
+    return true;
+}
+
 bool GetTokenDescription(const CScript &script, std::vector<std::string> &_vDesc)
 {
     _vDesc.clear();
@@ -162,6 +184,15 @@ bool GetTokenDescription(const CScript &script, std::vector<std::string> &_vDesc
     if (grpId == NRC1_OP_RETURN_GROUP_ID || grpId == NRC2_OP_RETURN_GROUP_ID)
     {
         bool ret = ParseNRC1and2Description(script, _vDesc, pc);
+        if (!ret)
+        {
+            _vDesc.clear();
+        }
+        return ret;
+    }
+    else if (grpId == NRC3_OP_RETURN_GROUP_ID)
+    {
+        bool ret = ParseNRC3Description(script, _vDesc, pc);
         if (!ret)
         {
             _vDesc.clear();
