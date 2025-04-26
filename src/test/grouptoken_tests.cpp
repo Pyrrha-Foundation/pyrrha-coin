@@ -1710,7 +1710,7 @@ BOOST_AUTO_TEST_CASE(grouptoken_legacy_descriptions)
     BOOST_CHECK_EQUAL(vLabels[4], "0");
 }
 
-BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
+BOOST_AUTO_TEST_CASE(grouptoken_nrc1_2_3_descriptions)
 {
     // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
     std::string ticker = "NEXT";
@@ -2041,6 +2041,61 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         const std::vector<std::string> vExpectedLabels { str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals };
 
         const std::string opreturn = "6a043b564c05034c4443174c6567656e64617279204475656c6973742043617264734c5068747470733a2f2f697066732e696f2f697066732f6261666b766d69626c6d326464346d6535797236763566327977787665786d78667667726c63367971357365646d6764746e7535786e6e666663652011a5b4763b6d73183688ec107bb1a2a9e5b24beab558975e7dc49d303e86662b00";
+        const std::vector<uint8_t> parsed = ParseHex(opreturn);
+        const CScript returnScript = CScript(parsed.begin(), parsed.end());
+        BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
+        BOOST_CHECK(vLabels == vExpectedLabels);
+    }
+
+    // Test that not data fails for NRC-3
+    OpRetGroupId = 88888892;
+    CScript ret8;
+    ret8 << OP_RETURN << OpRetGroupId;
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret8, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // Test that missing data fails for NRC-3
+    OpRetGroupId = 88888892;
+    CScript ret9;
+    ret6 << OP_RETURN << OpRetGroupId;
+    for (auto &d : desc2)
+    {
+        ret9 << d;
+    }
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret9, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // test hash invalid size NRC3
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b1104360000";
+        vLabels.clear();
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        std::vector<int> grpIds = {88888892};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test valid NRC3 parse
+    {
+        const std::string str_url = "https://ipfs.io/ipfs/bafyfmieoiknc6wnfcn6vvdand636bdpomforeypq5afvqbbrgjl3hrlctq";
+        const std::string str_urlZipFileHex = "3cacb9a4e71067df9ccb43bc0126c5ea48bc85101491592958bdebb1da057767";
+        const std::vector<std::string> vExpectedLabels { str_url, str_urlZipFileHex };
+        vLabels.clear();
+        const std::string opreturn = "6a043c564c054c5068747470733a2f2f697066732e696f2f697066732f62616679666d69656f696b6e6336776e66636e36767664616e643633366264706f6d666f72657970713561667671626272676a6c3368726c63747120677705dab1ebbd58295991141085bc48eac52601bc43cb9cdf6710e7a4b9ac3c";
         const std::vector<uint8_t> parsed = ParseHex(opreturn);
         const CScript returnScript = CScript(parsed.begin(), parsed.end());
         BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
