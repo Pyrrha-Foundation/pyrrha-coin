@@ -1818,7 +1818,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
         std::vector<int> grpIds = {88888890, 88888891};
@@ -1848,7 +1847,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         std::vector<std::vector<unsigned char> > desc3;
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
@@ -1880,7 +1878,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
         std::vector<int> grpIds = {88888890, 88888891};
@@ -1910,7 +1907,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         std::vector<std::vector<unsigned char> > desc3;
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
@@ -1942,7 +1938,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
         std::vector<int> grpIds = {88888890, 88888891};
@@ -1973,7 +1968,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
         std::vector<int> grpIds = {88888890, 88888891};
@@ -2003,7 +1997,6 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1and2_descriptions)
         std::vector<std::vector<unsigned char> > desc3;
         desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
         desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
-        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
         desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
         desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
