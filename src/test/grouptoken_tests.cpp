@@ -2022,9 +2022,11 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1_2_3_descriptions)
         const std::string str_url = "https://natives.cash/api/stables/nusd/getTokenInfo";
         const std::string str_urlZipFileHex = "14e6cb42fef84ddb9b67f7e8e21082007456764f44ef7745f94e5a0dcb060194";
         const std::string str_decimals = "6";
-        const std::vector<std::string> vExpectedLabels { str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals };
+        const std::vector<std::string> vExpectedLabels{str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals};
 
-        const std::string opreturn = "6a043a564c05044e5553440a4e6174697665205553443268747470733a2f2f6e6174697665732e636173682f6170692f737461626c65732f6e7573642f676574546f6b656e496e666f20940106cb0d5a4ef94577ef444f765674008210e2e8f7679bdb4df8fe42cbe61456";
+        const std::string opreturn = "6a043a564c05044e5553440a4e6174697665205553443268747470733a2f2f6e6174697665732e636"
+                                     "173682f6170692f737461626c65732f6e7573642f676574546f6b656e496e666f20940106cb0d5a4e"
+                                     "f94577ef444f765674008210e2e8f7679bdb4df8fe42cbe61456";
         const std::vector<uint8_t> parsed = ParseHex(opreturn);
         const CScript returnScript = CScript(parsed.begin(), parsed.end());
         BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
@@ -2038,9 +2040,12 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1_2_3_descriptions)
         const std::string str_url = "https://ipfs.io/ipfs/bafkvmiblm2dd4me5yr6v5f2ywxvexmxfvgrlc6yq5sedmgdtnu5xnnffce";
         const std::string str_urlZipFileHex = "2b66863e309dc47d5e9758b5ea4bb2e5a9a2b17b10ec883618736d3b76b4a511";
         const std::string str_decimals = "0";
-        const std::vector<std::string> vExpectedLabels { str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals };
+        const std::vector<std::string> vExpectedLabels{str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals};
 
-        const std::string opreturn = "6a043b564c05034c4443174c6567656e64617279204475656c6973742043617264734c5068747470733a2f2f697066732e696f2f697066732f6261666b766d69626c6d326464346d6535797236763566327977787665786d78667667726c63367971357365646d6764746e7535786e6e666663652011a5b4763b6d73183688ec107bb1a2a9e5b24beab558975e7dc49d303e86662b00";
+        const std::string opreturn =
+            "6a043b564c05034c4443174c6567656e64617279204475656c6973742043617264734c5068747470733a2f2f697066732e696f2f69"
+            "7066732f6261666b766d69626c6d326464346d6535797236763566327977787665786d78667667726c63367971357365646d676474"
+            "6e7535786e6e666663652011a5b4763b6d73183688ec107bb1a2a9e5b24beab558975e7dc49d303e86662b00";
         const std::vector<uint8_t> parsed = ParseHex(opreturn);
         const CScript returnScript = CScript(parsed.begin(), parsed.end());
         BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
@@ -2093,9 +2098,11 @@ BOOST_AUTO_TEST_CASE(grouptoken_nrc1_2_3_descriptions)
     {
         const std::string str_url = "https://ipfs.io/ipfs/bafyfmieoiknc6wnfcn6vvdand636bdpomforeypq5afvqbbrgjl3hrlctq";
         const std::string str_urlZipFileHex = "3cacb9a4e71067df9ccb43bc0126c5ea48bc85101491592958bdebb1da057767";
-        const std::vector<std::string> vExpectedLabels { str_url, str_urlZipFileHex };
+        const std::vector<std::string> vExpectedLabels{str_url, str_urlZipFileHex};
         vLabels.clear();
-        const std::string opreturn = "6a043c564c054c5068747470733a2f2f697066732e696f2f697066732f62616679666d69656f696b6e6336776e66636e36767664616e643633366264706f6d666f72657970713561667671626272676a6c3368726c63747120677705dab1ebbd58295991141085bc48eac52601bc43cb9cdf6710e7a4b9ac3c";
+        const std::string opreturn = "6a043c564c054c5068747470733a2f2f697066732e696f2f697066732f62616679666d69656f696b6"
+                                     "e6336776e66636e36767664616e643633366264706f6d666f72657970713561667671626272676a6c"
+                                     "3368726c63747120677705dab1ebbd58295991141085bc48eac52601bc43cb9cdf6710e7a4b9ac3c";
         const std::vector<uint8_t> parsed = ParseHex(opreturn);
         const CScript returnScript = CScript(parsed.begin(), parsed.end());
         BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
