@@ -141,6 +141,8 @@ class NodeConnCB(object):
 
     def on_getdata(self, conn, message): pass
 
+    def on_extgetdata(self, conn, message): pass
+
     def on_getblocks(self, conn, message): pass
 
     def on_tx(self, conn, message): pass
