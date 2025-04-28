@@ -592,6 +592,44 @@ class CInv(object):
             % (self.typemap[self.type], self.hash)
 
 
+class CInv2(object):
+    MSG_TX = 1
+    MSG_BLOCK = 2
+    MSG_FILTERED_BLOCK = 3
+    MSG_CMPCT_BLOCK = 4
+    MSG_XTHINBLOCK = 5
+    MSG_THINBLOCK = MSG_CMPCT_BLOCK
+    typemap = {
+        0: "Error",
+        1: "TX",
+        2: "Block",
+        3: "FilteredBlock",
+        4: "CompactBlock",
+        5: "XThinBlock",
+    }
+
+    def __init__(self, t=0, h=0):
+        assert type(t) is int
+        if type(h) is bytes:
+            h = deser_uint256(h)
+        assert type(h) is int
+        self.type = t
+        self.hash = h
+
+    def deserialize(self, f):
+        self.type = struct.unpack("<c", f.read(1))[0]
+        self.hash = deser_uint256(f)
+
+    def serialize(self, stype=SER_DEFAULT):
+        r = b""
+        r += struct.pack("<c", self.type)
+        r += ser_uint256(self.hash)
+        return r
+
+    def __repr__(self):
+        return "CInv2(type=%s hash=%064x)" \
+            % (self.typemap[self.type], self.hash)
+
 class CBlockLocator(object):
     def __init__(self):
         self.nVersion = MY_VERSION
@@ -2164,6 +2202,28 @@ class msg_inv(object):
     def __repr__(self):
         return "msg_inv(inv=%s)" % (repr(self.inv))
 
+class msg_extinv(object):
+    command = b"extinv"
+
+    def __init__(self, inv=None):
+        if inv is None:
+            self.inv = []
+        elif type(inv) is list:
+            self.inv = inv
+        elif type(inv) is CInv2:
+            self.inv = [inv]
+        else:
+            raise Exception("bad object passed to msg inv; it needs to be a CInv or list of CInv")
+
+    def deserialize(self, f):
+        self.inv = deser_vector(f, CInv2)
+
+    def serialize(self, stype=SER_DEFAULT):
+        return ser_vector(self.inv)
+
+    def __repr__(self):
+        return "msg_extinv(extinv=%s)" % (repr(self.inv))
+
 class msg_getdata(object):
     command = b"getdata"
 
@@ -2185,6 +2245,28 @@ class msg_getdata(object):
 
     def __repr__(self):
         return "msg_getdata(inv=%s)" % (repr(self.inv))
+
+class msg_extgetdata(object):
+    command = b"extgetdata"
+
+    def __init__(self, inv=None):
+        if inv is None:
+            self.inv = []
+        elif type(inv) == list:
+            self.inv = inv
+        elif type(inv) is CInv2:
+            self.inv = [inv]
+        else:
+            raise Exception("bad object passed to msg inv; it needs to be a CInv2 or list of CInv2")
+
+    def deserialize(self, f):
+        self.inv = deser_vector(f, CInv2)
+
+    def serialize(self, stype=SER_DEFAULT):
+        return ser_vector(self.inv)
+
+    def __repr__(self):
+        return "msg_extgetdata(extinv=%s)" % (repr(self.inv))
 
 class msg_notfound(object):
     command = b"notfound"
