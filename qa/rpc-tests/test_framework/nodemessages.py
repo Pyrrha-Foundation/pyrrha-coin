@@ -617,12 +617,12 @@ class CInv2(object):
         self.hash = h
 
     def deserialize(self, f):
-        self.type = struct.unpack("<c", f.read(1))[0]
+        self.type = struct.unpack("<B", f.read(1))[0]
         self.hash = deser_uint256(f)
 
     def serialize(self, stype=SER_DEFAULT):
         r = b""
-        r += struct.pack("<c", self.type)
+        r += struct.pack("<B", self.type)
         r += ser_uint256(self.hash)
         return r
 
@@ -2232,13 +2232,13 @@ class msg_getdata(object):
             self.inv = []
         elif type(inv) == list:
             self.inv = inv
-        elif type(inv) is CInv:
+        elif type(inv) is CInv2:
             self.inv = [inv]
         else:
             raise Exception("bad object passed to msg inv; it needs to be a CInv or list of CInv")
 
     def deserialize(self, f):
-        self.inv = deser_vector(f, CInv)
+        self.inv = deser_vector(f, CInv2)
 
     def serialize(self, stype=SER_DEFAULT):
         return ser_vector(self.inv)

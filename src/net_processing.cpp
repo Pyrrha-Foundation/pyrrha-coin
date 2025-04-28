@@ -1302,6 +1302,7 @@ bool ProcessMessage(CNode *pfrom,
     }
 
     // Peer wants old style inventory (CInv) messages
+/*
     else if (strCommand == NetMsgType::GETDATA && !pfrom->fPeerWantsINV2)
     {
         if (fImporting || fReindex)
@@ -1359,9 +1360,10 @@ bool ProcessMessage(CNode *pfrom,
             pfrom->vRecvGetData.insert(pfrom->vRecvGetData.end(), invDeque.begin(), invDeque.end());
         }
     }
-
+*/
     // Peer wants new style inventory (CInv2) messages
-    else if (strCommand == NetMsgType::GETDATA && pfrom->fPeerWantsINV2)
+  //  else if (strCommand == NetMsgType::GETDATA && pfrom->fPeerWantsINV2)
+    else if (strCommand == NetMsgType::GETDATA)
     {
         if (fImporting || fReindex)
         {
