@@ -20,6 +20,7 @@
 #include "respend/respenddetector.h"
 #include "threadgroup.h"
 #include "timedata.h"
+#include "txadmission.h"
 #include "txmempool.h"
 #include "txorphanpool.h"
 #include "unlimited.h"
