@@ -678,12 +678,12 @@ class CExtInv(object):
 
     def deserialize(self, f):
         self.type = struct.unpack("<B", f.read(1))[0]
-        self.hash = deser_hash32_vector(f)
+        self.hash = deser_hash8_vector(f)
 
     def serialize(self, stype=SER_DEFAULT):
         r = b""
         r += struct.pack("<B", self.type)
-        r += ser_hash32_vector(self.hash)
+        r += ser_hash8_vector(self.hash)
         return r
 
     def __repr__(self):

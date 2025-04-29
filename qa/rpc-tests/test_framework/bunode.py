@@ -32,6 +32,7 @@ class BUProtocolHandler(NodeConnCB):
         self.pong_counter = 0
         self.last_pong = msg_pong(0)
         self.last_getdata = []
+        self.last_extgetdata = []
         self.last_reject = []
         self.sleep_time = 0.05
         self.block_announced = False
@@ -157,17 +158,17 @@ class BUProtocolHandler(NodeConnCB):
         self.last_inv.append(message)
         self.block_announced = True
         for inv in message.inv:
-            if inv.type == CInv.MSG_BLOCK:
+            if inv.type == CInv2.MSG_BLOCK:
                 if self.requestOnInv & REQ_BLOCK:
                     msg = msg_getdata(inv)
                     self.send_message(msg)
                     self.show_debug_msg("requested block")
                 if self.requestOnInv & REQ_THINBLOCK:
-                    msg = msg_getdata(CInv(CInv.MSG_THINBLOCK, inv.hash))
+                    msg = msg_getdata(CInv2(CInv2.MSG_THINBLOCK, inv.hash))
                     self.send_message(msg)
                     self.show_debug_msg("requested thinblock")
                 if self.requestOnInv & REQ_XTHINBLOCK:
-                    msg = msg_getdata(CInv(CInv.MSG_XTHINBLOCK, inv.hash))
+                    msg = msg_getdata(CInv2(CInv2.MSG_XTHINBLOCK, inv.hash))
                     self.send_message(msg)
                     self.show_debug_msg("requested xtinblock")
 
@@ -195,6 +196,9 @@ class BUProtocolHandler(NodeConnCB):
 
     def on_getdata(self, conn, message):
         self.last_getdata.append(message)
+
+    def on_extgetdata(self, conn, message):
+        self.last_extgetdata.append(message)
 
     def on_reject(self, conn, message):
         self.last_reject.append(message)
@@ -288,6 +292,25 @@ class BUProtocolHandler(NodeConnCB):
             timeout -= self.sleep_time
         raise AssertionError("Sync getdata failed to complete")
 
+    # The request manager does not deal with vectors of GETDATA requests but rather one GETDATA per
+    # hash, therefore we need to be able to sync_extgetdata one message at a time rather than in batches.
+    def sync_extgetdata(self, hash_list, timeout=60):
+        while timeout > 0:
+            with mininode_lock:
+                # Check whether any getdata responses are in the hash list and
+                # if so remove them from both lists.
+                for x in self.last_extgetdata:
+                    for y in hash_list:
+                        if (str(x.inv).find(hex(y)[2:]) > 0):
+                            self.last_extgetdata.remove(x)
+                            hash_list.remove(y)
+                if hash_list == []:
+                    return
+
+            time.sleep(self.sleep_time)
+            timeout -= self.sleep_time
+        raise AssertionError("Sync getdata failed to complete")
+
     def sync_with_ping(self, timeout=60):
         self.send_message(msg_ping(nonce=self.ping_counter))
 
@@ -311,6 +334,13 @@ class BUProtocolHandler(NodeConnCB):
             return
 
         self.sync_getdata(hash_list, timeout)
+        return
+
+    def wait_for_extgetdata(self, hash_list, timeout=60):
+        if hash_list == []:
+            return
+
+        self.sync_extgetdata(hash_list, timeout)
         return
 
     def wait_for_disconnect(self, timeout=60):
