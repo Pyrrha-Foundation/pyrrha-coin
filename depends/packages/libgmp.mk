@@ -36,6 +36,10 @@ ifeq ($(HOST),x86_64-w64-mingw32)
   XTRA_CFG_ENV:=CC_FOR_BUILD=gcc
 endif
 
+ifeq ($(HOST),x86_64-linux-musl)
+  XTRA_CFG:=--disable-assembly
+endif
+
 ifeq (darwin, $(findstring darwin, $(HOST)))
   XTRA_CFG:=--disable-assembly
   XTRA_CFG_ENV:=CC="$(darwin_CC)" CXX="$(darwin_CXX)"
