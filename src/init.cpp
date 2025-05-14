@@ -1173,7 +1173,11 @@ bool AppInit2(Config &config)
 
     try
     {
+#ifdef WIN32
+        static boost::interprocess::file_lock lock(pathLockFile.wstring().c_str());
+#else
         static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
+#endif
         if (!lock.try_lock())
             return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."),
                 strDataDir, _(PACKAGE_NAME)));
