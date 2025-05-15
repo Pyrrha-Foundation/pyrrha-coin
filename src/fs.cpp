@@ -7,19 +7,40 @@
 #include <cstring>
 #include <filesystem>
 
-#ifdef WIN32
-#include <stringapiset.h>
-std::wstring charToWstring(const char *cstr)
-{
-    const size_t length = std::strlen(cstr);
-    const int count = MultiByteToWideChar(CP_ACP, 0, cstr, length, NULL, 0);
-    std::wstring wstr(count, 0);
-    MultiByteToWideChar(CP_ACP, 0, cstr, length, &wstr[0], count);
-    return wstr;
-}
-#endif
-
 namespace fsbridge {
+
+#ifdef WIN32
+    #include <stringapiset.h>
+    std::wstring charToWstring(const char *cstr)
+    {
+        const size_t length = std::strlen(cstr);
+        const int requiredSize = MultiByteToWideChar(CP_UTF8, 0, cstr, length, NULL, 0);
+        std::wstring wstr(requiredSize, 0);
+        MultiByteToWideChar(CP_UTF8, 0, cstr, length, &wstr[0], requiredSize);
+        return wstr;
+    }
+
+    std::wstring stringToWstring(const std::string str)
+    {
+        const char* cstr = str.c_str();
+        return charToWstring(cstr);
+    }
+
+    std::string wcharToString(const wchar_t *wcstr)
+    {
+        const size_t length = std::wcslen(wcstr);
+        const int requiredSize = WideCharToMultiByte(CP_UTF8, 0, wcstr, length, NULL, 0, NULL, NULL);
+        std::string str(requiredSize, 0);
+        WideCharToMultiByte(CP_UTF8, 0, wcstr, length, &str[0], requiredSize, NULL, NULL);
+        return str;
+    }
+
+    std::string wstringToString(const std::wstring wstr)
+    {
+        const wchar_t* wcstr = wstr.c_str();
+        return wcharToString(wcstr);
+    }
+#endif
 
 FILE *fopen(const fs::path& p, const char *mode)
 {
