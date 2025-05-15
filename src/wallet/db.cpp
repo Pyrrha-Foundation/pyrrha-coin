@@ -81,8 +81,8 @@ bool CDBEnv::Open(const fs::path &pathIn)
 
     // path needs to be a std::wstring on windows converted to a std::string
 #ifdef WIN32
-    std::wstring wstrPathIn = pathIn.wstring();
-    strPath = fsbridge::wstringToString(wstrPathIn);
+    const std::u8string &utf8PathIn = pathIn.u8string();
+    strPath = std::string{utf8PathIn.begin(), utf8PathIn.end()};
 #else
     strPath = pathIn.string();
 #endif
@@ -90,16 +90,16 @@ bool CDBEnv::Open(const fs::path &pathIn)
     fs::path pathLogDir = pathIn / "database";
     TryCreateDirectories(pathLogDir);
 #ifdef WIN32
-    std::wstring wstrPathLogDir = pathLogDir.wstring();
-    std::string strPathLogDir = fsbridge::wstringToString(wstrPathLogDir);
+    const std::u8string &utf8PathLogDir = pathLogDir.u8string();
+    std::string strPathLogDir = std::string{utf8PathLogDir.begin(), utf8PathLogDir.end()};
 #else
     std::string strPathLogDir = pathIn.string();
 #endif
 
     fs::path pathErrorFile = pathIn / "db.log";
 #ifdef WIN32
-    std::wstring wstrPathErrorFile = pathErrorFile.wstring();
-    std::string strPathErrorFile = fsbridge::wstringToString(wstrPathErrorFile);
+    const std::u8string &utf8PathErrorFile = pathErrorFile.u8string();
+    std::string strPathErrorFile = std::string{utf8PathErrorFile.begin(), utf8PathErrorFile.end()};
 #else
     std::string strPathErrorFile = pathIn.string();
 #endif

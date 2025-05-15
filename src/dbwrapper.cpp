@@ -97,8 +97,8 @@ CDBWrapper::CDBWrapper(const fs::path &path,
 
     // path needs to be a std::wstring on windows converted to a std::string
 #ifdef WIN32
-    std::wstring wstr = path.wstring();
-    std::string strPath = fsbridge::wstringToString(wstr);
+    const std::u8string &utf8Path = path.u8string();
+    std::string strPath = std::string{utf8Path.begin(), utf8Path.end()};
 #else
     std::string strPath = path.string();
 #endif

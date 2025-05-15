@@ -54,9 +54,9 @@
 #else // ifdef WIN32
 
 #ifdef UNICODE
- typedef LPWSTR LPTSTR;
+typedef LPWSTR LPTSTR;
 #else
- typedef LPSTR LPTSTR;
+typedef LPSTR LPTSTR;
 #endif
 
 #ifdef _MSC_VER
