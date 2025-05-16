@@ -5,6 +5,7 @@
 
 #include "chain.h"
 #include "chainparams.h"
+#include "daa.h"
 #include "pow.h"
 #include "random.h"
 #include "test/test_nexa.h"
@@ -25,11 +26,15 @@ BOOST_AUTO_TEST_CASE(GetBlockProofEquivalentTime_test)
     for (int i = 0; i < 10000; i++)
     {
         blocks[i].pprev = i ? &blocks[i - 1] : nullptr;
-        blocks[i].header.height = i;
-        blocks[i].header.nTime = 1269211443 + i * params.nPowTargetSpacing;
-        blocks[i].header.nBits = 0x207fffff; /* target 0x7fffff000... */
-        blocks[i].header.SetChainWork(
-            i ? blocks[i - 1].header.aChainWork() + GetBlockProof(blocks[i - 1]) : arith_uint256(0));
+        blocks[i].header->height = i;
+        blocks[i].nHeight = i;
+        blocks[i].header->nTime = 1269211443 + i * params.nPowTargetSpacing;
+        blocks[i].nTime = blocks[i].header->nTime;
+        blocks[i].header->nBits = 0x207fffff; /* target 0x7fffff000... */
+        blocks[i].nBits = blocks[i].header->nBits;
+        blocks[i].header->SetChainWork(
+            i ? blocks[i - 1].header->aChainWork() + GetBlockProof(blocks[i - 1]) : arith_uint256(0));
+        blocks[i].nChainWork = UintToArith256(blocks[i].header->chainWork);
     }
 
     for (int j = 0; j < 1000; j++)
@@ -47,11 +52,15 @@ static CBlockIndex GetBlockIndex(CBlockIndex *pindexPrev, int64_t nTimeInterval,
 {
     CBlockIndex block;
     block.pprev = pindexPrev;
-    block.header.height = pindexPrev->height() + 1;
-    block.header.nTime = pindexPrev->time() + nTimeInterval;
-    block.header.nBits = nBits;
+    block.header->height = pindexPrev->height() + 1;
+    block.nHeight = block.header->height;
+    block.header->nTime = pindexPrev->GetBlockTime() + nTimeInterval;
+    block.nTime = block.header->nTime;
+    block.header->nBits = nBits;
+    block.nBits = block.header->nBits;
+    block.header->SetChainWork(pindexPrev->chainWork() + GetBlockProof(block));
+    block.nChainWork = UintToArith256(block.header->chainWork);
     block.BuildSkip();
-    block.header.SetChainWork(pindexPrev->chainWork() + GetBlockProof(block));
     return block;
 }
 
@@ -93,13 +102,17 @@ BOOST_AUTO_TEST_CASE(asert_difficulty_test)
 
     // Genesis block, and parent of ASERT anchor block in this test case.
     blocks[0] = CBlockIndex();
-    blocks[0].header.height = 0;
-    blocks[0].header.nTime = 1269211443;
+    blocks[0].header->height = 0;
+    blocks[0].nHeight = 0;
+    blocks[0].header->nTime = 1269211443;
+    blocks[0].nTime = blocks[0].header->nTime;
     // The pre-anchor block's nBits should never be used, so we set it to a nonsense value in order to
     // trigger an error if it is ever accessed
-    blocks[0].header.nBits = 0x0dedbeef;
+    blocks[0].header->nBits = 0x0dedbeef;
+    blocks[0].nBits = blocks[0].header->nBits;
 
-    blocks[0].header.SetChainWork(GetBlockProof(blocks[0]));
+    blocks[0].header->SetChainWork(GetBlockProof(blocks[0]));
+    blocks[0].nChainWork = UintToArith256(blocks[0].header->chainWork);
 
     // Block counter.
     size_t i = 1;
@@ -237,7 +250,8 @@ BOOST_AUTO_TEST_CASE(asert_difficulty_test)
     blocks[i] = GetBlockIndex(&blocks[i - 1], -2 * 24 * 3600 - 30, nBits);
     for (size_t j = 0; j < 4 * 24 * 3600 + 660; j++)
     {
-        blocks[i].header.nTime++;
+        blocks[i].header->nTime++;
+        blocks[i].nTime = blocks[i].header->nTime;
         nBits = GetNextASERTWorkRequired(&blocks[i], &blkHeaderDummy, params, &blocks[1]);
 
         if (j > 8)
@@ -267,10 +281,10 @@ BOOST_AUTO_TEST_CASE(asert_difficulty_test)
             dRelMax = dRelErr;
         BOOST_CHECK_MESSAGE(
             fabs(dErr) < dMaxErr, strprintf("solveTime: %d\tStep size: %.8f%%\tdErr: %.8f%%\tnBits: %0x\n",
-                                      int64_t(blocks[i].time()) - blocks[i - 1].time(), dStep * 100, dErr * 100, nBits));
+                                      int64_t(blocks[i].GetBlockTime()) - blocks[i - 1].GetBlockTime(), dStep * 100, dErr * 100, nBits));
         BOOST_CHECK_MESSAGE(fabs(dRelErr) < dMaxErr,
             strprintf("solveTime: %d\tStep size: %.8f%%\tdRelErr: %.8f%%\tnBits: %0x\n",
-                                int64_t(blocks[i].time()) - blocks[i - 1].time(), dStep * 100, dRelErr * 100, nBits));
+                                int64_t(blocks[i].GetBlockTime()) - blocks[i - 1].GetBlockTime(), dStep * 100, dRelErr * 100, nBits));
     }
     auto failMsg = strprintf(
         "Min error: %16.14f%%\tMax error: %16.14f%%\tMax step: %16.14f%%\n", dMin * 100, dMax * 100, dMaxStep * 100);

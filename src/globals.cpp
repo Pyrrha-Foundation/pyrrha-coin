@@ -110,12 +110,16 @@ CCriticalSection cs_rpcWarmup;
 
 /** Dirty block index and mapBlockIndex are under the same lock. Once an new entry is made into
  *  mapBlockIndex then there is also a new entry in setDirtyBlockIndex.  The dirty block index
- *  is written later to disk when it's convenient.
+ *  is written later to disk when it's convenient with tracking for headers that need to be
+ *  trimmed held in setOldDirtyBlockIndex.
  */
 uint64_t nDiskBlockIndexVersion = 0;
 CSharedCriticalSection cs_mapBlockIndex;
 BlockMap mapBlockIndex GUARDED_BY(cs_mapBlockIndex);
 std::set<CBlockIndex *> setDirtyBlockIndex GUARDED_BY(cs_mapBlockIndex);
+std::set<CBlockIndex *> setOldDirtyBlockIndex GUARDED_BY(cs_mapBlockIndex);
+// The set of blockindex values which are to have their headers trimmed from memory. This is a RAM saving feature.
+std::set<const CBlockIndex *> setHeadersToTrim GUARDED_BY(cs_mapBlockIndex);
 /** All pairs A->B, where A (or one of its ancestors) misses transactions, but B has transactions.
  * Pruned nodes may have entries where B is missing data.
  */
