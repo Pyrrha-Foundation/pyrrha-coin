@@ -48,6 +48,10 @@ void ResetASERTAnchorBlockCache() noexcept;
 const CBlockIndex *GetASERTAnchorBlockCache() noexcept;
 
 uint32_t GetNextWorkRequired(const CBlockIndex *pindexLast, const CBlockHeader *pblock, const Consensus::Params &);
+uint32_t GetNextNonTailstormWorkRequired(const CBlockIndex *pindexPrev,
+    const CBlockHeader *pblock,
+    const Consensus::Params &params);
+
 arith_uint256 GetNextNonTailstormBlockTarget(const CBlockIndex *pindexPrev,
     const CBlockHeader *pblock,
     const Consensus::Params &params);

@@ -215,20 +215,36 @@ bool ContextualCheckBlockHeader(const CChainParams &chainparams,
         return state.DoS(100, error("%s: announced block size too large", __func__), REJECT_INVALID, "bad-blk-size");
     }
 
+    int subblocks = block.NumSubblocks();
     // Check proof of work
-    uint32_t expectedNbits = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-    if (block.nBits != expectedNbits)
+    uint32_t expectedNbits = 0;
+    if (subblocks == 0) // normal block
     {
-        return state.DoS(100,
-            error("%s: incorrect proof of work. Height %d, Block nBits 0x%x, expected 0x%x", __func__, nHeight,
-                block.nBits, expectedNbits),
-            REJECT_INVALID, "bad-diffbits");
+        expectedNbits = GetNextNonTailstormWorkRequired(pindexPrev, &block, consensusParams);
+        if (block.nBits != expectedNbits)
+        {
+            return state.DoS(100,
+                error("%s: incorrect proof of work. Height %d, Block nBits 0x%x, expected 0x%x", __func__, nHeight,
+                    block.nBits, expectedNbits),
+                REJECT_INVALID, "bad-diffbits");
+        }
+    }
+    else
+    {
+        expectedNbits = GetNextWorkRequired(pindexPrev, &block, consensusParams);
+        if (block.nBits != expectedNbits)
+        {
+            return state.DoS(100,
+                error("%s: incorrect proof of work. Height %d, Block nBits 0x%x, expected 0x%x", __func__, nHeight,
+                    block.nBits, expectedNbits),
+                REJECT_INVALID, "bad-diffbits");
+        }
     }
     // auto fullblockWork = GetNextSummaryBlockWorkRequired(pindexPrev, pblock.get(), conparams);
     // auto expectedChainWork = ArithToUint256((pindexPrev ? pindexPrev->chainWork() : 0) +
     // GetWorkForDifficultyBits(fullblockWork));
-    auto expectedChainWork = ArithToUint256((pindexPrev ? pindexPrev->chainWork() : 0) +
-                                            ((block.NumSubblocks() + 1) * GetWorkForDifficultyBits(expectedNbits)));
+    auto expectedChainWork = ArithToUint256(
+        (pindexPrev ? pindexPrev->chainWork() : 0) + ((subblocks + 1) * GetWorkForDifficultyBits(expectedNbits)));
     if (block.chainWork != expectedChainWork)
     {
         return state.DoS(100,
@@ -3800,10 +3816,12 @@ bool _ActivateBestChain(CValidationState &state,
     {
         if (shutdown_threads.load() == true)
         {
+            state.Error("shutting down");
             return false;
         }
         if (ShutdownRequested())
         {
+            state.Error("shutting down");
             return false;
         }
 
@@ -3859,6 +3877,7 @@ bool _ActivateBestChain(CValidationState &state,
                 // this block has enough work to advance the tip.
                 if (pindexMostWork->chainWork() <= pindexOldTip->chainWork())
                 {
+                    state.Error("Not enough work to advance tip");
                     return false;
                 }
             }
@@ -3907,6 +3926,7 @@ bool _ActivateBestChain(CValidationState &state,
             }
             else
             {
+                LOGA("Chain activation failed, but state is not invalid\n");
                 return false;
             }
         }
@@ -3923,7 +3943,10 @@ bool _ActivateBestChain(CValidationState &state,
         // chain. Set pblock to nullptr here to make sure as we continue we get blocks from disk.
         pindexMostWork = FindMostWorkChain();
         if (!pindexMostWork)
+        {
+            state.Error("Best chain changed while processing this block");
             return false;
+        }
         pblock.reset();
         fOneDone = true;
     } while (pindexMostWork->chainWork() > chainActive.Tip()->chainWork());
@@ -4021,8 +4044,8 @@ bool ProcessNewBlock(CValidationState &state,
         }
         else
         {
-            LOG(BLK, "Invalid block %s: time:%d TX size:%d len:%d ActivateBestChain failed: %s\n", hexHash,
-                pblock->nTime, pblock->vtx.size(), pblock->GetBlockSize(), state.GetLogString());
+            LOG(BLK, "Stopped activation of block %s: time:%d TX size:%d len:%d ActivateBestChain returned false: %s\n",
+                hexHash, pblock->nTime, pblock->vtx.size(), pblock->GetBlockSize(), state.GetLogString());
             return false;
         }
     }
