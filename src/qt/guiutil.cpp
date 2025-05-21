@@ -473,7 +473,7 @@ void openDebugLogfile()
 
     /* Open debug.log with the associated application */
     if (fs::exists(pathDebug))
-        QDesktopServices::openUrl(QUrl::fromLocalFile(boostPathToQString(pathDebug)));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(filesystemPathToQString(pathDebug)));
 }
 
 void SubstituteFonts(const QString &language)
@@ -953,8 +953,13 @@ void setClipboard(const QString &str)
     QApplication::clipboard()->setText(str, QClipboard::Selection);
 }
 
-fs::path qstringToBoostPath(const QString &path) { return fs::path(path.toStdString()); }
-QString boostPathToQString(const fs::path &path) { return QString::fromStdString(path.string()); }
+fs::path qstringToFilesystemPath(const QString &path) { return fs::u8path(path.toStdString()); }
+QString filesystemPathToQString(const fs::path &path)
+{
+    const std::u8string &utf8Path = path.u8string();
+    const std::string strPath = std::string{utf8Path.begin(), utf8Path.end()};
+    return QString::fromStdString(strPath);
+}
 QString formatDurationStr(int secs)
 {
     QStringList strList;
