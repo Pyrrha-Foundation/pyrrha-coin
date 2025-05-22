@@ -84,7 +84,7 @@ cache: &global_cache_settings
     stage: build
     # Environment based on workarounds in this issue:
     # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27300
-    image: bchunlimited/nexa:ubuntu20.04
+    image: bchunlimited/nexa:ubuntu24.04
     cache: {}
     variables:
         DOCKER_HOST: tcp://docker:2375
@@ -129,7 +129,7 @@ gitian-binaries:
 ######## Ubuntu base settings
 ######################################################
 .ubuntu_base:
-    image: bchunlimited/nexa:ubuntu20.04
+    image: bchunlimited/nexa:ubuntu24.04
 
 .ubuntu_ccache_scripts:
     extends: .ubuntu_base
