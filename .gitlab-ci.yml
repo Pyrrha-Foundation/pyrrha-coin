@@ -378,9 +378,6 @@ build-ubuntu:
     stage: build
     extends: .cache-ubuntu
     needs: [build-ubuntu-deps]
-    variables:
-        CXX: g++-10
-        CC: gcc-10
     script:
         - ./autogen.sh
         - mkdir build; cd build
@@ -422,9 +419,6 @@ build-ubuntu-rostrum:
 
     variables:
         CARGO_HOME: ${CI_PROJECT_DIR}/cargohome
-        # needed due to gcc 9.x bug,see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95189
-        CXX: g++-10
-        CC: gcc-10
 
     before_script:
       - mkdir -p cargohome
