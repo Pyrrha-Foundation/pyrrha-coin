@@ -922,6 +922,9 @@ build-osx-arm64:
 build-debian-nodeps:
     stage: build
     extends: .cache-debian-nodeps
+    variables:
+        CC: clang
+        CXX: clang++
     needs: []
     script:
         - ./autogen.sh
@@ -939,6 +942,9 @@ build-debian-nodeps:
 build-debian-nodeps-qt:
     stage: build
     extends: .cache-debian-nodeps
+    variables:
+        CC: clang
+        CXX: clang++
     needs: []
     script:
         - ./autogen.sh
