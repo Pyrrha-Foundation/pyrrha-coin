@@ -1287,7 +1287,7 @@ build-alpine-nodeps:
         - apk --no-cache add curl git build-base libtool autoconf automake pkgconf openssl-dev libevent-dev gmp-dev util-linux boost-dev db-dev miniupnpc-dev zeromq-dev openjdk21
         - ./autogen.sh
         - mkdir build; cd build
-        - ../configure --cache-file=config.cache --with-gui=no --enable-glibc-back-compat --enable-reduce-exports
+        - ../configure --cache-file=config.cache --with-gui=no --enable-reduce-exports
         - make -j `nproc`
         - ccache --show-stats
     artifacts:
@@ -1305,7 +1305,7 @@ build-alpine-nodeps-qt:
         - apk --no-cache add curl git build-base libtool autoconf automake pkgconf openssl-dev libevent-dev gmp-dev util-linux boost-dev db-dev miniupnpc-dev zeromq-dev openjdk21
         - ./autogen.sh
         - mkdir build; cd build
-        - ../configure --cache-file=config.cache --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-tests
+        - ../configure --cache-file=config.cache --with-gui=qt5 --enable-reduce-exports --disable-bench --disable-tests
         - make -j `nproc`
         - ccache --show-stats
     artifacts:
