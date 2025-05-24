@@ -1284,7 +1284,7 @@ build-alpine-nodeps:
     extends: .cache-alpine-nodeps
     needs: []
     script:
-        - apk --no-cache add curl git build-base libtool autoconf automake pkgconf openssl-dev libevent-dev gmp-dev util-linux boost-dev db-dev miniupnpc-dev zeromq-dev openjdk21
+        - apk add ccache curl git build-base libtool autoconf automake pkgconf openssl-dev libevent-dev gmp-dev util-linux boost-dev db-dev miniupnpc-dev zeromq-dev openjdk21
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --cache-file=config.cache --with-gui=no --enable-reduce-exports
@@ -1302,7 +1302,7 @@ build-alpine-nodeps-qt:
     extends: .cache-alpine-nodeps
     needs: []
     script:
-        - apk --no-cache add curl git build-base libtool autoconf automake pkgconf openssl-dev libevent-dev gmp-dev util-linux boost-dev db-dev miniupnpc-dev zeromq-dev openjdk21 qt5-qtbase-dev qt5-qttools-dev qt5-qdbusviewer protobuf-dev
+        - apk add ccache curl git build-base libtool autoconf automake pkgconf openssl-dev libevent-dev gmp-dev util-linux boost-dev db-dev miniupnpc-dev zeromq-dev openjdk21 qt5-qtbase-dev qt5-qttools-dev qt5-qdbusviewer protobuf-dev
         - ./autogen.sh
         - mkdir build; cd build
         - ../configure --cache-file=config.cache --with-gui=qt5 --enable-reduce-exports --disable-bench --disable-tests
