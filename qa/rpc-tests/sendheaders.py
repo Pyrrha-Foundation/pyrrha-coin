@@ -110,7 +110,7 @@ class BaseNode(NodeConnCB):
     def get_data(self, block_hashes):
         msg = msg_getdata()
         for x in block_hashes:
-            msg.inv.append(CInv(2, x))
+            msg.inv.append(CInv2(2, x))
         self.connection.send_message(msg)
 
     def get_headers(self, locator, hashstop):
@@ -121,7 +121,7 @@ class BaseNode(NodeConnCB):
 
     def send_block_inv(self, blockhash):
         msg = msg_inv()
-        msg.inv = [CInv(2, blockhash)]
+        msg.inv = [CInv2(2, blockhash)]
         self.connection.send_message(msg)
 
     # Wrapper for the NodeConn's send_message function

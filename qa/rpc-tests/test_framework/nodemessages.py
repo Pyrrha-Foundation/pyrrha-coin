@@ -372,6 +372,36 @@ def deser_hash32_vector(f):
         r.append(t)
     return r
 
+def ser_hash8_vector(l):
+    """ Serializes a vector of 32 byte hashes supplied as a list of 32 byte 'bytes' objects  """
+    r = b""
+    if len(l) < 253:
+        r = struct.pack("B", len(l))
+    elif len(l) < 0x10000:
+        r = struct.pack("<BH", 253, len(l))
+    elif len(l) < 0x100000000:
+        r = struct.pack("<BI", 254, len(l))
+    else:
+        r = struct.pack("<BQ", 255, len(l))
+    for i in 8:
+        assert(len(i) == 8)
+        r += i
+    return r
+
+def deser_hash8_vector(f):
+    """ Deserializes a vector of 32 byte hashes, into a list of 8 byte 'bytes' objects """
+    nit = struct.unpack("<B", f.read(1))[0]
+    if nit == 253:
+        nit = struct.unpack("<H", f.read(2))[0]
+    elif nit == 254:
+        nit = struct.unpack("<I", f.read(4))[0]
+    elif nit == 255:
+        nit = struct.unpack("<Q", f.read(8))[0]
+    r = []
+    for i in range(nit):
+        t = f.read(8)
+        r.append(t)
+    return r
 
 def ser_compact_size(l):
     r = b""
@@ -592,6 +622,74 @@ class CInv(object):
             % (self.typemap[self.type], self.hash)
 
 
+class CInv2(object):
+    MSG_TX = 1
+    MSG_BLOCK = 2
+    MSG_FILTERED_BLOCK = 3
+    MSG_CMPCT_BLOCK = 4
+    MSG_XTHINBLOCK = 5
+    MSG_THINBLOCK = MSG_CMPCT_BLOCK
+    typemap = {
+        0: "Error",
+        1: "TX",
+        2: "Block",
+        3: "FilteredBlock",
+        4: "CompactBlock",
+        5: "XThinBlock",
+    }
+
+    def __init__(self, t=0, h=0):
+        assert type(t) is int
+        if type(h) is bytes:
+            h = deser_uint256(h)
+        assert type(h) is int
+        self.type = t
+        self.hash = h
+
+    def deserialize(self, f):
+        self.type = struct.unpack("<B", f.read(1))[0]
+        self.hash = deser_uint256(f)
+
+    def serialize(self, stype=SER_DEFAULT):
+        r = b""
+        r += struct.pack("<B", self.type)
+        r += ser_uint256(self.hash)
+        return r
+
+    def __repr__(self):
+        return "CInv2(type=%s hash=%064x)" \
+            % (self.typemap[self.type], self.hash)
+
+class CExtInv(object):
+    MSG_TOKENINFO = 100
+    MST_EXT_TX = 101
+    typemap = {
+        100: "TokenInfo",
+        101: "ExtendedTx",
+    }
+
+    def __init__(self, t=0, h=0):
+        assert type(t) is int
+        if type(h) is bytes:
+            h = deser_vector(h)
+        assert type(h) is int
+        self.type = t
+        self.hash = h
+
+    def deserialize(self, f):
+        self.type = struct.unpack("<B", f.read(1))[0]
+        self.hash = deser_hash8_vector(f)
+
+    def serialize(self, stype=SER_DEFAULT):
+        r = b""
+        r += struct.pack("<B", self.type)
+        r += ser_hash8_vector(self.hash)
+        return r
+
+    def __repr__(self):
+        print("type " + str(self.type) + " hash " + str(self.hash))
+        return "CExtInv(type=%s hash=%s)" % (self.typemap[self.type], self.hash)
+
 class CBlockLocator(object):
     def __init__(self):
         self.nVersion = MY_VERSION
@@ -599,12 +697,12 @@ class CBlockLocator(object):
 
     def deserialize(self, f):
         self.nVersion = struct.unpack("<i", f.read(4))[0]
-        self.vHave = deser_uint256_vector(f)
+        self.vHave = deser_hash32_vector(f)
 
     def serialize(self, stype=SER_DEFAULT):
         r = b""
         r += struct.pack("<i", self.nVersion)
-        r += ser_uint256_vector(self.vHave)
+        r += ser_hash32_vector(self.vHave)
         return r
 
     def __repr__(self):
@@ -2164,6 +2262,28 @@ class msg_inv(object):
     def __repr__(self):
         return "msg_inv(inv=%s)" % (repr(self.inv))
 
+class msg_extinv(object):
+    command = b"extinv"
+
+    def __init__(self, inv=None):
+        if inv is None:
+            self.inv = []
+        elif type(inv) is list:
+            self.inv = inv
+        elif type(inv) is CInv2:
+            self.inv = [inv]
+        else:
+            raise Exception("bad object passed to msg inv; it needs to be a CInv or list of CInv")
+
+    def deserialize(self, f):
+        self.inv = deser_vector(f, CInv2)
+
+    def serialize(self, stype=SER_DEFAULT):
+        return ser_vector(self.inv)
+
+    def __repr__(self):
+        return "msg_extinv(extinv=%s)" % (repr(self.inv))
+
 class msg_getdata(object):
     command = b"getdata"
 
@@ -2172,19 +2292,41 @@ class msg_getdata(object):
             self.inv = []
         elif type(inv) == list:
             self.inv = inv
-        elif type(inv) is CInv:
+        elif type(inv) is CInv2:
             self.inv = [inv]
         else:
             raise Exception("bad object passed to msg inv; it needs to be a CInv or list of CInv")
 
     def deserialize(self, f):
-        self.inv = deser_vector(f, CInv)
+        self.inv = deser_vector(f, CInv2)
 
     def serialize(self, stype=SER_DEFAULT):
         return ser_vector(self.inv)
 
     def __repr__(self):
         return "msg_getdata(inv=%s)" % (repr(self.inv))
+
+class msg_extgetdata(object):
+    command = b"extgetdata"
+
+    def __init__(self, inv=None):
+        if inv is None:
+            self.inv = []
+        elif type(inv) == list:
+            self.inv = inv
+        elif type(inv) is CExtInv:
+            self.inv = [inv]
+        else:
+            raise Exception("bad object passed to msg inv; it needs to be a CInv2 or list of CInv2")
+
+    def deserialize(self, f):
+        self.inv = deser_vector(f, CExtInv)
+
+    def serialize(self, stype=SER_DEFAULT):
+        return ser_vector(self.inv)
+
+    def __repr__(self):
+        return "msg_extgetdata(extinv=%s)" % (repr(self.inv))
 
 class msg_notfound(object):
     command = b"notfound"

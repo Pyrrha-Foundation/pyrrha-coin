@@ -141,6 +141,8 @@ class NodeConnCB(object):
 
     def on_getdata(self, conn, message): pass
 
+    def on_extgetdata(self, conn, message): pass
+
     def on_getblocks(self, conn, message): pass
 
     def on_tx(self, conn, message): pass
@@ -246,7 +248,9 @@ class NodeConn(asyncore.dispatcher):
         b"addr": msg_addr,
         b"alert": msg_alert,
         b"inv": msg_inv,
+        b"extinv": msg_extinv,
         b"getdata": msg_getdata,
+        b"extgetdata": msg_extgetdata,
         b"getblocks": msg_getblocks,
         b"tx": msg_tx,
         b"block": msg_block,
@@ -385,14 +389,18 @@ class NodeConn(asyncore.dispatcher):
         self.recvBufLen = len(self.recvbuf)
         try:
             while True:
+                print("start 1")
                 nowLen = len(self.recvbuf)
                 self.curIndex += (self.recvBufLen - nowLen)
                 self.recvBufLen = nowLen
                 if nowLen < 4:
                     return
+                print("start 2")
                 if (self.recvbuf[:4] != self.MAGIC_BYTES[self.network]):
+                    print("in magic")
                     raise ValueError("got garbage %s" % repr(self.recvbuf))
                 if True:
+                    print("in True")
                     if len(self.recvbuf) < 4 + 12 + 4 + 4:
                         return
                     command = self.recvbuf[4:4 + 12].split(b"\x00", 1)[0]
@@ -404,14 +412,20 @@ class NodeConn(asyncore.dispatcher):
                     msg = self.recvbuf[4 + 12 + 4 + 4:4 + 12 + 4 + 4 + msglen]
                     self.recvbuf = self.recvbuf[4 + 12 + 4 + 4 + msglen:]
                 if command in self.messagemap:
+                    print("in messagemap")
                     f = BytesIO(msg)
+                    print("in messagemap 1")
                     t = self.messagemap[command]()
+                    print("in messagemap 2")
                     t.deserialize(f)
+                    print("in messagemap 3")
                     self.got_message(t, cookie)
+                    print("in messagemap 4")
                 else:
                     print("Unknown command: '" + command.decode() + "' ")
                     self.show_debug_msg("Unknown command: '" + command.decode() + "' " + repr(msg))
         except Exception as e:
+            print("exeption")
             print('got_data:', repr(e))
             self.exceptions.append(e)
             import traceback
@@ -451,10 +465,14 @@ class NodeConn(asyncore.dispatcher):
             self.last_sent = time.time()
 
     def got_message(self, message, cookie):
-        if self.last_sent + 30 * 60 < time.time():
+        print("got mess 1")
+        if self.last_sent + 30 * 60 < time.time():\
             self.send_message(self.messagemap[b'ping']())
+        print("got mess 2")
         self.show_debug_msg("Recv %s" % repr(message))
+        print("got mess 3")
         self.cb.deliver(self, message, cookie)
+        print("got mess 4")
 
     def disconnect_node(self):
         self.disconnect = True
@@ -499,13 +517,26 @@ class P2PDataStore(SingleNodeConnCB):
         self.getdata_requests = []
 
     def on_getdata(self, conn, message):
-        """Check for the tx/block in our stores and if found, reply with an inv message."""
+        """Check for the block in our stores and if found, reply with a block."""
         for inv in message.inv:
             self.getdata_requests.append(inv.hash)
-            if inv.type == CInv.MSG_TX and inv.hash in self.tx_store.keys():
-                self.send_message(msg_tx(self.tx_store[inv.hash]))
-            elif inv.type == CInv.MSG_BLOCK and inv.hash in self.block_store.keys():
+    #        if inv.type == CInv2.MSG_TX and inv.hash in self.tx_store.keys():
+    #            self.send_message(msg_tx(self.tx_store[inv.hash]))
+    #        elif inv.type == CInv2.MSG_BLOCK and inv.hash in self.block_store.keys():
+            if inv.type == CInv2.MSG_BLOCK and inv.hash in self.block_store.keys():
                 self.send_message(msg_block(self.block_store[inv.hash]))
+            else:
+                logging.debug(
+                    'getdata message type {} received.'.format(hex(inv.type)))
+
+    def on_extgetdata(self, conn, message):
+        """Check for the txin our stores and if found, reply a tx."""
+        for inv in message.inv:
+            self.getdata_requests.append(inv.hash)
+            if inv.type == CExtInv.MSG_TX and inv.hash in self.tx_store.keys():
+                self.send_message(msg_tx(self.tx_store[inv.hash]))
+ #           elif inv.type == CInv.MSG_BLOCK and inv.hash in self.block_store.keys():
+ #               self.send_message(msg_block(self.block_store[inv.hash]))
             else:
                 logging.debug(
                     'getdata message type {} received.'.format(hex(inv.type)))

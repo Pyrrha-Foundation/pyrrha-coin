@@ -73,7 +73,7 @@ static std::string NetMessage(CLockSwapQ<CSerializeData> &_vSendMsg)
     if (_vSendMsg.size() == 0)
         return "none";
 
-    CInv inv_result;
+    CInv2 inv_result;
     CSerializeData data;
     if (!_vSendMsg.pop_front(data))
     {
@@ -91,7 +91,7 @@ static std::string NetMessage(CLockSwapQ<CSerializeData> &_vSendMsg)
         CDataStream ssInv(SER_NETWORK, PROTOCOL_VERSION);
         ssInv.insert(ssInv.begin(), ssData.begin() + 25, ssData.begin() + 61);
 
-        CInv inv;
+        CInv2 inv;
         ssInv >> inv;
 
         if (inv.type == MSG_BLOCK)

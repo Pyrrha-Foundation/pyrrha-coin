@@ -322,7 +322,7 @@ class CompactBlocksTest(BitcoinTestFramework):
         with mininode_lock:
             if self.test_node.last_cmpctblock is None:
                 self.test_node.clear_block_announcement()
-                inv = CInv(4, block_hash)  # 4 == "CompactBlock"
+                inv = CInv2(4, block_hash)  # 4 == "CompactBlock"
                 self.test_node.send_message(msg_getdata([inv]))
 
         wait_until(self.test_node.received_block_announcement, timeout=30)
@@ -380,7 +380,7 @@ class CompactBlocksTest(BitcoinTestFramework):
                 self.test_node.last_getdata = None
 
             if announce == "inv":
-                self.test_node.send_message(msg_inv([CInv(2, block.sha256)]))
+                self.test_node.send_message(msg_extinv([CInv2(2, block.sha256)]))
             else:
                 self.test_node.send_header_for_blocks([block])
             waitFor(30, lambda: self.test_node.last_getdata is not None)
