@@ -171,8 +171,6 @@ uint64_t nBlockSequenceId GUARDED_BY(cs_main) = 1;
  */
 std::map<uint256, NodeId> mapBlockSource GUARDED_BY(cs_main);
 
-bool fBlocksOnly GUARDED_BY(cs_main) = false; // total mess needs fixing
-
 /** Unguarded global state that gets modified only once during node startup */
 bool fWhiteListRelay = false;
 bool fWhiteListForceRelay = false;
@@ -184,6 +182,7 @@ uint32_t nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
 bool fCheckBlockIndex = false;
 bool fCheckpointsEnabled = DEFAULT_CHECKPOINTS_ENABLED;
 uint32_t nXthinBloomFilterSize = SMALLEST_MAX_BLOOM_FILTER_SIZE;
+bool fBlocksOnly = DEFAULT_BLOCKSONLY;
 
 CCriticalSection cs_LastBlockFile;
 /** Dirty block file entries. */
