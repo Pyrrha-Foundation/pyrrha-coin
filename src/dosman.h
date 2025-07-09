@@ -64,7 +64,7 @@ public:
      * @param[in] nodeid   The ID of the misbehaving node.  No effect if the CNode is no longer present.
      * @param[in] howmuch  Incremental misbehaving score for the latest infraction by this node.
      */
-    void Misbehaving(NodeId nodeid, int howmuch);
+    void Misbehaving(NodeId nodeid, int howmuch, BanReason reason = (BanReason)-1);
 
     /** Update the current values of misbehavior by decaying them over a set time period.
      * @param[in] pNode    The node which is being updated.  No effect if nullptr.
