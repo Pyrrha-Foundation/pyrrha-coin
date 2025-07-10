@@ -108,7 +108,6 @@ uint32_t GetNextASERTWorkRequired(const CBlockIndex *pindexPrev,
     if (params.fPowAllowMinDifficultyBlocks &&
         (pblock->GetBlockTime() > pindexPrev->GetBlockTime() + 2 * params.nPowTargetSpacing))
     {
-printf("returning because min diff blocktime %ld pindexprev blocktime %ld\n", pblock->GetBlockTime(), pindexPrev->GetBlockTime());
         return UintToArith256(params.powLimit).GetCompact();
     }
 
@@ -133,7 +132,6 @@ printf("returning because min diff blocktime %ld pindexprev blocktime %ld\n", pb
         refBlockTarget, params.nPowTargetSpacing, nTimeDiff, nHeightDiff, powLimit, params.nASERTHalfLife);
 
     // CalculateASERT() already clamps to powLimit.
-printf("done next target\n");
     return nextTarget.GetCompact();
 }
 
@@ -153,8 +151,6 @@ arith_uint256 CalculateASERT(const arith_uint256 &refTarget,
     // We need some leading zero bits in powLimit in order to have room to handle
     // overflows easily. 32 leading zero bits is more than enough.
     // (broken if starting from genesis block with more difficult POW, so using 20 leading 0 bits)
-printf("powlimit %s\n", ArithToUint256(powLimit).ToString().c_str());
-printf("powlimit shifted %d\n", powLimit >> 236);
     assert((powLimit >> 236) == 0);
 
     // Height diff should NOT be negative.
@@ -194,14 +190,13 @@ printf("powlimit shifted %d\n", powLimit >> 236);
         65536 +
         ((+195766423245049ull * frac + 971821376ull * frac * frac + 5127ull * frac * frac * frac + (1ull << 47)) >> 48);
     // this is always < 2^241 since refTarget < 2^224
-    arith_uint256 nextTarget = refTarget * factor * 120;
+    arith_uint256 nextTarget = refTarget * factor;
 
     // multiply by 2^(integer part) / 65536
     shifts -= 16;
     if (shifts <= 0)
     {
         nextTarget >>= -shifts;
-printf("shifts less than zero\n");
     }
     else
     {
@@ -211,12 +206,10 @@ printf("shifts less than zero\n");
         {
             // If we had wider integers, the final value of nextTarget would
             // be >= 2^256 so it would have just ended up as powLimit anyway.
-printf("setting to powlimit\n");
             nextTarget = powLimit;
         }
         else
         {
-printf("no overflow so set to nexttargetshifted\n");
             // Shifting produced no overflow, can assign value
             nextTarget = nextTargetShifted;
         }
@@ -229,10 +222,8 @@ printf("no overflow so set to nexttargetshifted\n");
     }
     else if (nextTarget > powLimit)
     {
-printf("> powlimit so setting there\n");
-     //   nextTarget = powLimit;
+        nextTarget = powLimit;
     }
-printf("nexttarget %s\n", ArithToUint256(nextTarget).ToString().c_str());
     // we return from only 1 place for copy elision
     return nextTarget;
 }

@@ -540,8 +540,6 @@ public:
         cashaddrPrefix = strNetworkID;
 
         consensus.nSubsidyHalvingInterval = 210000 * 5; // 2 minute blocks rather than 10 min -> * 5
-        //uint32_t tgtBits = 4033820160;
-        //uint32_t tgtBits = 0x1e0fffff;
         uint32_t tgtBits = 0x200000ff;
         bool fNegative;
         bool fOverflow;
@@ -559,14 +557,14 @@ public:
         // difficulty is cut in half. Doubled if blocks are ahead of schedule.
         // Two days (in seconds)
         consensus.nASERTHalfLife = 2 * 24 * 60 * 60;
-     //   consensus.nASERTHalfLife = 10;
 
         consensus.nextForkActivationTime = NEXT_FORK_ACTIVATION_TIME;
 
         std::vector<unsigned char> nonce;
         std::vector<unsigned char> hardCodedNonce;
         nonce = hardCodedNonce = ParseHex("132a25");
-        genesis = CreateGenesisBlock("this is nexa testnet", CScript() << OP_1, 1741344106, nonce, tgtBits, 0 * COIN);
+        genesis = CreateGenesisBlock("this is nexa stormtest", CScript() << OP_1, 1741344106, nonce, tgtBits, 0 * COIN);
+
 #if 0 // recalculate GB if needed (note that this code will not work with the java nexa shared library because it
       // must start before the random numbers (initialized in ECC_Start are hooked up).
         ECC_Start();
@@ -581,8 +579,8 @@ public:
         }
 #else // check GB is what is expected
         consensus.hashGenesisBlock = genesis.GetHash();
-     //   assert(
-     //       consensus.hashGenesisBlock == uint256S("508c843a4b98fb25f57cf9ebafb245a5c16468f06519cdd467059a91e7b79d52"));
+        assert(
+            consensus.hashGenesisBlock == uint256S("47b0dc36eac6c19ae2a2ac5fa2a238176de3af3edbc97a499a10894ac57c1c6f"));
 #endif
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -601,11 +599,11 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        //vSeeds.push_back(CDNSSeedData("nextchain.cash", "seed.nextchain.cash", true));
-        //vSeeds.push_back(CDNSSeedData("nexa.org", "seeder.nexa.org", true));
-        //vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "nexa-seeder.bitcoinunlimited.info", true));
+        // vSeeds.push_back(CDNSSeedData("nextchain.cash", "seed.nextchain.cash", true));
+        // vSeeds.push_back(CDNSSeedData("nexa.org", "seeder.nexa.org", true));
+        // vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "nexa-seeder.bitcoinunlimited.info", true));
 
-        //vFixedSeeds = std::vector<SeedSpec6>();
+        // vFixedSeeds = std::vector<SeedSpec6>();
 
         // clang-format off
         // checkpoint related to various network upgrades need to be the first block
