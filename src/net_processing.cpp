@@ -2613,6 +2613,37 @@ bool ProcessMessage(CNode *pfrom,
         capdProtocol.HandleCapdMessage(pfrom, strCommand, msgCookie, vRecv, nStopwatchTimeReceived);
     }
 
+    else if (strCommand == NetMsgType::GET_UTXO)
+    {
+        // Check that number of outputs requested does not exceed the maximum
+        unsigned int nCount = ReadCompactSize(vRecv);
+        if (nCount > MAX_TX_NUM_VOUT)
+        {
+            dosMan.Misbehaving(pfrom, 20, BanReasonInvalidSize);
+            return error("get_utxo size = %u", nCount);
+        }
+        std::vector<COutPoint> vOutpoints;
+        vRecv >> vOutpoints;
+
+        // For each outpoint retreive the CTxOut and add it to a vector which is sent
+        // back to the requesting peer.
+        std::vector<CUtxo> vUtxo;
+        for (auto &outpoint : vOutpoints)
+        {
+            CUtxo utxo;
+            CreateUTXO(outpoint, utxo);
+            vUtxo.push_back(std::move(utxo));
+        }
+        pfrom->PushMessage(NetMsgType::UTXO, vUtxo);
+
+        // Getting coins from pcoinsTip may actually pull coins into RAM from disk
+        // so we need to make sure to trim the cache if necessary.
+        if (pcoinsTip->DynamicMemoryUsage() > (size_t)nCoinCacheMaxSize)
+        {
+            pcoinsTip->Trim(nCoinCacheMaxSize * .95);
+        }
+    }
+
     else if (strCommand == NetMsgType::REJECT)
     {
         // BU: Request manager: this was restructured to not just be active in fDebug mode so that the request manager
@@ -3595,4 +3626,42 @@ bool HandleHeaderPathMessage(CDataStream &vRecv, CNode *pfrom, uint32_t msgCooki
 
     pfrom->PushMessageWithCookie(NetMsgType::HEADERPATH, msgCookie | 0xFFFF, headers);
     return true;
+}
+
+void CreateUTXO(COutPoint &outpoint, CUtxo &utxo)
+{
+    utxo.outpoint = outpoint;
+
+    // Check the txpool first
+    utxo.fExists = false;
+    {
+        READLOCK(mempool.cs_txmempool);
+        CTxOut txout = mempool._get(outpoint);
+        if (!txout.IsNull())
+        {
+            utxo.txOut = std::move(txout);
+            utxo.fInTxPool = true;
+        }
+        utxo.fSpent = mempool.isSpent(outpoint);
+
+        if (!txout.IsNull() || utxo.fSpent)
+        {
+            utxo.fExists = true;
+        }
+    }
+
+    // If we didn't find anything in the txpool then check the coins cache
+    Coin coin;
+    if (!utxo.fExists && pcoinsTip->GetCoin(outpoint, coin))
+    {
+        utxo.fSpent = coin.IsSpent();
+        utxo.fInTxPool = false;
+        utxo.fExists = true;
+
+        if (!utxo.fSpent)
+        {
+            utxo.txOut = std::move(coin.out);
+            utxo.nHeight = coin.nHeight;
+        }
+    }
 }
