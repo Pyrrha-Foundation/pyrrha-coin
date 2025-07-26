@@ -2635,13 +2635,6 @@ bool ProcessMessage(CNode *pfrom,
             vUtxo.push_back(std::move(utxo));
         }
         pfrom->PushMessage(NetMsgType::UTXO, vUtxo);
-
-        // Getting coins from pcoinsTip may actually pull coins into RAM from disk
-        // so we need to make sure to trim the cache if necessary.
-        if (pcoinsTip->DynamicMemoryUsage() > (size_t)nCoinCacheMaxSize)
-        {
-            pcoinsTip->Trim(nCoinCacheMaxSize * .95);
-        }
     }
 
     else if (strCommand == NetMsgType::REJECT)
@@ -3650,18 +3643,24 @@ void CreateUTXO(COutPoint &outpoint, CUtxo &utxo)
         }
     }
 
-    // If we didn't find anything in the txpool then check the coins cache
+    // If we didn't find anything in the txpool then see if we can find the coin in pcoinsTip first
+    // and if not found there then try to get the coin directly from the database.
+    //
+    // NOTE: Checking either pcoinsTip or the database directly will not cache the coin in memory.
     Coin coin;
-    if (!utxo.fExists && pcoinsTip->GetCoin(outpoint, coin))
+    if (!utxo.fExists)
     {
-        utxo.fSpent = coin.IsSpent();
-        utxo.fInTxPool = false;
-        utxo.fExists = true;
-
-        if (!utxo.fSpent)
+        if (pcoinsTip->GetCoinFromCache(outpoint, coin) || pcoinsdbview->GetCoin(outpoint, coin))
         {
-            utxo.txOut = std::move(coin.out);
-            utxo.nHeight = coin.nHeight;
+            utxo.fSpent = coin.IsSpent();
+            utxo.fInTxPool = false;
+            utxo.fExists = true;
+
+            if (!utxo.fSpent)
+            {
+                utxo.txOut = std::move(coin.out);
+                utxo.nHeight = coin.nHeight;
+            }
         }
     }
 }
