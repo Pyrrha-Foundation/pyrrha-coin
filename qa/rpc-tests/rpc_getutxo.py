@@ -26,8 +26,8 @@ class RPCGetUtxoTest(BitcoinTestFramework):
         assert_equal(self.nodes[0].getutxo(outpoint)[0]["exists"], False);
 
         # Test a utxo that is a coinbase
+        waitFor(60, lambda: len(self.nodes[0].listunspent()) == 1)
         list = self.nodes[0].listunspent();
-        assert_equal(len(list), 1)
         saved_outpoint_1 = list[0]['outpoint'];
         getutxo = self.nodes[0].getutxo(saved_outpoint_1)
         assert_equal(getutxo[0]["outpoint"], saved_outpoint_1);
@@ -39,8 +39,8 @@ class RPCGetUtxoTest(BitcoinTestFramework):
         #### Test a utxo that is in the mempool only
         subtractfeefromamount = False
         self.nodes[0].sendtoaddress(self.nodes[0].getnewaddress(), 1000000, "", "", subtractfeefromamount)
+        waitFor(60, lambda: len(self.nodes[0].listunspent(0,1)) == 2)
         list = self.nodes[0].listunspent(0,1);
-        assert_equal(len(list) , 2)
 
         # the confirmed coinbase should have been spent
         getutxo = self.nodes[0].getutxo(saved_outpoint_1)
@@ -71,8 +71,8 @@ class RPCGetUtxoTest(BitcoinTestFramework):
 
         # Test a utxo that was spent which was "intxpool"
         self.nodes[0].sendtoaddress(self.nodes[0].getnewaddress(), 9000000, "", "", subtractfeefromamount)
+        waitFor(60, lambda: len(self.nodes[0].listunspent(0,1)) == 2)
         list = self.nodes[0].listunspent(0,1);
-        assert_equal(len(list) , 2)
 
         # check that the old utxos were spent
         getutxo = self.nodes[0].getutxo(saved_outpoint_2)
