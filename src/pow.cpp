@@ -18,12 +18,24 @@ static uint256 sha256(uint256 data)
     return ret;
 }
 
-bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params &params)
+bool CheckProofOfWork(const uint256 &hash, unsigned int nBits, const Consensus::Params &params)
 {
     bool fNegative;
     bool fOverflow;
-    arith_uint256 bnTarget;
+    arith_uint256 target;
+    target.SetCompact(nBits, &fNegative, &fOverflow);
 
+    // Check range
+    if (fNegative || target == 0 || fOverflow || target > UintToArith256(params.powLimit))
+        return false;
+    return CheckProofOfWork(hash, target, params, nullptr);
+}
+
+bool CheckProofOfWork(uint256 hash,
+    const arith_uint256 &bnTarget,
+    const Consensus::Params &params,
+    arith_uint256 *hashout)
+{
     if (params.powAlgorithm == 1)
     {
         // This algorithm uses the hash as a priv key to sign sha256(hash) using deterministic k.
@@ -45,12 +57,9 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params 
         sha.Finalize(hash.begin());
     }
 
-    bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
-
-    // Check range
-    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
-        return false;
-
+    auto tmp = UintToArith256(hash);
+    if (hashout != nullptr)
+        *hashout = tmp;
     // Check proof of work matches claimed amount
     if (UintToArith256(hash) > bnTarget)
         return false;
@@ -58,8 +67,16 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params 
     return true;
 }
 
-arith_uint256 GetBlockProof(const CBlockIndex &block) { return GetWorkForDifficultyBits(block.tgtBits()); }
-int64_t GetBlockProofEquivalentTime(const CBlockIndex &to,
+arith_uint256 GetBlockWork(const CBlockIndex &block)
+{
+    // This works for both tailstorm and legacy blocks because for legacy blocks, tgtBits needs to be the full value
+    // and the number of subblocks will be 0.
+    auto work = GetWorkForDifficultyBits(block.tgtBits());
+    work *= block.header.NumSubblocks() + 1;
+    return work;
+}
+
+int64_t GetBlockWorkEquivalentTime(const CBlockIndex &to,
     const CBlockIndex &from,
     const CBlockIndex &tip,
     const Consensus::Params &params)
@@ -75,7 +92,7 @@ int64_t GetBlockProofEquivalentTime(const CBlockIndex &to,
         r = from.chainWork() - to.chainWork();
         sign = -1;
     }
-    r = r * arith_uint256(params.nPowTargetSpacing) / GetBlockProof(tip);
+    r = r * arith_uint256(params.nPowTargetSpacing) / GetBlockWork(tip);
     if (r.bits() > 63)
     {
         return sign * std::numeric_limits<int64_t>::max();

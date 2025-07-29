@@ -38,6 +38,19 @@ bool CheckBlockHeader(const Consensus::Params &consensusParams,
     CValidationState &state,
     bool fCheckPOW = true);
 
+/** Context-independent summary block validity checks.
+    Do any additional (context-free) checks on this block header so make sure it is a valid summary block.
+    It is expected that this block has already been check to have a valid header.
+
+    Since this is a context-free check, the transactions in this block are NOT checked to be consistent with
+    its referenced subblocks' transactions.
+*/
+bool CheckSummaryBlockHeader(const Consensus::Params &consensusParams,
+    const ConstCBlockRef pblock,
+    CValidationState &state,
+    bool fCheckPOW);
+
+
 /** Context-dependent validity header checks */
 bool ContextualCheckBlockHeader(const CChainParams &chainparams,
     const CBlockHeader &block,
@@ -104,7 +117,8 @@ bool TestBlockValidity(CValidationState &state,
     const ConstCBlockRef pblock,
     CBlockIndex *pindexPrev,
     bool fCheckPOW = true,
-    bool fCheckMerkleRoot = true);
+    bool fCheckMerkleRoot = true,
+    bool fSummaryBlock = false);
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params &consensusParams);
 
@@ -132,7 +146,8 @@ bool CheckBlock(const Consensus::Params &consensusParams,
     ConstCBlockRef pblock,
     CValidationState &state,
     bool fCheckPOW = true,
-    bool fCheckMerkleRoot = true);
+    bool fCheckMerkleRoot = true,
+    bool fSummaryBlock = false);
 
 /** Mark a block as having its data received and checked (up to BLOCK_VALID_TRANSACTIONS). */
 bool ReceivedBlockTransactions(ConstCBlockRef pblock,

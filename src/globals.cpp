@@ -385,6 +385,32 @@ CTweak<bool> doubleSpendProofs("net.doubleSpendProofs",
     "Process and forward double spend proofs (default: true)",
     true);
 
+extern bool forceTemplateRecalc;
+std::string TailstormChanged(const bool &value, CTweak<bool> *item, bool validate)
+{
+    if (validate == false)
+    {
+        if (true) // clear old candidates to force creation of new ones because mining alg is changing.
+        {
+            LOCK(csMiningCandidates);
+            miningCandidatesMap.clear();
+            // lastMiningCandidateId = 0;
+            forceTemplateRecalc = true;
+        }
+        if (item->Value())
+        {
+            ModifiableParams().GetModifiableConsensus().tailstormSubblocks = 4;
+        }
+        else
+        {
+            ModifiableParams().GetModifiableConsensus().tailstormSubblocks = 0;
+        }
+    }
+    return std::string(); // we accept the change
+}
+CTweak<bool> tailstormEnabled("mining.tailstorm", "Enable tailstorm block mining", false, &TailstormChanged);
+
+
 CTweak<uint64_t> coinbaseReserve("mining.coinbaseReserve",
     strprintf("How much space to reserve for the coinbase transaction, in bytes (default: %d)",
         DEFAULT_COINBASE_RESERVE_SIZE),
@@ -448,6 +474,36 @@ CTweak<uint64_t> maxSigChecks("test.maxBlockSigChecks",
         " this override is turned off.  Use for testing only! (default: %ld)",
         0),
     0);
+
+std::string RegtestMining(const bool &value, CTweak<bool> *item, bool validate)
+{
+    auto &cp = ModifiableParams();
+
+    if (validate == false)
+    {
+        auto &con = cp.GetModifiableConsensus();
+        if (item->Value())
+        {
+            con.fPowNoRetargeting = false;
+            con.fPowAllowMinDifficultyBlocks = false;
+        }
+        else
+        {
+            con.fPowNoRetargeting = true;
+            con.fPowAllowMinDifficultyBlocks = true;
+        }
+        return std::string();
+    }
+    else
+    {
+        if (cp.NetworkIDString() == CBaseChainParams::REGTEST)
+            return std::string(); // we accept the change
+        else
+            return std::string("Changing this parameter only makes sense on regtest"); // disallowed
+    }
+}
+CTweak<bool> regtestMining("mining.regtest", "Require block mining on regtest", false, &RegtestMining);
+
 
 CTweak<bool> parallelTweak("test.parallel", "Turn Parallel Block Validation on or off (default: true)", true);
 CTweak<bool> pvtest("test.pvtest",

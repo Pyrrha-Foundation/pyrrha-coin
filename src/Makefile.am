@@ -225,6 +225,7 @@ BITCOIN_CORE_H = \
   support/cleanse.h \
   support/pagelocker.h \
   sync.h \
+  tailstorm.h \
   threadgroup.h \
   threadsafety.h \
   timedata.h \
@@ -439,6 +440,8 @@ libnexa_a_common_SOURCES = \
   pow.cpp \
   pow.h \
   validation/headervalidation.cpp \
+  tailstorm.cpp \
+  tailstorm.h \
   random.cpp \
   random.h \
   randomenv.h \
@@ -644,6 +647,8 @@ libnexa_common_a_SOURCES = \
   utilstrencodings.h \
   version.h \
   versionbits.cpp \
+  tailstorm.cpp \
+  tailstorm.h \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.

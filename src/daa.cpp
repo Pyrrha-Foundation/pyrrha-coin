@@ -65,6 +65,14 @@ static const CBlockIndex *GetASERTAnchorBlock(const CBlockIndex *const pindex, c
             anchor = anchor->pskip;
             continue; // continue skipping
         }
+        // Tailstorm: If in regtest, use block 1 as the anchor, so that we can reuse the genesis block
+        // but still have a recent anchor block time
+        if (params.fPowAllowMinDifficultyBlocks)
+        {
+            auto tmp = anchor->pprev;
+            if (tmp->pprev == nullptr)
+                break;
+        }
         anchor = anchor->pprev;
     }
 
@@ -88,7 +96,8 @@ static const CBlockIndex *GetASERTAnchorBlock(const CBlockIndex *const pindex, c
 uint32_t GetNextASERTWorkRequired(const CBlockIndex *pindexPrev,
     const CBlockHeader *pblock,
     const Consensus::Params &params,
-    const CBlockIndex *pindexAnchorBlock) noexcept
+    const CBlockIndex *pindexAnchorBlock,
+    bool tailstorm) noexcept
 {
     // This cannot handle the genesis block and early blocks in general.
     assert(pindexPrev != nullptr);
@@ -108,7 +117,7 @@ uint32_t GetNextASERTWorkRequired(const CBlockIndex *pindexPrev,
     if (params.fPowAllowMinDifficultyBlocks &&
         (pblock->GetBlockTime() > pindexPrev->GetBlockTime() + 2 * params.nPowTargetSpacing))
     {
-        return UintToArith256(params.powLimit).GetCompact();
+        return powLimit.GetCompact();
     }
 
     // For nTimeDiff calculation, the timestamp of the parent to the anchor block is used,
@@ -128,8 +137,32 @@ uint32_t GetNextASERTWorkRequired(const CBlockIndex *pindexPrev,
     const arith_uint256 refBlockTarget = arith_uint256().SetCompact(pindexAnchorBlock->header.nBits);
     // Do the actual target adaptation calculation in separate
     // CalculateASERT() function
-    arith_uint256 nextTarget = CalculateASERT(
-        refBlockTarget, params.nPowTargetSpacing, nTimeDiff, nHeightDiff, powLimit, params.nASERTHalfLife);
+
+    arith_uint256 nextTarget;
+
+    // make the target N times easier to produce N subblocks per block (if we are doing tailstorm)
+    if (tailstorm && (params.tailstormSubblocks != 0))
+    {
+        nextTarget = CalculateASERT(
+            refBlockTarget, params.nPowTargetSpacing, nTimeDiff, nHeightDiff, powLimit, params.nASERTHalfLife);
+        // Make the target easier by the number of PoW puzzles we are solving
+        nextTarget *= params.tailstormSubblocks;
+        if (nextTarget > powLimit)
+        {
+            LOGA("warning: tailstorm target difficulty is too easy! %s > %s", nextTarget.ToString(),
+                powLimit.ToString());
+            nextTarget = powLimit; // We can't get any easier than this
+        }
+    }
+    else
+    {
+        // powLimit/2: Force the non tailstorm blocks to be at least twice as hard as the tailstorm ones even if we
+        // are up against the pow limit.
+        // This makes a big difference in regtest because the GB has a long-ago time, so a lot of the initial blocks'
+        // difficulty will be at the pow limit.
+        nextTarget = CalculateASERT(
+            refBlockTarget, params.nPowTargetSpacing, nTimeDiff, nHeightDiff, powLimit / 2, params.nASERTHalfLife);
+    }
 
     // CalculateASERT() already clamps to powLimit.
     return nextTarget.GetCompact();
@@ -151,7 +184,7 @@ arith_uint256 CalculateASERT(const arith_uint256 &refTarget,
     // We need some leading zero bits in powLimit in order to have room to handle
     // overflows easily. 32 leading zero bits is more than enough.
     // (broken if starting from genesis block with more difficult POW, so using 20 leading 0 bits)
-    assert((powLimit >> 236) == 0);
+    assert((powLimit >> 238) == 0);
 
     // Height diff should NOT be negative.
     assert(nHeightDiff >= 0);
@@ -243,7 +276,53 @@ uint32_t GetNextWorkRequired(const CBlockIndex *pindexPrev, const CBlockHeader *
     }
 
     const CBlockIndex *panchorBlock = GetASERTAnchorBlock(pindexPrev, params);
-    return GetNextASERTWorkRequired(pindexPrev, pblock, params, panchorBlock);
+    return GetNextASERTWorkRequired(pindexPrev, pblock, params, panchorBlock, true);
+}
+
+uint32_t GetNextNonTailstormWorkRequired(const CBlockIndex *pindexPrev,
+    const CBlockHeader *pblock,
+    const Consensus::Params &params)
+{
+    // Genesis block
+    if (pindexPrev == nullptr)
+    {
+        return UintToArith256(params.powLimit).GetCompact();
+    }
+
+    // Special rule for regtest: we never retarget.
+    if (params.fPowNoRetargeting)
+    {
+        return pindexPrev->tgtBits();
+    }
+
+    const CBlockIndex *panchorBlock = GetASERTAnchorBlock(pindexPrev, params);
+    return GetNextASERTWorkRequired(pindexPrev, pblock, params, panchorBlock, true);
+}
+
+
+arith_uint256 GetNextNonTailstormBlockTarget(const CBlockIndex *pindexPrev,
+    const CBlockHeader *pblock,
+    const Consensus::Params &params)
+{
+    // Genesis block
+    if (pindexPrev == nullptr)
+    {
+        return UintToArith256(params.powLimit);
+    }
+
+    // Special rule for regtest: we never retarget.
+    if (params.fPowNoRetargeting)
+    {
+        arith_uint256 tmp;
+        tmp.SetCompact(pindexPrev->tgtBits());
+        return tmp;
+    }
+
+    arith_uint256 tmp;
+    const CBlockIndex *panchorBlock = GetASERTAnchorBlock(pindexPrev, params);
+    uint32_t bits = GetNextASERTWorkRequired(pindexPrev, pblock, params, panchorBlock, false);
+    tmp.SetCompact(bits);
+    return tmp;
 }
 
 bool MineBlock(CBlockHeader &blockHeader, unsigned long int tries, const Consensus::Params &cparams)

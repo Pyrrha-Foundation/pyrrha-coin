@@ -12,6 +12,7 @@
 #include "hashwrapper.h"
 #include "pow.h"
 #include "streams.h"
+#include "tailstorm.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 
@@ -42,6 +43,17 @@ uint256 GetMiningHash(const uint256 &headerCommitment, const std::vector<unsigne
     return r;
 }
 
+uint64_t CBlockHeader::NumSubblocks() const
+{
+    auto subblks = ParseMinerData(minerData);
+    return subblks.size();
+}
+
+// bool CBlockHeader::IsSummaryBlock(const Consensus::Params& params) const
+//{
+//     auto subblks = ParseMinerData(minerData);
+//     return NumSubblocks() >= params.tailstormSubblocks-1;
+// }
 
 uint256 CBlockHeader::GetHash() const
 {
@@ -68,6 +80,8 @@ uint256 CBlockHeader::GetMiningHash() const
     DbgAssert(size != 0, ); // Size must be properly calculated before we can figure out the hash
     return ::GetMiningHash(GetMiningHeaderCommitment(), nonce);
 }
+
+uint256 CBlockHeader::SubblockId() const { return GetMiningHash(); }
 
 std::string CBlock::ToString() const
 {
@@ -124,6 +138,15 @@ arith_uint256 GetWorkForDifficultyBits(uint32_t nBits)
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
     if (fNegative || fOverflow || bnTarget == arith_uint256(0))
         return 0;
+    // We need to compute 2**256 / (bnTarget+1), but we can't represent 2**256
+    // as it's too large for a arith_uint256. However, as 2**256 is at least as large
+    // as bnTarget+1, it is equal to ((2**256 - bnTarget - 1) / (bnTarget+1)) + 1,
+    // or ~bnTarget / (nTarget+1) + 1.
+    return (~bnTarget / (bnTarget + 1)) + 1;
+}
+
+arith_uint256 GetWorkForTarget(arith_uint256 bnTarget)
+{
     // We need to compute 2**256 / (bnTarget+1), but we can't represent 2**256
     // as it's too large for a arith_uint256. However, as 2**256 is at least as large
     // as bnTarget+1, it is equal to ((2**256 - bnTarget - 1) / (bnTarget+1)) + 1,
