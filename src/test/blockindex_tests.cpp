@@ -71,9 +71,9 @@ BOOST_AUTO_TEST_CASE(header_handling)
         CBlockIndex *pindex = AddToBlockIndex(chainparams, *pblock);
 
         // Check we have the header when we first create the index value
-        BOOST_CHECK(pindex->header != nullptr);
-        BOOST_CHECK(pindex->header->height == pblock->height);
-        BOOST_CHECK(pindex->header->nBits == pblock->nBits);
+        BOOST_CHECK(!pindex->IsHeaderNull());
+        BOOST_CHECK(pindex->GetBlockHeader().height == pblock->height);
+        BOOST_CHECK(pindex->GetBlockHeader().nBits == pblock->nBits);
 
         chainActive.SetTip(pindex);
     }
@@ -94,11 +94,11 @@ BOOST_AUTO_TEST_CASE(header_handling)
         {
             if ((nChainHeight - iter.second->nHeight) < (2 * DEFAULT_HEADERS_TO_KEEP_IN_RAM))
             {
-                BOOST_CHECK(iter.second->header != nullptr);
+                BOOST_CHECK(!iter.second->IsHeaderNull());
             }
             else
             {
-                BOOST_CHECK(iter.second->header == nullptr);
+                BOOST_CHECK(iter.second->IsHeaderNull());
             }
         }
         BOOST_CHECK(setHeadersToTrim.size() == 99);
@@ -128,9 +128,9 @@ BOOST_AUTO_TEST_CASE(header_handling)
         CBlockIndex *pindex = AddToBlockIndex(chainparams, *pblock);
 
         // Check we have the header when we first create the index value
-        BOOST_CHECK(pindex->header);
-        BOOST_CHECK(pindex->header->height = pblock->height);
-        BOOST_CHECK(pindex->header->nBits = pblock->nBits);
+        BOOST_CHECK(!pindex->IsHeaderNull());
+        BOOST_CHECK(pindex->GetBlockHeader().height == pblock->height);
+        BOOST_CHECK(pindex->GetBlockHeader().nBits == pblock->nBits);
 
         chainActive.SetTip(pindex);
     }
@@ -147,11 +147,11 @@ BOOST_AUTO_TEST_CASE(header_handling)
             const uint32_t &nHeight = iter.second->nHeight;
             if (nHeight == 0 || (nChainHeight - nHeight) < DEFAULT_HEADERS_TO_KEEP_IN_RAM)
             {
-                BOOST_CHECK(iter.second->header != nullptr);
+                BOOST_CHECK(!iter.second->IsHeaderNull());
             }
             else
             {
-                BOOST_CHECK(iter.second->header == nullptr);
+                BOOST_CHECK(iter.second->IsHeaderNull());
             }
         }
         BOOST_CHECK(setHeadersToTrim.size() == 0);
@@ -182,9 +182,9 @@ BOOST_AUTO_TEST_CASE(header_handling)
         CBlockIndex *pindex = AddToBlockIndex(chainparams, *pblock);
 
         // Check we have the header when we first create the index value
-        BOOST_CHECK(pindex->header);
-        BOOST_CHECK(pindex->header->height = pblock->height);
-        BOOST_CHECK(pindex->header->nBits = pblock->nBits);
+        BOOST_CHECK(!pindex->IsHeaderNull());
+        BOOST_CHECK(pindex->GetBlockHeader().height == pblock->height);
+        BOOST_CHECK(pindex->GetBlockHeader().nBits == pblock->nBits);
 
         chainActive.SetTip(pindex);
     }
@@ -202,11 +202,11 @@ BOOST_AUTO_TEST_CASE(header_handling)
             const uint32_t &nHeight = iter.second->nHeight;
             if (nHeight == 0 || (nChainHeight - nHeight) < DEFAULT_HEADERS_TO_KEEP_IN_RAM)
             {
-                BOOST_CHECK(iter.second->header != nullptr);
+                BOOST_CHECK(!iter.second->IsHeaderNull());
             }
             else
             {
-                BOOST_CHECK(iter.second->header == nullptr);
+                BOOST_CHECK(iter.second->IsHeaderNull());
             }
         }
         BOOST_CHECK(setHeadersToTrim.size() == 0);
@@ -237,9 +237,9 @@ BOOST_AUTO_TEST_CASE(header_handling)
         CBlockIndex *pindex = AddToBlockIndex(chainparams, *pblock);
 
         // Check we have the header when we first create the index value
-        BOOST_CHECK(pindex->header);
-        BOOST_CHECK(pindex->header->height = pblock->height);
-        BOOST_CHECK(pindex->header->nBits = pblock->nBits);
+        BOOST_CHECK(!pindex->IsHeaderNull());
+        BOOST_CHECK(pindex->GetBlockHeader().height == pblock->height);
+        BOOST_CHECK(pindex->GetBlockHeader().nBits == pblock->nBits);
 
         chainActive.SetTip(pindex);
     }
@@ -257,11 +257,11 @@ BOOST_AUTO_TEST_CASE(header_handling)
             const uint32_t &nHeight = iter.second->nHeight;
             if (nHeight == 0 || (nChainHeight - nHeight) < DEFAULT_HEADERS_TO_KEEP_IN_RAM)
             {
-                BOOST_CHECK(iter.second->header != nullptr);
+                BOOST_CHECK(!iter.second->IsHeaderNull());
             }
             else
             {
-                BOOST_CHECK(iter.second->header == nullptr);
+                BOOST_CHECK(iter.second->IsHeaderNull());
             }
         }
         BOOST_CHECK(setHeadersToTrim.size() == 0);

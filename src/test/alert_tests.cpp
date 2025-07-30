@@ -35,15 +35,10 @@ BOOST_AUTO_TEST_CASE(PartitionAlert)
             indexDummy[i].pprev = nullptr;
         else
             indexDummy[i].pprev = &indexDummy[i - 1];
-        indexDummy[i].header->height = i;
-        indexDummy[i].nHeight = i;
-        indexDummy[i].nSize = 100;
-        indexDummy[i].header->nBits = 1;
-        indexDummy[i].nBits = indexDummy[i].header->nBits;
-        indexDummy[i].header->size = 1;
-        indexDummy[i].nSize = indexDummy[i].header->size;
-        indexDummy[i].header->nTime = now - (500 - i) * nPowTargetSpacing;
-        indexDummy[i].nTime = indexDummy[i].header->nTime;
+        indexDummy[i].SetBlockHeaderHeight(i);
+        indexDummy[i].SetBlockHeaderBits(1);
+        indexDummy[i].SetBlockHeaderSize(1);
+        indexDummy[i].SetBlockHeaderTime(now - (500 - i) * nPowTargetSpacing);
         // Other members don't matter, the partition check code doesn't
         // use them
     }
@@ -76,8 +71,7 @@ BOOST_AUTO_TEST_CASE(PartitionAlert)
     int64_t quickSpacing = nPowTargetSpacing * 2 / 5;
     for (int i = 0; i < 500; i++) // Tweak chain timestamps:
     {
-        indexDummy[i].header->nTime = now - (500 - i) * quickSpacing;
-        indexDummy[i].nTime = indexDummy[i].header->nTime;
+        indexDummy[i].SetBlockHeaderTime(now - (500 - i) * quickSpacing);
     }
     PartitionCheck(falseFunc, csDummy, &indexDummy[99], nPowTargetSpacing);
     BOOST_CHECK(!strMiscWarning.empty());

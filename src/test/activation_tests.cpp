@@ -19,8 +19,7 @@ static void SetMTP(std::array<CBlockIndex, 12> &blocks, int64_t mtp)
 
     for (size_t i = 0; i < len; ++i)
     {
-        blocks[i].header->nTime = mtp + (i - (len / 2));
-        blocks[i].nTime = mtp + (i - (len / 2));
+        blocks[i].SetBlockHeaderTime(mtp + (i - (len / 2)));
     }
 
     assert(blocks.back().GetMedianTimePast() == mtp);
@@ -42,9 +41,8 @@ BOOST_AUTO_TEST_CASE(isfork1enabled)
             blocks[i].pprev = nullptr;
         else
             blocks[i].pprev = &blocks[i - 1];
-        blocks[i].header->nBits = 1;
-        blocks[i].header->height = i;
-        blocks[i].nHeight = i;
+        blocks[i].SetBlockHeaderBits(1);
+        blocks[i].SetBlockHeaderHeight(i);
     }
 
     SetMTP(blocks, activation - 1);

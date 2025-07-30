@@ -26,15 +26,11 @@ BOOST_AUTO_TEST_CASE(GetBlockProofEquivalentTime_test)
     for (int i = 0; i < 10000; i++)
     {
         blocks[i].pprev = i ? &blocks[i - 1] : nullptr;
-        blocks[i].header->height = i;
-        blocks[i].nHeight = i;
-        blocks[i].header->nTime = 1269211443 + i * params.nPowTargetSpacing;
-        blocks[i].nTime = blocks[i].header->nTime;
-        blocks[i].header->nBits = 0x207fffff; /* target 0x7fffff000... */
-        blocks[i].nBits = blocks[i].header->nBits;
-        blocks[i].header->SetChainWork(
-            i ? blocks[i - 1].header->aChainWork() + GetBlockProof(blocks[i - 1]) : arith_uint256(0));
-        blocks[i].nChainWork = UintToArith256(blocks[i].header->chainWork);
+        blocks[i].SetBlockHeaderHeight(i);
+        blocks[i].SetBlockHeaderTime(1269211443 + i * params.nPowTargetSpacing);
+        blocks[i].SetBlockHeaderBits(0x207fffff); /* target 0x7fffff000... */
+        blocks[i].SetBlockHeaderChainWork(ArithToUint256(
+            i ? blocks[i - 1].GetBlockHeader().aChainWork() + GetBlockProof(blocks[i - 1]) : arith_uint256(0)));
     }
 
     for (int j = 0; j < 1000; j++)
@@ -52,14 +48,10 @@ static CBlockIndex GetBlockIndex(CBlockIndex *pindexPrev, int64_t nTimeInterval,
 {
     CBlockIndex block;
     block.pprev = pindexPrev;
-    block.header->height = pindexPrev->height() + 1;
-    block.nHeight = block.header->height;
-    block.header->nTime = pindexPrev->GetBlockTime() + nTimeInterval;
-    block.nTime = block.header->nTime;
-    block.header->nBits = nBits;
-    block.nBits = block.header->nBits;
-    block.header->SetChainWork(pindexPrev->chainWork() + GetBlockProof(block));
-    block.nChainWork = UintToArith256(block.header->chainWork);
+    block.SetBlockHeaderHeight(pindexPrev->height() + 1);
+    block.SetBlockHeaderTime(pindexPrev->GetBlockTime() + nTimeInterval);
+    block.SetBlockHeaderBits(nBits);
+    block.SetBlockHeaderChainWork(ArithToUint256(pindexPrev->chainWork() + GetBlockProof(block)));
     block.BuildSkip();
     return block;
 }
@@ -102,17 +94,12 @@ BOOST_AUTO_TEST_CASE(asert_difficulty_test)
 
     // Genesis block, and parent of ASERT anchor block in this test case.
     blocks[0] = CBlockIndex();
-    blocks[0].header->height = 0;
-    blocks[0].nHeight = 0;
-    blocks[0].header->nTime = 1269211443;
-    blocks[0].nTime = blocks[0].header->nTime;
+    blocks[0].SetBlockHeaderHeight(0);
+    blocks[0].SetBlockHeaderTime(1269211443);
     // The pre-anchor block's nBits should never be used, so we set it to a nonsense value in order to
     // trigger an error if it is ever accessed
-    blocks[0].header->nBits = 0x0dedbeef;
-    blocks[0].nBits = blocks[0].header->nBits;
-
-    blocks[0].header->SetChainWork(GetBlockProof(blocks[0]));
-    blocks[0].nChainWork = UintToArith256(blocks[0].header->chainWork);
+    blocks[0].SetBlockHeaderBits(0x0dedbeef);
+    blocks[0].SetBlockHeaderChainWork(ArithToUint256(GetBlockProof(blocks[0])));
 
     // Block counter.
     size_t i = 1;
@@ -250,8 +237,8 @@ BOOST_AUTO_TEST_CASE(asert_difficulty_test)
     blocks[i] = GetBlockIndex(&blocks[i - 1], -2 * 24 * 3600 - 30, nBits);
     for (size_t j = 0; j < 4 * 24 * 3600 + 660; j++)
     {
-        blocks[i].header->nTime++;
-        blocks[i].nTime = blocks[i].header->nTime;
+        uint32_t _nTime = blocks[i].GetBlockHeader().nTime + 1;
+        blocks[i].SetBlockHeaderTime(_nTime);
         nBits = GetNextASERTWorkRequired(&blocks[i], &blkHeaderDummy, params, &blocks[1]);
 
         if (j > 8)

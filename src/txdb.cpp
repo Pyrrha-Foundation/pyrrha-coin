@@ -386,7 +386,7 @@ CBlockHeader GetBlockHeaderFromDB(const uint256 &hash)
         }
         else
         {
-            return *pindex.header;
+            return pindex.GetBlockHeader();
         }
     }
     else if (nDiskBlockIndexVersion >= 2)
@@ -471,14 +471,14 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 CBlockIndex *pindexNew = InsertBlockIndex(key.second);
                 if (nStoredBlockIndexVersion <= 1)
                 {
-                    pindexNew->pprev = InsertBlockIndex(diskindex.header->hashPrevBlock);
-                    pindexNew->nHeight = diskindex.header->height;
-                    pindexNew->nSize = diskindex.header->size;
-                    pindexNew->nChainWork = UintToArith256(diskindex.header->chainWork);
-                    pindexNew->nTx = diskindex.header->txCount;
-                    pindexNew->nTime = diskindex.header->nTime;
-                    pindexNew->nBits = diskindex.header->nBits;
-                    pindexNew->header = diskindex.header;
+                    pindexNew->pprev = InsertBlockIndex(diskindex.GetBlockHeader().hashPrevBlock);
+                    pindexNew->nHeight = diskindex.GetBlockHeader().height;
+                    pindexNew->nSize = diskindex.GetBlockHeader().size;
+                    pindexNew->nChainWork = UintToArith256(diskindex.GetBlockHeader().chainWork);
+                    pindexNew->nTx = diskindex.GetBlockHeader().txCount;
+                    pindexNew->nTime = diskindex.GetBlockHeader().nTime;
+                    pindexNew->nBits = diskindex.GetBlockHeader().nBits;
+                    pindexNew->SetBlockHeader(std::make_shared<CBlockHeader>(diskindex.GetBlockHeader()));
                 }
                 else if (nStoredBlockIndexVersion >= 2)
                 {
@@ -489,7 +489,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                     pindexNew->nTx = diskindex.nTx;
                     pindexNew->nTime = diskindex.nTime;
                     pindexNew->nBits = diskindex.nBits;
-                    pindexNew->header = nullptr;
+                    pindexNew->SetBlockHeader(nullptr);
                 }
 
                 pindexNew->nFile = diskindex.nFile;
@@ -574,12 +574,12 @@ bool CBlockHeadersDB::WriteBatchSync(const std::vector<std::pair<int, const CBlo
         // Sometimes the header could be null as in the case of receiving block data which then causes
         // the block status field to need an update but the header in the block index was previously pruned. This
         // is perfectly fine because the header, which is static data, would have already been written to disk.
-        if ((*it)->header == nullptr)
+        if ((*it)->IsHeaderNull())
         {
             continue;
         }
 
-        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), *(*it)->header);
+        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), (*it)->GetBlockHeader());
     }
     return WriteBatch(batch, true);
 }

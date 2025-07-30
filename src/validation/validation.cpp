@@ -398,7 +398,7 @@ CBlockIndex *AddToBlockIndex(const CChainParams &chainparams, const CBlockHeader
 
     auto expectedWork =
         ArithToUint256((pindexNew->pprev ? pindexNew->pprev->chainWork() : 0) + GetBlockProof(*pindexNew));
-    if (pindexNew->header->chainWork != expectedWork)
+    if (pindexNew->GetBlockHeader().chainWork != expectedWork)
     {
         pindexNew->nStatus |= BLOCK_FAILED_VALID; // block doesn't match checkpoints so invalid
         delete pindexNew;
@@ -739,7 +739,7 @@ bool LoadBlockIndexDB()
             CBlockHeader header;
             if (pblockheaders->FindBlockHeader(*(it->second->phashBlock), header))
             {
-                it->second->header = std::make_shared<CBlockHeader>(header);
+                it->second->SetBlockHeader(std::make_shared<CBlockHeader>(header));
             }
             else
             {
@@ -1953,10 +1953,6 @@ bool ContextualCheckBlock(ConstCBlockRef pblock, CValidationState &state, CBlock
                 __func__, nHeight, expectHex, scriptSigHex, hashHex, hashpHex, pindexPrev->phashBlock->ToString()),
             REJECT_INVALID, "bad-cb-height");
     }
-
-    CBlockIndex indexDummy(*pblock);
-    indexDummy.pprev = pindexPrev;
-    indexDummy.header->height = pindexPrev == nullptr ? 1 : pindexPrev->height() + 1;
 
     return true;
 }

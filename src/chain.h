@@ -234,9 +234,11 @@ public:
     //! Verification status of this block. See enum BlockStatus
     uint32_t nStatus;
 
-    //! block header - must be private to prevent a nullptr access. Use GetBlockHeader() instead.
+protected:
+    //! block header - must be private to prevent a nullptr access. Use GetBlockHeader() and SetBlockHeader().
     std::shared_ptr<CBlockHeader> header;
 
+public:
     //! Sequential id assigned to distinguish order in which blocks are received.
     uint32_t nSequenceId;
 
@@ -307,6 +309,58 @@ public:
             ret.nPos = nUndoPos;
         }
         return ret;
+    }
+
+    bool IsHeaderNull() const { return header == nullptr; }
+    void SetBlockHeader(std::shared_ptr<CBlockHeader> _header) { header = _header; }
+    void SetBlockHeaderHeight(uint32_t _height)
+    {
+        WRITELOCK(cs_mapBlockIndex);
+        if (header != nullptr)
+        {
+            header->height = _height;
+            nHeight = _height;
+        }
+    }
+
+    void SetBlockHeaderBits(uint32_t _nBits)
+    {
+        WRITELOCK(cs_mapBlockIndex);
+        if (header != nullptr)
+        {
+            header->nBits = _nBits;
+            nBits = _nBits;
+        }
+    }
+
+    void SetBlockHeaderTime(uint32_t _nTime)
+    {
+        WRITELOCK(cs_mapBlockIndex);
+        if (header != nullptr)
+        {
+            header->nTime = _nTime;
+            nTime = _nTime;
+        }
+    }
+
+    void SetBlockHeaderSize(uint32_t _nSize)
+    {
+        WRITELOCK(cs_mapBlockIndex);
+        if (header != nullptr)
+        {
+            header->size = _nSize;
+            nSize = _nSize;
+        }
+    }
+
+    void SetBlockHeaderChainWork(uint256 _nChainWork)
+    {
+        WRITELOCK(cs_mapBlockIndex);
+        if (header != nullptr)
+        {
+            header->chainWork = _nChainWork;
+            nChainWork = UintToArith256(_nChainWork);
+        }
     }
 
     CBlockHeader GetBlockHeader() const

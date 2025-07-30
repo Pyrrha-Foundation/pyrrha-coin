@@ -276,7 +276,7 @@ void SyncStorage(const CChainParams &chainparams)
                 }
 
                 pindexNew->pprev = InsertBlockIndex(tmpHeader.hashPrevBlock);
-                pindexNew->header = std::make_shared<CBlockHeader>(tmpHeader);
+                pindexNew->SetBlockHeader(std::make_shared<CBlockHeader>(tmpHeader));
                 pindexNew->nHeight = tmpHeader.height;
                 pindexNew->nSize = tmpHeader.size;
                 pindexNew->nChainWork = UintToArith256(tmpHeader.chainWork);
@@ -303,7 +303,7 @@ void SyncStorage(const CChainParams &chainparams)
                 index->nHeight = tmpHeader.height;
                 index->nSize = tmpHeader.size;
                 index->nChainWork = UintToArith256(tmpHeader.chainWork);
-                index->header = std::make_shared<CBlockHeader>(tmpHeader);
+                index->SetBlockHeader(std::make_shared<CBlockHeader>(tmpHeader));
                 index->pprev = InsertBlockIndex(tmpHeader.hashPrevBlock);
             }
 
@@ -490,7 +490,7 @@ void SyncStorage(const CChainParams &chainparams)
                 pindexNew->nFile = item.second.second.nFile;
                 pindexNew->nDataPos = item.second.second.nDataPos;
                 pindexNew->nUndoPos = item.second.second.nUndoPos;
-                pindexNew->header = std::make_shared<CBlockHeader>(tmpHeader);
+                pindexNew->SetBlockHeader(std::make_shared<CBlockHeader>(tmpHeader));
                 pindexNew->nStatus = item.second.second.nStatus;
                 pindexNew->nSequenceId = item.second.second.nSequenceId;
                 pindexNew->nTimeReceived = item.second.second.nTimeReceived;
@@ -508,7 +508,7 @@ void SyncStorage(const CChainParams &chainparams)
                 index->nHeight = tmpHeader.height;
                 index->nSize = tmpHeader.size;
                 index->nChainWork = UintToArith256(tmpHeader.chainWork);
-                index->header = std::make_shared<CBlockHeader>(tmpHeader);
+                index->SetBlockHeader(std::make_shared<CBlockHeader>(tmpHeader));
                 index->pprev = InsertBlockIndex(tmpHeader.hashPrevBlock);
             }
             // Update the block data
@@ -870,7 +870,7 @@ bool FlushStateToDiskInternal(CValidationState &state,
                 {
                     if (setHeadersToTrim.count(pindex))
                     {
-                        pindex->header = nullptr;
+                        pindex->SetBlockHeader(nullptr);
                         setHeadersToTrim.erase(pindex);
                     }
                 }
