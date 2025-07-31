@@ -742,6 +742,11 @@ CTweak<uint64_t> dbcacheTweak("cache.dbcache",
         0),
     0);
 
+/** What is the maximum number of headers to keep in the blockindex RAM */
+CTweak<uint32_t> maxHeadersToKeepInRAM("cache.maxHeaders",
+    strprintf("Maximum headers to keep in RAM (default: %u)", DEFAULT_HEADERS_TO_KEEP_IN_RAM),
+    DEFAULT_HEADERS_TO_KEEP_IN_RAM);
+
 /** Dust Threshold (in satoshis) defines the minimum quantity an output may contain for the
     transaction to be considered standard, and therefore relayable.
  */

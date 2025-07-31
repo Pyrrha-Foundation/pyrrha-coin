@@ -27,6 +27,7 @@ extern std::vector<CBlockFileInfo> vinfoBlockFile;
 extern int nLastBlockFile;
 extern CTweak<uint64_t> pruneIntervalTweak;
 extern CTweak<uint64_t> dbcacheTweak;
+extern CTweak<uint32_t> maxHeadersToKeepInRAM;
 extern std::atomic<uint64_t> nTotalChainTx;
 
 CCriticalSection cs_flushstate;
@@ -736,7 +737,7 @@ bool FlushStateToDiskInternal(CValidationState &state,
     static int64_t nLastFlush = 0;
     static int64_t nLastSetChain = 0;
     static int64_t nLastCoinsCacheReset = 0;
-    static size_t nLastMapBlockIndexFlushSize = DEFAULT_HEADERS_TO_KEEP_IN_RAM;
+    static size_t nLastMapBlockIndexFlushSize = maxHeadersToKeepInRAM.Value();
 
     TRY_LOCK(cs_flushstate, lock);
     if (!lock)
@@ -786,7 +787,7 @@ bool FlushStateToDiskInternal(CValidationState &state,
     bool fDoFullFlush =
         (mode == FLUSH_STATE_ALWAYS) || fCacheCritical || fAutoCache || fPeriodicFlush || fCoinCacheReset;
     // if in IBD allow a larger window, otherwise flush the blockindex more often.
-    size_t nFlushBlockIndexWindow = IsInitialBlockDownload() ? MAX_HEADERS_RESULTS : DEFAULT_HEADERS_TO_KEEP_IN_RAM;
+    size_t nFlushBlockIndexWindow = IsInitialBlockDownload() ? MAX_HEADERS_RESULTS : maxHeadersToKeepInRAM.Value();
     bool fFlushBlockIndex = ((mapBlockIndex.size() - nLastMapBlockIndexFlushSize) > nFlushBlockIndexWindow);
 
     // Write blocks and block index to disk.

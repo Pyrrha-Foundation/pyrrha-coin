@@ -44,6 +44,7 @@
 
 extern CTweak<int> maxReorgDepth;
 extern CTweak<bool> pvtest;
+extern CTweak<uint32_t> maxHeadersToKeepInRAM;
 extern std::atomic<uint64_t> nTotalChainTx;
 extern uint64_t nDiskBlockIndexVersion;
 
@@ -421,7 +422,7 @@ CBlockIndex *AddToBlockIndex(const CChainParams &chainparams, const CBlockHeader
     setDirtyBlockIndex.insert(pindexNew);
 
     // Find the index where a header can be trimmed and save it.
-    int64_t nHeightToTrim = (int64_t)pindexNew->nHeight - DEFAULT_HEADERS_TO_KEEP_IN_RAM;
+    int64_t nHeightToTrim = (int64_t)pindexNew->nHeight - maxHeadersToKeepInRAM.Value();
     if (nHeightToTrim > 0)
     {
         CBlockIndex *pindexToTrim = pindexNew->GetAncestor(nHeightToTrim);
@@ -727,7 +728,7 @@ bool LoadBlockIndexDB()
     if (nBlockIndexVersion >= 2)
     {
         // how many headers to load into memory
-        uint32_t nToLoad = DEFAULT_HEADERS_TO_KEEP_IN_RAM;
+        uint32_t nToLoad = maxHeadersToKeepInRAM.Value();
 
         // used for spot checking proof of work.
         FastRandomContext ctx;
