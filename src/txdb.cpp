@@ -579,7 +579,7 @@ bool CBlockHeadersDB::WriteBatchSync(const std::vector<std::pair<int, const CBlo
             continue;
         }
 
-        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), (*it)->GetBlockHeader());
+        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), *(*it)->header);
     }
     return WriteBatch(batch, true);
 }

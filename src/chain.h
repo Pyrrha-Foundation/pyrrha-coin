@@ -171,6 +171,8 @@ std::string ToString(BlockStatus s);
  */
 class CBlockIndex
 {
+    friend class CBlockHeadersDB;
+
 public:
     //! (memory only) pointer to the hash of the block, if any. Memory is owned by this CBlockIndex
     const uint256 *phashBlock;
