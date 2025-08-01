@@ -6,9 +6,10 @@
 #ifndef NEXA_QT_WALLETMODEL_H
 #define NEXA_QT_WALLETMODEL_H
 
-#include "paymentrequestplus.h"
+#include "amount.h"
 #include "walletmodeltransaction.h"
-
+#include "script/destinations.h"
+#include "consensus/grouptokens.h"
 #include "support/allocators/secure.h"
 
 #include <map>
@@ -65,8 +66,6 @@ public:
     // If from a payment request, this is used for storing the memo
     QString message;
 
-    // If from a payment request, paymentRequest.IsInitialized() will be true
-    PaymentRequestPlus paymentRequest;
     // Empty if no authentication or invalid signature/cert/etc.
     QString authenticatedMerchant;
 
@@ -84,9 +83,6 @@ public:
         std::string sLabel = label.toStdString();
         std::string sMessage = message.toStdString();
         std::string slabelPublic = labelPublic.toStdString();
-        std::string sPaymentRequest;
-        if (!ser_action.ForRead() && paymentRequest.IsInitialized())
-            paymentRequest.SerializeToString(&sPaymentRequest);
         std::string sAuthenticatedMerchant = authenticatedMerchant.toStdString();
 
         READWRITE(this->nVersion);
@@ -94,7 +90,6 @@ public:
         READWRITE(sLabel);
         READWRITE(amount);
         READWRITE(sMessage);
-        READWRITE(sPaymentRequest);
         READWRITE(sAuthenticatedMerchant);
 
         if (ser_action.ForRead())
@@ -103,8 +98,6 @@ public:
             label = QString::fromStdString(sLabel);
             message = QString::fromStdString(sMessage);
             labelPublic = QString::fromStdString(slabelPublic);
-            if (!sPaymentRequest.empty())
-                paymentRequest.parse(QByteArray::fromRawData(sPaymentRequest.data(), sPaymentRequest.size()));
             authenticatedMerchant = QString::fromStdString(sAuthenticatedMerchant);
         }
     }
