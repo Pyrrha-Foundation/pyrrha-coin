@@ -81,8 +81,8 @@ class CCrypter
 {
     friend class wallet_crypto::TestCrypter; // for test access to vchKey/vchIV
 private:
-    std::vector<unsigned char, secure_allocator<unsigned char>>  vchKey;
-    std::vector<unsigned char, secure_allocator<unsigned char>>  vchIV;
+    std::vector<unsigned char, secure_allocator<unsigned char> > vchKey;
+    std::vector<unsigned char, secure_allocator<unsigned char> > vchIV;
     bool fKeySet;
 
     int BytesToKeySHA512AES(const std::vector<unsigned char> &chSalt,
@@ -115,10 +115,7 @@ public:
         vchIV.resize(WALLET_CRYPTO_IV_SIZE);
     }
 
-    ~CCrypter()
-    {
-        CleanKey();
-    }
+    ~CCrypter() { CleanKey(); }
 };
 
 /** Keystore which keeps the private keys encrypted.

@@ -7,10 +7,10 @@
 #define NEXA_QT_WALLETMODEL_H
 
 #include "amount.h"
-#include "walletmodeltransaction.h"
-#include "script/destinations.h"
 #include "consensus/grouptokens.h"
+#include "script/destinations.h"
 #include "support/allocators/secure.h"
+#include "walletmodeltransaction.h"
 
 #include <map>
 #include <vector>

@@ -305,7 +305,6 @@ void PaymentServer::handleURIOrFile(const QString &s)
     {
         return;
     }
-
 }
 
 void PaymentServer::handleURIConnection()
