@@ -339,7 +339,7 @@ bool CNetAddr::IsLocal() const
 
     // IPv6 loopback (::1/128)
     static const unsigned char pchLocal[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
-    if (memcmp(&ip[0], pchLocal, 16) == 0)
+    if (IsIPv6() && memcmp(ip.data(), pchLocal, 16) == 0)
         return true;
 
     return false;
