@@ -1378,6 +1378,9 @@ bool AppInit2(Config &config)
                 uiInterface.InitMessage(_("Opening Token Mintage database..."));
                 ptokenMint = new CTokenMintageDB(cacheConfig.nBlockTreeDBCache, false, fReset);
 
+                // Set the coins cache for the tailstorm forest
+                tailstormForest.SetBackend(pcoinsTip);
+
                 if (fTxIndex)
                 {
                     TxIndexDB *txindex_db = nullptr;

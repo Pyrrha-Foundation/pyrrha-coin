@@ -19,6 +19,7 @@
 #include "unlimited.h"
 #include "util.h"
 #include "utiltime.h"
+#include "validation/tailstorm.h"
 #include "validation/validation.h"
 #include <map>
 #include <string>
@@ -139,10 +140,10 @@ unsigned int CParallelValidation::QueueCount()
 
 bool CParallelValidation::Initialize(const boost::thread::id this_id, const CBlockIndex *pindex, const bool fParallel)
 {
-    AssertLockHeld(cs_main);
-
     if (fParallel)
     {
+        AssertLockHeld(cs_main);
+
         // If the chain tip has passed this block by, its an orphan.  It cannot be connected to the active chain, so
         // return.
         if (chainActive.Tip()->chainWork() > pindex->chainWork())
@@ -493,8 +494,10 @@ void CParallelValidation::HandleBlockMessage(CNode *pfrom,
     // prevents us from re-requesting the block during the time it is being processed.
     requester.ProcessingBlock(pblock->GetHash(), pfrom);
 
-    // NOTE: You must not have a cs_main lock before you aquire the semaphore grant or you can end up deadlocking
+    // NOTE: You must not have a cs_main or the cs_forest lock before you aquire the semaphore grant
+    // or you can end up deadlocking
     AssertLockNotHeld(cs_main);
+    AssertLockNotHeld(tailstormForest.cs_forest);
 
     // Aquire semaphore grant
     if (IsChainNearlySyncd())
@@ -538,6 +541,10 @@ void CParallelValidation::HandleBlockMessage(CNode *pfrom,
                     }
 
                     // if the new competing block is the biggest or of equal size to the biggest then reject it.
+                    // TODO: for tailstorm maybe we have to separate out subblock from summaryblocks? otherwise
+                    // we could reject small subblocks in favor of summary blocks? Is there a danger here
+                    // we could end up preventing the propagation of subblocks since we can't validate the summary
+                    // without them?
                     if (fCompeting && (nLargestBlockSize <= pblock->GetBlockSize()))
                     {
                         LOG(PARALLEL,
@@ -665,6 +672,44 @@ void HandleBlockMessageThread(CNodeRef noderef, const string strCommand, ConstCB
         // process the block advance the tip.
         if (IsChainNearlySyncd())
             FlushStateToDisk(state, FLUSH_STATE_ALWAYS);
+
+
+        // Perform tailstorm related function for connecting orphans and initiating
+        // potential re-orgs.
+        //
+        // Check for any orphaned blocks or summary blocks and connected them if possible.
+        std::set<uint256> setToAnnounce;
+        {
+            LOCK(tailstormForest.cs_forest);
+            setToAnnounce = tailstormForest.ProcessOrphans();
+
+            // Check for subblocks to prune
+            PruneSubblocks(pblock);
+        }
+
+        // Announce accepted subblocks to other peers
+        {
+            LOCK(cs_vNodes);
+            for (const uint256 &_hash : setToAnnounce)
+            {
+                for (CNode *pnode : vNodes)
+                {
+                    pnode->PushSubblockHash(_hash);
+                }
+            }
+        }
+
+        // Check that we're on the best dag and if not then
+        // initiate a re-org over to the summary block that has
+        // the best dag connected to it.
+        //
+        // NOTE: you can not put this call to CheckForReorg() in the above
+        // code block where the cs_forest lock is taken. This will cause
+        // a lockorder issue with cs_main.
+        if (!setToAnnounce.empty())
+        {
+            tailstormForest.CheckForReorg();
+        }
     }
     catch (const std::exception &e)
     {
