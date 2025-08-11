@@ -37,5 +37,7 @@ def get_libnexa_api_methods():
             if line.startswith("SLAPI"):
                 line = line.split("(")[0]
                 function_name = line.split(" ")[-1]
+                # if a pointer * got picked up in the function name, remove it
+                function_name = function_name.replace("*", "")
                 methods.append(function_name)
     return methods
