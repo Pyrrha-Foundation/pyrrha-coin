@@ -2615,15 +2615,14 @@ bool ProcessMessage(CNode *pfrom,
 
     else if (strCommand == NetMsgType::GET_UTXO)
     {
-        // Check that number of outputs requested does not exceed the maximum
-        unsigned int nCount = ReadCompactSize(vRecv);
-        if (nCount > MAX_TX_NUM_VOUT)
-        {
-            dosMan.Misbehaving(pfrom, 20, BanReasonInvalidSize);
-            return error("get_utxo size = %u", nCount);
-        }
         std::vector<COutPoint> vOutpoints;
         vRecv >> vOutpoints;
+        // Check that number of outputs requested does not exceed the maximum
+        if (vOutpoints.size() > MAX_TX_NUM_VOUT)
+        {
+            dosMan.Misbehaving(pfrom, 20, BanReasonInvalidSize);
+            return error("get_utxo size = %u", vOutpoints.size());
+        }
 
         // For each outpoint retreive the CTxOut and add it to a vector which is sent
         // back to the requesting peer.
@@ -2634,7 +2633,7 @@ bool ProcessMessage(CNode *pfrom,
             CreateUTXO(outpoint, utxo);
             vUtxo.push_back(std::move(utxo));
         }
-        pfrom->PushMessage(NetMsgType::UTXO, vUtxo);
+        pfrom->PushMessageWithCookie(NetMsgType::UTXO, msgCookie | 0xffff, vUtxo);
     }
 
     else if (strCommand == NetMsgType::REJECT)
