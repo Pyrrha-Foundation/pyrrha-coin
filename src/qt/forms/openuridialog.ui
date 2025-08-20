@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Open nexa URI</string>
+   <string>Open URI</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
