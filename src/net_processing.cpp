@@ -1710,12 +1710,12 @@ bool ProcessMessage(CNode *pfrom,
 
                     // Remove any entries that have been in the cache too long.  Unconnected headers should only exist
                     // for a very short while, typically just a second or two.
+                    bool fErase = false;
                     int64_t nTimeHeaderArrived = (*mi).second.second;
                     const uint256 &headerHash = (*mi).first;
-                    mi++;
                     if (GetTime() - nTimeHeaderArrived >= UNCONNECTED_HEADERS_TIMEOUT)
                     {
-                        mapUnConnectedHeaders.erase(toErase);
+                        fErase = true;
                     }
                     // At this point we know the headers in the list received are known to be in order, therefore,
                     // check if the header is equal to some other header in the list. If so then remove it from the
@@ -1726,11 +1726,16 @@ bool ProcessMessage(CNode *pfrom,
                         {
                             if (header.GetHash() == headerHash)
                             {
-                                mapUnConnectedHeaders.erase(toErase);
+                                fErase = true;
                                 break;
                             }
                         }
                     }
+
+                    if (fErase)
+                        mi = mapUnConnectedHeaders.erase(toErase);
+                    else
+                        mi++;
                 }
             }
 
