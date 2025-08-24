@@ -1640,8 +1640,6 @@ bool ProcessMessage(CNode *pfrom,
             for (const CBlockHeader &header : headers)
             {
                 const uint256 &hash = header.GetHash();
-                if (mapUnConnectedHeaders.count(hash))
-                    continue;
 
                 // LOG(NET, "Received header %s from %s\n", header.GetId().ToString(), pfrom->GetLogName());
                 // check that the first header has a previous block in the blockindex.
