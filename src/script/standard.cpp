@@ -198,28 +198,6 @@ bool ExtendedSolver(const CScript &scriptPubKey,
     grp.clear();
     vSolutionsRet.clear();
 
-    if (scriptPubKey.type == ScriptType::TEMPLATE)
-    {
-        // Get the group data out and put the template hash and args hash in Ret 0 and 1 respectively.
-        // Right now its not necessary to dig thru the template's visible args, but when new templates are
-        // devised that this wallet can sign which use visible args, we might have to do that.
-        typeRet = TX_SCRIPT_TEMPLATE;
-        vSolutionsRet.resize(2);
-        ScriptTemplateError err = GetScriptTemplate(scriptPubKey, &grp, &vSolutionsRet[0], &vSolutionsRet[1], nullptr);
-        if (err == ScriptTemplateError::OK)
-        {
-            size_t argsHashSize = vSolutionsRet[1].size();
-            // allow 2 different hash types, or no hashed args
-            if ((argsHashSize != CHash160::OUTPUT_SIZE) && (argsHashSize != CHash256::OUTPUT_SIZE) &&
-                (argsHashSize != 0))
-            {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
     // Shortcut for pay-to-script-hash, which are more constrained than the other types:
     // it is always OP_HASH160 20 [20 byte hash] OP_EQUAL
     // or [data] OP_GROUP OP_DROP OP_HASH160 20 [20 byte hash] OP_EQUAL
@@ -279,6 +257,28 @@ bool ExtendedSolver(const CScript &scriptPubKey,
         // safe as size is in range 1..16
         vSolutionsRet.push_back({static_cast<uint8_t>(keys.size())});
         return true;
+    }
+
+    if (scriptPubKey.type == ScriptType::TEMPLATE)
+    {
+        // Get the group data out and put the template hash and args hash in Ret 0 and 1 respectively.
+        // Right now its not necessary to dig thru the template's visible args, but when new templates are
+        // devised that this wallet can sign which use visible args, we might have to do that.
+        typeRet = TX_SCRIPT_TEMPLATE;
+        vSolutionsRet.resize(2);
+        ScriptTemplateError err = GetScriptTemplate(scriptPubKey, &grp, &vSolutionsRet[0], &vSolutionsRet[1], nullptr);
+        if (err == ScriptTemplateError::OK)
+        {
+            size_t argsHashSize = vSolutionsRet[1].size();
+            // allow 2 different hash types, or no hashed args
+            if ((argsHashSize != CHash160::OUTPUT_SIZE) && (argsHashSize != CHash256::OUTPUT_SIZE) &&
+                (argsHashSize != 0))
+            {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     vSolutionsRet.clear();
