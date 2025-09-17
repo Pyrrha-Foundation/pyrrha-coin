@@ -237,7 +237,8 @@ ScriptTemplateError GetScriptTemplate(const CScript &script,
     /*  TODO: This is in consensus after fork1, see ContextualCheckTransaction.  Enable it here after activation
     size_t constraintHashSize = constraintHash->size();
     // allow 2 different hash types, or no hashed args
-    if ((constraintHashSize != CHash160::OUTPUT_SIZE) && (constraintHashSize != CHash256::OUTPUT_SIZE) && (constraintHashSize != 0))
+    if ((constraintHashSize != CHash160::OUTPUT_SIZE) && (constraintHashSize != CHash256::OUTPUT_SIZE) &&
+    (constraintHashSize != 0))
     {
         return ScriptTemplateError::INVALID;
     }

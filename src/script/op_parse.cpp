@@ -174,8 +174,7 @@ bool ScriptMachine::EvalParseUnlockingTemplateBytecode(int64_t first,
     CScript::const_iterator scriptSigIter = scriptSig.begin();
     CScript templateScript;
     std::vector<unsigned char> constraintArgsPushBytes;
-    ScriptError templateLoadError =
-        LoadCheckTemplateHash(scriptSig, scriptSigIter, templateHash, templateScript);
+    ScriptError templateLoadError = LoadCheckTemplateHash(scriptSig, scriptSigIter, templateHash, templateScript);
     if (templateLoadError != SCRIPT_ERR_OK)
     {
         return set_error(&error, templateLoadError);
