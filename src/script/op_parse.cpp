@@ -64,13 +64,13 @@ bool ScriptMachine::EvalParseCanonicalLockingBytecode(int64_t first, int64_t cou
 {
     CGroupTokenInfo grp;
     VchType templateHash;
-    VchType argsHash;
+    VchType constraintHash;
     CScript::const_iterator rest = pscript.begin();
     VchType zero; // OP_0 is pushing an empty item
     if (count == 0)
         return true;
 
-    ScriptTemplateError ret = GetScriptTemplate(pscript, &grp, &templateHash, &argsHash, &rest);
+    ScriptTemplateError ret = GetScriptTemplate(pscript, &grp, &templateHash, &constraintHash, &rest);
     if (ret != ScriptTemplateError::OK)
     {
         return set_error(&error, SCRIPT_ERR_PARSE);
@@ -127,7 +127,7 @@ bool ScriptMachine::EvalParseCanonicalLockingBytecode(int64_t first, int64_t cou
             pushedCount++;
             break;
         case 4:
-            PushStack(argsHash);
+            PushStack(constraintHash);
             pushedCount++;
             break;
         case 5:
@@ -153,44 +153,45 @@ bool ScriptMachine::EvalParseCanonicalLockingBytecode(int64_t first, int64_t cou
 // 8 onwards = satisfier pushes
 bool ScriptMachine::EvalParseUnlockingTemplateBytecode(int64_t first,
     int64_t count,
-    const CScript &unlockingScript,
-    const CScript &lockingScript)
+    const CScript &scriptSig,
+    const CScript &scriptPubKey)
 {
     CGroupTokenInfo grp;
     VchType templateHash;
-    VchType argsHash;
-    CScript::const_iterator lockingRest = lockingScript.begin();
+    VchType constraintHash;
+    CScript::const_iterator rest = scriptPubKey.begin();
     VchType zero; // OP_0 is pushing an empty item
     if (count == 0)
+    {
         return true;
-
-    // Parse the lockingScript into its pieces so we know what to expect in the unlocking script
-    ScriptTemplateError ret = GetScriptTemplate(lockingScript, &grp, &templateHash, &argsHash, &lockingRest);
+    }
+    // Parse the scriptPubKey into its pieces so we know what to expect in the scriptSig
+    ScriptTemplateError ret = GetScriptTemplate(scriptPubKey, &grp, &templateHash, &constraintHash, &rest);
     if (ret != ScriptTemplateError::OK)
     {
         return set_error(&error, SCRIPT_ERR_PARSE);
     }
-    CScript::const_iterator satisfierBegin = unlockingScript.begin();
-    CScript constraintScript;
-    std::vector<unsigned char> argsScriptBytes;
+    CScript::const_iterator scriptSigIter = scriptSig.begin();
+    CScript templateScript;
+    std::vector<unsigned char> constraintArgsPushBytes;
     ScriptError templateLoadError =
-        LoadCheckTemplateHash(unlockingScript, satisfierBegin, templateHash, constraintScript);
+        LoadCheckTemplateHash(scriptSig, scriptSigIter, templateHash, templateScript);
     if (templateLoadError != SCRIPT_ERR_OK)
     {
         return set_error(&error, templateLoadError);
     }
-    if (argsHash.size() != 0) // no hash (OP_0) means no args
+    if (constraintHash.size() != 0) // no hash (OP_0) means no args
     {
         // Grab the args script (its the 2nd data push in the scriptSig)
         opcodetype argsDataOpcode;
-        if (!unlockingScript.GetOp(satisfierBegin, argsDataOpcode, argsScriptBytes))
+        if (!scriptSig.GetOp(scriptSigIter, argsDataOpcode, constraintArgsPushBytes))
         {
             return set_error(&error, SCRIPT_ERR_TEMPLATE);
         }
     }
 
-    // The rest of the unlockingScript is the satisfier
-    CScript satisfier(satisfierBegin, unlockingScript.end());
+    // The rest of the scriptSig is the satisfier args
+    CScript satisfier(scriptSigIter, scriptSig.end());
 
     // Now provide the requested items
     int64_t pushedCount = 0;
@@ -204,12 +205,12 @@ bool ScriptMachine::EvalParseUnlockingTemplateBytecode(int64_t first,
         {
         case 0: // template code
         {
-            PushStack(constraintScript.ToVch());
+            PushStack(templateScript.ToVch());
             pushedCount++;
         }
         break;
-        case 1: // args code
-            PushStack(argsScriptBytes);
+        case 1: // constraint args code
+            PushStack(constraintArgsPushBytes);
             pushedCount++;
             break;
         case 2:
@@ -227,6 +228,6 @@ bool ScriptMachine::EvalParseUnlockingTemplateBytecode(int64_t first,
     }
 
     if (pushedCount < count)
-        return EvalParseBytecode(idx - 8, count - pushedCount, unlockingScript, satisfierBegin, unlockingScript.end());
+        return EvalParseBytecode(idx - 8, count - pushedCount, scriptSig, scriptSigIter, scriptSig.end());
     return true;
 }
