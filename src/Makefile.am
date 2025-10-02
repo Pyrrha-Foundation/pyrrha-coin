@@ -635,6 +635,8 @@ libnexa_common_a_SOURCES = \
   script/standard.cpp \
   serialize.h \
   tinyformat.h \
+  txdb.cpp \
+  txdb.h \
   uint256.cpp \
   uint256.h \
   utilstrencodings.cpp \
