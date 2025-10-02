@@ -324,8 +324,6 @@ void Shutdown()
         pblocktree = nullptr;
         delete pblockheaders;
         pblockheaders = nullptr;
-        delete pblockdb;
-        pblockdb = nullptr;
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -1329,16 +1327,6 @@ bool AppInit2(Config &config)
         fReindex = GetBoolArg("-reindex", DEFAULT_REINDEX);
     }
 
-    int64_t requested_block_mode = GetArg("-useblockdb", DEFAULT_BLOCK_DB_MODE);
-    if (requested_block_mode >= 0 && requested_block_mode < END_STORAGE_OPTIONS)
-    {
-        BLOCK_DB_MODE = static_cast<BlockDBMode>(requested_block_mode);
-    }
-    else
-    {
-        BLOCK_DB_MODE = DEFAULT_BLOCK_DB_MODE;
-    }
-
     // Return the initial values for the various in memory caches.
     CacheConfig cacheConfig = DiscoverCacheConfiguration();
     LOGA("Cache configuration:\n");
@@ -1367,10 +1355,7 @@ bool AppInit2(Config &config)
                 delete pcoinsdbview;
                 delete pcoinscatcher;
                 delete pblocktree;
-                delete pblocktreeother;
                 delete pblockheaders;
-                delete pblockheadersother;
-                delete pblockdb;
                 delete ptokenDesc;
                 delete ptokenMint;
                 g_txindex = nullptr;
