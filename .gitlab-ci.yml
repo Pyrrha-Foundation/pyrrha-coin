@@ -362,9 +362,6 @@ build-ubuntu-deps:
     stage: build_depends
     extends: .cache-ubuntu
     needs: []
-    variables:
-        CXX: g++-10
-        CC: gcc-10
     script:
         - cd depends
         - make HOST=x86_64-linux-gnu -j `nproc`
