@@ -71,8 +71,8 @@ class TxnCloneTest(BitcoinTestFramework):
 
         tx1 = tx1json
 
-        # Node0's balance should be starting balance, plus 50BTC for another
-        # matured block, minus tx1 and tx2 amounts, and minus transaction fees:
+        # Node0's balance should be starting balance, plus 10mil NEX for another
+        # matured block, minus tx1,  and minus transaction fees:
         expected = starting_balance + fund_foo_tx["fee"]
         if self.options.mine_block: expected += COINBASE_REWARD
         expected += tx1["amount"] + tx1["fee"]
@@ -82,9 +82,8 @@ class TxnCloneTest(BitcoinTestFramework):
         assert_equal(self.nodes[0].getbalance("foo", 0), FooAmt + tx1["amount"] + tx1["fee"])
 
         if self.options.mine_block:
+            tx1 = self.nodes[0].gettransaction(tx1id)
             assert_equal(tx1["confirmations"], 1)
-            # Node1's "from0" balance should be both transaction amounts:
-            assert_equal(self.nodes[1].getbalance("from0"), -(tx1["amount"] + tx2["amount"]))
         else:
             assert_equal(tx1["confirmations"], 0)
 
