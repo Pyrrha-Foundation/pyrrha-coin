@@ -154,7 +154,7 @@ CScript BuildTokenDescScript(const std::vector<std::vector<unsigned char> > &des
 {
     // see https: github.com/bitcoincashorg/bitcoincash.org/blob/master/etc/protocols.csv
     CScript ret;
-    ret << OP_RETURN << DEFAULT_OP_RETURN_GROUP_ID;
+    ret << OP_RETURN << LEGACY_TOKEN_OP_RETURN_GROUP_ID;
     for (auto &d : desc)
     {
         ret << d;

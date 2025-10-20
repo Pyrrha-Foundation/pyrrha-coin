@@ -1621,7 +1621,7 @@ BOOST_FIXTURE_TEST_CASE(grouptoken_blockchain, TestChain100Setup)
     BOOST_CHECK_EQUAL(dummyNode1.vLowPrioritySendMsg.size(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(grouptoken_descriptions)
+BOOST_AUTO_TEST_CASE(grouptoken_legacy_descriptions)
 {
     // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
     std::string ticker = "NEXT";
@@ -1708,6 +1708,406 @@ BOOST_AUTO_TEST_CASE(grouptoken_descriptions)
     BOOST_CHECK_EQUAL(vLabels[2], "");
     BOOST_CHECK_EQUAL(vLabels[3], "");
     BOOST_CHECK_EQUAL(vLabels[4], "0");
+}
+
+BOOST_AUTO_TEST_CASE(grouptoken_nrc1_2_3_descriptions)
+{
+    // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+    std::string ticker = "NEXT";
+    std::string name = "NexaToken";
+    std::string url = "http://nexa.org";
+    std::string urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b110436";
+    std::string decimals = "4";
+
+    UniValue params(UniValue::VARR);
+    params.push_back(ticker);
+    params.push_back(name);
+    params.push_back(url);
+    params.push_back(urlZipFileHex);
+    params.push_back(decimals);
+    unsigned int curparam = 0;
+    auto desc = ParseGroupDescParams(params, curparam);
+
+    CScript opretScript;
+    opretScript = BuildTokenDescScript(desc);
+
+    std::vector<std::string> vLabels;
+    GetTokenDescription(opretScript, vLabels);
+    BOOST_CHECK_EQUAL(ticker, vLabels[0]);
+    BOOST_CHECK_EQUAL(name, vLabels[1]);
+    BOOST_CHECK_EQUAL(url, vLabels[2]);
+    BOOST_CHECK_EQUAL(urlZipFileHex, vLabels[3]);
+    BOOST_CHECK_EQUAL(decimals, vLabels[4]);
+
+    // Test that OP_RETURN must have a valid as group id or it will return empty labels
+    // see https: github.com/bitcoincashorg/bitcoincash.org/blob/master/etc/protocols.csv
+    uint32_t OpRetGroupId = 99999999;
+
+    CScript ret1;
+    ret1 << OP_RETURN << OpRetGroupId;
+    for (auto &d : desc)
+    {
+        ret1 << d;
+    }
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret1, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // Test that OP_RETURN must be present in the script
+    OpRetGroupId = 88888890;
+
+    CScript ret2;
+    ret2 << OP_NOP << OpRetGroupId;
+    for (auto &d : desc)
+    {
+        ret2 << d;
+    }
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret2, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // Test that not data fails for NRC11
+    OpRetGroupId = 88888890;
+
+    CScript ret3;
+    ret3 << OP_RETURN << OpRetGroupId;
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret3, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // Test that not data fails for NRC-2
+    OpRetGroupId = 88888891;
+
+    CScript ret4;
+    ret4 << OP_RETURN << OpRetGroupId;
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret4, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // Test that missing data fails for NRC-1 and NRC-2
+    OpRetGroupId = 88888890;
+    std::vector<std::vector<unsigned char> > desc2;
+    std::string label("AAA");
+    desc2.push_back(std::vector<unsigned char>(label.begin(), label.end()));
+
+    CScript ret5;
+    ret5 << OP_RETURN << OpRetGroupId;
+    for (auto &d : desc2)
+    {
+        ret5 << d;
+    }
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret5, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    OpRetGroupId = 88888891;
+    CScript ret6;
+    ret6 << OP_RETURN << OpRetGroupId;
+    for (auto &d : desc2)
+    {
+        ret6 << d;
+    }
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret6, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // test ticker too small
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "N";
+        std::string str_name = "NexaToken";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b110436";
+        std::string str_decimals = "4";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test ticker too large
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "NEXTNEXTNEXT";
+        std::string str_name = "NexaToken";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b110436";
+        std::string str_decimals = "4";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test ticker invalid char
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "NEXT@1";
+        std::string str_name = "NexaToken";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b110436";
+        std::string str_decimals = "4";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test ticker name too small
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "NEXT";
+        std::string str_name = "N";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b110436";
+        std::string str_decimals = "4";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test ticker name too large
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "NEXT";
+        std::string str_name = "NexaToken123456789123456789";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b110436";
+        std::string str_decimals = "4";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test hash invalid size
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "NEXT";
+        std::string str_name = "NexaToken123456789123456789";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b1104360000";
+        std::string str_decimals = "4";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test too many decimals
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_ticker = "NEXT";
+        std::string str_name = "NexaToken123456789123456789";
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b1104360000";
+        std::string str_decimals = "19";
+
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_ticker.begin(), str_ticker.end()));
+        desc3.push_back(std::vector<unsigned char>(str_name.begin(), str_name.end()));
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        desc3.push_back(std::vector<unsigned char>(std::stoi(str_decimals)));
+        std::vector<int> grpIds = {88888890, 88888891};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test valid NRC-1
+    {
+        const std::string str_ticker = "NUSD";
+        const std::string str_name = "Native USD";
+        const std::string str_url = "https://natives.cash/api/stables/nusd/getTokenInfo";
+        const std::string str_urlZipFileHex = "14e6cb42fef84ddb9b67f7e8e21082007456764f44ef7745f94e5a0dcb060194";
+        const std::string str_decimals = "6";
+        const std::vector<std::string> vExpectedLabels{str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals};
+
+        const std::string opreturn = "6a043a564c05044e5553440a4e6174697665205553443268747470733a2f2f6e6174697665732e636"
+                                     "173682f6170692f737461626c65732f6e7573642f676574546f6b656e496e666f20940106cb0d5a4e"
+                                     "f94577ef444f765674008210e2e8f7679bdb4df8fe42cbe61456";
+        const std::vector<uint8_t> parsed = ParseHex(opreturn);
+        const CScript returnScript = CScript(parsed.begin(), parsed.end());
+        BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
+        BOOST_CHECK(vLabels == vExpectedLabels);
+    }
+
+    // test valid NRC-2
+    {
+        const std::string str_ticker = "LDC";
+        const std::string str_name = "Legendary Duelist Cards";
+        const std::string str_url = "https://ipfs.io/ipfs/bafkvmiblm2dd4me5yr6v5f2ywxvexmxfvgrlc6yq5sedmgdtnu5xnnffce";
+        const std::string str_urlZipFileHex = "2b66863e309dc47d5e9758b5ea4bb2e5a9a2b17b10ec883618736d3b76b4a511";
+        const std::string str_decimals = "0";
+        const std::vector<std::string> vExpectedLabels{str_ticker, str_name, str_url, str_urlZipFileHex, str_decimals};
+
+        const std::string opreturn =
+            "6a043b564c05034c4443174c6567656e64617279204475656c6973742043617264734c5068747470733a2f2f697066732e696f2f69"
+            "7066732f6261666b766d69626c6d326464346d6535797236763566327977787665786d78667667726c63367971357365646d676474"
+            "6e7535786e6e666663652011a5b4763b6d73183688ec107bb1a2a9e5b24beab558975e7dc49d303e86662b00";
+        const std::vector<uint8_t> parsed = ParseHex(opreturn);
+        const CScript returnScript = CScript(parsed.begin(), parsed.end());
+        BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
+        BOOST_CHECK(vLabels == vExpectedLabels);
+    }
+
+    // Test that not data fails for NRC-3
+    OpRetGroupId = 88888892;
+    CScript ret8;
+    ret8 << OP_RETURN << OpRetGroupId;
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret8, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // Test that missing data fails for NRC-3
+    OpRetGroupId = 88888892;
+    CScript ret9;
+    ret6 << OP_RETURN << OpRetGroupId;
+    for (auto &d : desc2)
+    {
+        ret9 << d;
+    }
+    BOOST_CHECK_EQUAL(GetTokenDescription(ret9, vLabels), false);
+    BOOST_CHECK(vLabels.empty());
+
+    // test hash invalid size NRC3
+    {
+        // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
+        std::string str_url = "http://nexa.org";
+        std::string str_urlZipFileHex = "e2769b09e784f32f62ef849763d4f45b98e07ba658647343b915ff832b1104360000";
+        vLabels.clear();
+        std::vector<std::vector<unsigned char> > desc3;
+        desc3.push_back(std::vector<unsigned char>(str_url.begin(), str_url.end()));
+        desc3.push_back(std::vector<unsigned char>(str_urlZipFileHex.begin(), str_urlZipFileHex.end()));
+        std::vector<int> grpIds = {88888892};
+
+        for (const int &id : grpIds)
+        {
+            CScript ret7;
+            ret7 << OP_RETURN << id;
+            for (auto &d : desc3)
+            {
+                ret7 << d;
+            }
+            BOOST_CHECK_EQUAL(GetTokenDescription(ret7, vLabels), false);
+            BOOST_CHECK(vLabels.empty());
+        }
+    }
+
+    // test valid NRC3 parse
+    {
+        const std::string str_url = "https://ipfs.io/ipfs/bafyfmieoiknc6wnfcn6vvdand636bdpomforeypq5afvqbbrgjl3hrlctq";
+        const std::string str_urlZipFileHex = "3cacb9a4e71067df9ccb43bc0126c5ea48bc85101491592958bdebb1da057767";
+        const std::vector<std::string> vExpectedLabels{str_url, str_urlZipFileHex};
+        vLabels.clear();
+        const std::string opreturn = "6a043c564c054c5068747470733a2f2f697066732e696f2f697066732f62616679666d69656f696b6"
+                                     "e6336776e66636e36767664616e643633366264706f6d666f72657970713561667671626272676a6c"
+                                     "3368726c63747120677705dab1ebbd58295991141085bc48eac52601bc43cb9cdf6710e7a4b9ac3c";
+        const std::vector<uint8_t> parsed = ParseHex(opreturn);
+        const CScript returnScript = CScript(parsed.begin(), parsed.end());
+        BOOST_CHECK_EQUAL(GetTokenDescription(returnScript, vLabels), true);
+        BOOST_CHECK(vLabels == vExpectedLabels);
+    }
 }
 #endif
 

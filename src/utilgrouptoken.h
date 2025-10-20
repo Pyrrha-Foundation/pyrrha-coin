@@ -7,7 +7,16 @@
 
 #include "consensus/grouptokens.h"
 
-static const unsigned int DEFAULT_OP_RETURN_GROUP_ID = 88888888;
+static const unsigned int LEGACY_TOKEN_OP_RETURN_GROUP_ID = 88888888;
+static const unsigned int LEGACY_NFT_OP_RETURN_GROUP_ID = 88888889;
+
+// NRC-1 Token
+static const unsigned int NRC1_OP_RETURN_GROUP_ID = 88888890;
+// NRC-2 NFT Collection
+static const unsigned int NRC2_OP_RETURN_GROUP_ID = 88888891;
+// NRC-3 NFT
+static const unsigned int NRC3_OP_RETURN_GROUP_ID = 88888892;
+
 
 struct CAuth
 {
