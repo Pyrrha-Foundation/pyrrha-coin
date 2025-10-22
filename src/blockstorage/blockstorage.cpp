@@ -81,9 +81,7 @@ static void InitBlockIndexDatabases(std::string folder, uint64_t _nBlockTreeDBCa
     nTotalChainTx.store(nChainTx);
 }
 
-void InitializeBlockStorage(const int64_t &_nBlockTreeDBCache,
-    const int64_t &_nBlockDBCache,
-    const int64_t &_nBlockUndoDBCache)
+void InitializeBlockStorage(const int64_t &_nBlockTreeDBCache)
 {
     // If not pruning then raise the pre-allocation level to the maximum size. This keeps pruned nodes
     // from allocating very large files when they are not needed yet.

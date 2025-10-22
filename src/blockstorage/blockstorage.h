@@ -26,9 +26,7 @@ static const uint64_t DEFAULT_UNDOFILE_CHUNK_SIZE = 0x100000; // 1 MiB
 extern uint64_t blockfile_chunk_size;
 extern uint64_t undofile_chunk_size;
 
-void InitializeBlockStorage(const int64_t &_nBlockTreeDBCache,
-    const int64_t &_nBlockDBCache,
-    const int64_t &_nBlockUndoDBCache);
+void InitializeBlockStorage(const int64_t &_nBlockTreeDBCache);
 
 /** Functions for disk access for blocks */
 ConstCBlockRef ReadBlockFromDisk(const CBlockIndex *pindex, const Consensus::Params &consensusParams);

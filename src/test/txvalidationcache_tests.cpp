@@ -100,8 +100,6 @@ BOOST_FIXTURE_TEST_CASE(cache_configuration, TestChain100Setup)
 {
     // check that default values are returned
     CacheConfig cacheConfig1 = DiscoverCacheConfiguration(true);
-    BOOST_CHECK(cacheConfig1.nBlockDBCache == 0);
-    BOOST_CHECK(cacheConfig1.nBlockUndoDBCache == 0);
     BOOST_CHECK(cacheConfig1.nBlockTreeDBCache == 2097152);
     BOOST_CHECK(cacheConfig1.nTxIndexCache == 0);
     BOOST_CHECK(cacheConfig1.nCoinDBCache == 73662464);
@@ -109,8 +107,6 @@ BOOST_FIXTURE_TEST_CASE(cache_configuration, TestChain100Setup)
 
     // Check non-default values are returned
     CacheConfig cacheConfig2 = DiscoverCacheConfiguration();
-    BOOST_CHECK(cacheConfig2.nBlockDBCache == 0);
-    BOOST_CHECK(cacheConfig2.nBlockUndoDBCache == 0);
     BOOST_CHECK(cacheConfig2.nBlockTreeDBCache == 655360);
     BOOST_CHECK(cacheConfig2.nTxIndexCache == 0);
     BOOST_CHECK(cacheConfig2.nCoinDBCache == 1146880);
@@ -120,8 +116,6 @@ BOOST_FIXTURE_TEST_CASE(cache_configuration, TestChain100Setup)
     bool nTemp = fTxIndex;
     fTxIndex = true;
     cacheConfig1 = DiscoverCacheConfiguration(true);
-    BOOST_CHECK(cacheConfig1.nBlockDBCache == 0);
-    BOOST_CHECK(cacheConfig1.nBlockUndoDBCache == 0);
     BOOST_CHECK(cacheConfig1.nBlockTreeDBCache == 2097152);
     BOOST_CHECK(cacheConfig1.nTxIndexCache == 36831232);
     BOOST_CHECK(cacheConfig1.nCoinDBCache == 36831232);
@@ -129,8 +123,6 @@ BOOST_FIXTURE_TEST_CASE(cache_configuration, TestChain100Setup)
 
     // Check non-default values are returned
     cacheConfig2 = DiscoverCacheConfiguration();
-    BOOST_CHECK(cacheConfig2.nBlockDBCache == 0);
-    BOOST_CHECK(cacheConfig2.nBlockUndoDBCache == 0);
     BOOST_CHECK(cacheConfig2.nBlockTreeDBCache == 655360);
     BOOST_CHECK(cacheConfig2.nTxIndexCache == 573440);
     BOOST_CHECK(cacheConfig2.nCoinDBCache == 573440);

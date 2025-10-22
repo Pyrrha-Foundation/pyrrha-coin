@@ -711,8 +711,6 @@ CacheConfig CacheSizeCalculations(int64_t _nTotalCache)
     _nTotalCache -= cache.nBlockTreeDBCache;
 
     // use 12.5%-25% of the remainder for the utxo leveldb disk cache
-    _nTotalCache -= cache.nBlockDBCache;
-    _nTotalCache -= cache.nBlockUndoDBCache;
     cache.nCoinDBCache = std::min(_nTotalCache / 4, (_nTotalCache / 8) + (1 << 23));
     if (!fTxIndex)
     {
