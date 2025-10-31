@@ -84,7 +84,7 @@ cache: &global_cache_settings
     stage: build
     # Environment based on workarounds in this issue:
     # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27300
-    image: bchunlimited/nexa:ubuntu20.04
+    image: bchunlimited/nexa:ubuntu24.04
     cache: {}
     variables:
         DOCKER_HOST: tcp://docker:2375
@@ -129,7 +129,7 @@ gitian-binaries:
 ######## Ubuntu base settings
 ######################################################
 .ubuntu_base:
-    image: bchunlimited/nexa:ubuntu20.04
+    image: bchunlimited/nexa:ubuntu24.04
 
 .ubuntu_ccache_scripts:
     extends: .ubuntu_base
@@ -362,9 +362,6 @@ build-ubuntu-deps:
     stage: build_depends
     extends: .cache-ubuntu
     needs: []
-    variables:
-        CXX: g++-10
-        CC: gcc-10
     script:
         - cd depends
         - make HOST=x86_64-linux-gnu -j `nproc`
@@ -378,9 +375,6 @@ build-ubuntu:
     stage: build
     extends: .cache-ubuntu
     needs: [build-ubuntu-deps]
-    variables:
-        CXX: g++-10
-        CC: gcc-10
     script:
         - ./autogen.sh
         - mkdir build; cd build
@@ -422,9 +416,6 @@ build-ubuntu-rostrum:
 
     variables:
         CARGO_HOME: ${CI_PROJECT_DIR}/cargohome
-        # needed due to gcc 9.x bug,see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95189
-        CXX: g++-10
-        CC: gcc-10
 
     before_script:
       - mkdir -p cargohome
@@ -928,6 +919,9 @@ build-osx-arm64:
 build-debian-nodeps:
     stage: build
     extends: .cache-debian-nodeps
+    variables:
+        CC: clang
+        CXX: clang++
     needs: []
     script:
         - ./autogen.sh
@@ -945,6 +939,9 @@ build-debian-nodeps:
 build-debian-nodeps-qt:
     stage: build
     extends: .cache-debian-nodeps
+    variables:
+        CC: clang
+        CXX: clang++
     needs: []
     script:
         - ./autogen.sh
