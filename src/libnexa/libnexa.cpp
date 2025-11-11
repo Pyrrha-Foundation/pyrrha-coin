@@ -446,7 +446,6 @@ SLAPI int calcSigHash(const unsigned char *txData,
 }
 
 
-
 /** Sign one input of a transaction
     All buffer arguments should be in binary-serialized data.
     The transaction (txData) must contain the COutPoint (tx hash and vout) of all relevant inputs,

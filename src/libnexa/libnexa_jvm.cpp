@@ -442,7 +442,6 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_calcS
 }
 
 
-
 extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_signHashSchnorr(JNIEnv *env,
     jobject ths,
     jbyteArray message,
@@ -515,7 +514,6 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_org_nexa_libnexakotlin_Native_signH
     }
     return makeJByteArray(env, result, resultLen);
 }
-
 
 
 // libnexa-inconsistency: no parseGroupDescription equivalent
