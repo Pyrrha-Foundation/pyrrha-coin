@@ -2,7 +2,6 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-
 #if defined(HAVE_CONFIG_H)
 #include "nexa-config.h"
 #endif
@@ -47,6 +46,227 @@
 #ifdef DEBUG_LOCKORDER
 std::atomic<bool> lockdataDestructed{false};
 LockData lockdata;
+#endif
+
+#ifdef MINER_OPENCL 
+#include <stdexcept>
+
+#include "CL/cl.h"
+#include "secp256k1.cl"
+
+#define secp256k1_precomp	0
+#define secp256k1_pj		1
+#define secp256k1_pubkey	2
+#define secp256k1_pubkey2	3
+#define secp256k1_hashOut	4
+
+uint32_t g_rawIntensity = 1 << 20;
+
+// secp256k1 stuff
+uint32_t g_curveBits = 20;
+void *g_secp256k1_precompute_20 = nullptr;
+void *g_secp256k1_gej_temp = nullptr;
+void *g_secp256k1_z_ratio = nullptr;
+
+// opencl stuff
+#ifndef MAX_GPUS
+    #define MAX_GPUS 16
+#endif
+
+enum _kernel
+{
+    kernel_sha256_64 = 0,
+    kernel_sha256_40,
+    kernel_sha256_32,
+    kernel_nexapow_start,
+    kernel_nexapow,
+    kernel_secp256k1_64,
+    kernel_checkhash_64,
+    kernel_count
+};
+
+bool                g_isNvidia[MAX_GPUS];
+cl_device_id        g_deviceId[MAX_GPUS];
+cl_context          g_deviceContext[MAX_GPUS];
+cl_command_queue    g_deviceCommandQueue[MAX_GPUS];
+
+cl_mem              g_bufferInput[MAX_GPUS];
+cl_mem              g_bufferOutput[MAX_GPUS];
+cl_mem              g_bufferTarget[MAX_GPUS];
+cl_mem              g_bufferHash[MAX_GPUS];
+cl_mem              g_bufferExtra[MAX_GPUS][8];
+
+cl_program          g_program[MAX_GPUS];
+cl_kernel           g_kernels[MAX_GPUS][kernel_count];
+
+uint32_t            g_nonces[MAX_GPUS];
+uint16_t            g_noncesExtra[MAX_GPUS];
+
+const char* getClErrorString(cl_int error)
+{
+    switch(error)
+    {
+    case  CL_SUCCESS: return "CL_SUCCESS";
+    case  CL_DEVICE_NOT_FOUND: return "CL_DEVICE_NOT_FOUND";
+    case  CL_DEVICE_NOT_AVAILABLE: return "CL_DEVICE_NOT_AVAILABLE";
+    case  CL_COMPILER_NOT_AVAILABLE: return "CL_COMPILER_NOT_AVAILABLE";
+    case  CL_MEM_OBJECT_ALLOCATION_FAILURE: return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+    case  CL_OUT_OF_RESOURCES: return "CL_OUT_OF_RESOURCES";
+    case  CL_OUT_OF_HOST_MEMORY: return "CL_OUT_OF_HOST_MEMORY";
+    case  CL_PROFILING_INFO_NOT_AVAILABLE: return "CL_PROFILING_INFO_NOT_AVAILABLE";
+    case  CL_MEM_COPY_OVERLAP: return "CL_MEM_COPY_OVERLAP";
+    case  CL_IMAGE_FORMAT_MISMATCH: return "CL_IMAGE_FORMAT_MISMATCH";
+    case  CL_IMAGE_FORMAT_NOT_SUPPORTED: return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+    case  CL_BUILD_PROGRAM_FAILURE: return "CL_BUILD_PROGRAM_FAILURE";
+    case  CL_MAP_FAILURE: return "CL_MAP_FAILURE";
+    case  CL_MISALIGNED_SUB_BUFFER_OFFSET: return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
+    case  CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST: return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
+    case  CL_COMPILE_PROGRAM_FAILURE: return "CL_COMPILE_PROGRAM_FAILURE";
+    case  CL_LINKER_NOT_AVAILABLE: return "CL_LINKER_NOT_AVAILABLE";
+    case  CL_LINK_PROGRAM_FAILURE: return "CL_LINK_PROGRAM_FAILURE";
+    case  CL_DEVICE_PARTITION_FAILED: return "CL_DEVICE_PARTITION_FAILED";
+    case  CL_KERNEL_ARG_INFO_NOT_AVAILABLE: return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
+
+    case  CL_INVALID_VALUE: return "CL_INVALID_VALUE";
+    case  CL_INVALID_DEVICE_TYPE: return "CL_INVALID_DEVICE_TYPE";
+    case  CL_INVALID_PLATFORM: return "CL_INVALID_PLATFORM";
+    case  CL_INVALID_DEVICE: return "CL_INVALID_DEVICE";
+    case  CL_INVALID_CONTEXT: return "CL_INVALID_CONTEXT";
+    case  CL_INVALID_QUEUE_PROPERTIES: return "CL_INVALID_QUEUE_PROPERTIES";
+    case  CL_INVALID_COMMAND_QUEUE: return "CL_INVALID_COMMAND_QUEUE";
+    case  CL_INVALID_HOST_PTR: return "CL_INVALID_HOST_PTR";
+    case  CL_INVALID_MEM_OBJECT: return "CL_INVALID_MEM_OBJECT";
+    case  CL_INVALID_IMAGE_FORMAT_DESCRIPTOR: return "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
+    case  CL_INVALID_IMAGE_SIZE: return "CL_INVALID_IMAGE_SIZE";
+    case  CL_INVALID_SAMPLER: return "CL_INVALID_SAMPLER";
+    case  CL_INVALID_BINARY: return "CL_INVALID_BINARY";
+    case  CL_INVALID_BUILD_OPTIONS: return "CL_INVALID_BUILD_OPTIONS";
+    case  CL_INVALID_PROGRAM: return "CL_INVALID_PROGRAM";
+    case  CL_INVALID_PROGRAM_EXECUTABLE: return "CL_INVALID_PROGRAM_EXECUTABLE";
+    case  CL_INVALID_KERNEL_NAME: return "CL_INVALID_KERNEL_NAME";
+    case  CL_INVALID_KERNEL_DEFINITION: return "CL_INVALID_KERNEL_DEFINITION";
+    case  CL_INVALID_KERNEL: return "CL_INVALID_KERNEL";
+    case  CL_INVALID_ARG_INDEX: return "CL_INVALID_ARG_INDEX";
+    case  CL_INVALID_ARG_VALUE: return "CL_INVALID_ARG_VALUE";
+    case  CL_INVALID_ARG_SIZE: return "CL_INVALID_ARG_SIZE";
+    case  CL_INVALID_KERNEL_ARGS: return "CL_INVALID_KERNEL_ARGS";
+    case  CL_INVALID_WORK_DIMENSION: return "CL_INVALID_WORK_DIMENSION";
+    case  CL_INVALID_WORK_GROUP_SIZE: return "CL_INVALID_WORK_GROUP_SIZE";
+    case  CL_INVALID_WORK_ITEM_SIZE: return "CL_INVALID_WORK_ITEM_SIZE";
+    case  CL_INVALID_GLOBAL_OFFSET: return "CL_INVALID_GLOBAL_OFFSET";
+    case  CL_INVALID_EVENT_WAIT_LIST: return "CL_INVALID_EVENT_WAIT_LIST";
+    case  CL_INVALID_EVENT: return "CL_INVALID_EVENT";
+    case  CL_INVALID_OPERATION: return "CL_INVALID_OPERATION";
+    case  CL_INVALID_GL_OBJECT: return "CL_INVALID_GL_OBJECT";
+    case  CL_INVALID_BUFFER_SIZE: return "CL_INVALID_BUFFER_SIZE";
+    case  CL_INVALID_MIP_LEVEL: return "CL_INVALID_MIP_LEVEL";
+    case  CL_INVALID_GLOBAL_WORK_SIZE: return "CL_INVALID_GLOBAL_WORK_SIZE";
+    case  CL_INVALID_PROPERTY: return "CL_INVALID_PROPERTY";
+    case  CL_INVALID_IMAGE_DESCRIPTOR: return "CL_INVALID_IMAGE_DESCRIPTOR";
+    case  CL_INVALID_COMPILER_OPTIONS: return "CL_INVALID_COMPILER_OPTIONS";
+    case  CL_INVALID_LINKER_OPTIONS: return "CL_INVALID_LINKER_OPTIONS";
+    case  CL_INVALID_DEVICE_PARTITION_COUNT: return "CL_INVALID_DEVICE_PARTITION_COUNT";
+    case  CL_INVALID_PIPE_SIZE: return "CL_INVALID_PIPE_SIZE";
+    case  CL_INVALID_DEVICE_QUEUE: return "CL_INVALID_DEVICE_QUEUE";
+    case  CL_INVALID_SPEC_ID: return "CL_INVALID_SPEC_ID";
+    case  CL_MAX_SIZE_RESTRICTION_EXCEEDED: return "CL_MAX_SIZE_RESTRICTION_EXCEEDED";
+    default: return "UNKNOWN OPENCL ERROR";
+    }
+}
+
+
+#define SET_KERNEL_ARG_GPU( _gpuId, _kernel, _id, _size, _arg ) \
+	if ( ( ret = clSetKernelArg( g_kernels[ _gpuId ][ _kernel ], _id, _size, _arg ) ) != CL_SUCCESS )\
+	{\
+        std::stringstream errMsg;\
+        errMsg << "[" << __FILE__ ":" << __LINE__ << "] GPU #" << _gpuId << ": failed to set parameter" << _id << " for kernel " \
+               << _kernel << " error " << ret << " " << getClErrorString(ret) << "\n"; \
+        throw std::runtime_error( errMsg.str().c_str() );\
+	}\
+
+#ifdef _WIN32
+#include <windows.h>
+
+static inline void port_sleep( size_t msec )
+{
+    Sleep( (DWORD)msec );
+}
+#else
+#include <unistd.h>
+
+static inline void port_sleep( size_t msec )
+{
+  usleep( msec * 1000 );
+}
+#endif
+
+cl_int multiRunJob64( uint32_t gpuId, _kernel kernel, cl_mem inputBuffer, cl_mem hashBuffer, uint32_t startNonce = 0 )
+{
+    cl_int ret = CL_SUCCESS;
+
+	SET_KERNEL_ARG_GPU( gpuId, kernel, 0, sizeof(cl_mem), &inputBuffer );
+	SET_KERNEL_ARG_GPU( gpuId, kernel, 1, sizeof(cl_mem), &hashBuffer );
+	SET_KERNEL_ARG_GPU( gpuId, kernel, 2, sizeof(cl_mem), nullptr );
+    uint32_t maxIntensity = g_rawIntensity;
+    SET_KERNEL_ARG_GPU( gpuId, kernel, 3, sizeof(cl_uint), &maxIntensity );
+
+    size_t offset = startNonce;
+    size_t workSize = 64;
+    size_t intensity = ( g_rawIntensity / workSize + 1 ) * workSize;
+	if ( ( ret = clEnqueueNDRangeKernel( g_deviceCommandQueue[ gpuId ], g_kernels[ gpuId ][ kernel ], 1, offset ? &offset : nullptr, &intensity, &workSize, 0, nullptr, nullptr ) ) != CL_SUCCESS )
+	{
+        std::stringstream errMsg;
+        errMsg << "GPU #" << gpuId << ": failed on clEnqueueNDRangeKernel for kernel" << kernel
+               << " error " << ret << " " << getClErrorString(ret);
+        throw std::runtime_error( errMsg.str().c_str() );
+	}
+
+	return CL_SUCCESS;
+}
+
+cl_int multiCheckHash( uint32_t gpuId, cl_mem buffer )
+{
+    cl_int ret = CL_SUCCESS;
+	cl_event eventFinish;
+
+	SET_KERNEL_ARG_GPU( gpuId, kernel_checkhash_64, 0, sizeof(cl_mem), &buffer );
+	SET_KERNEL_ARG_GPU( gpuId, kernel_checkhash_64, 1, sizeof(cl_mem), &g_bufferOutput[ gpuId ] );
+    SET_KERNEL_ARG_GPU( gpuId, kernel_checkhash_64, 2, sizeof(cl_ulong), &g_bufferTarget[ gpuId ] );
+    uint32_t maxIntensity = g_rawIntensity;
+    SET_KERNEL_ARG_GPU( gpuId, kernel_checkhash_64, 3, sizeof(cl_uint), &maxIntensity );
+
+    size_t workSize = 64;
+    size_t intensity = ( g_rawIntensity / workSize + 1 ) * workSize;
+    if ( ( ret = clEnqueueNDRangeKernel( g_deviceCommandQueue[ gpuId ], g_kernels[ gpuId ][ kernel_checkhash_64 ], 1, nullptr, &intensity, &workSize, 0, nullptr, &eventFinish ) ) != CL_SUCCESS )
+    {
+        std::stringstream errMsg;
+        errMsg << "GPU #" << gpuId << ": failed on clEnqueueNDRangeKernel for kernel" << kernel_checkhash_64
+               << " error " << ret << " " << getClErrorString(ret); 
+        throw std::runtime_error( errMsg.str().c_str() );
+    }
+
+    if ( g_isNvidia[ gpuId ] )
+    {
+        clFlush( g_deviceCommandQueue[ gpuId ] );
+
+        cl_int evenStatus;
+        do
+        {
+            clGetEventInfo( eventFinish, CL_EVENT_COMMAND_EXECUTION_STATUS, sizeof(cl_int), &evenStatus, nullptr );
+            if ( evenStatus > CL_COMPLETE ) port_sleep( 1 );
+        }
+        while ( evenStatus > CL_COMPLETE ) ;
+        clReleaseEvent( eventFinish );
+        eventFinish = nullptr;
+    }
+    else
+    {
+        clWaitForEvents( 1, &eventFinish );
+    }
+    clReleaseEvent( eventFinish );
+
+    return CL_SUCCESS;
+}
 #endif
 
 // Lambda used to generate entropy, per-thread (see CpuMiner, et al below)
@@ -95,8 +315,13 @@ public:
         addHeader(_("Mining options:"))
             .addArg("blockversion=<n>", ::AllowedArgs::requiredInt,
                 _("Set the block version number. For testing only. Value must be an integer"))
+#ifdef MINER_OPENCL
+            .addArg("gpus=<n>", ::AllowedArgs::requiredInt,
+                _("Number of gpus to use for mining (default: 1). Value must be an integer"))
+#else
             .addArg("cpus=<n>", ::AllowedArgs::requiredInt,
                 _("Number of cpus to use for mining (default: 1). Value must be an integer"))
+#endif
             .addArg("duration=<n>", ::AllowedArgs::requiredInt,
                 _("Number of seconds to mine a particular block candidate (default: 30). Value must be an integer"))
             .addArg("nblocks=<n>", ::AllowedArgs::requiredInt,
@@ -154,13 +379,22 @@ void static MinerThread(int threadNum)
         {
             CpuMiner(threadNum);
         }
+        catch( const std::runtime_error &e )
+        {
+            printf("[%s:%d] GPU #%d: cannot continue with this GPU, error: %s\n", __FILE__, __LINE__, threadNum, e.what());
+            return;  // Stop this trying with this GPU, but don't stop the program
+        }
         catch (const std::exception &e)
         {
             PrintExceptionContinue(&e, "CommandLineRPC()");
+            MilliSleep(2000);  // So if this GPU is screwed, it can just keep failing in the background w/o affecting the rest
+            printf("[%s:%d] GPU #%d: retrying\n",__FILE__, __LINE__, threadNum);
         }
         catch (...)
         {
             PrintExceptionContinue(nullptr, "CommandLineRPC()");
+            MilliSleep(2000);  // So if this GPU is screwed, it can just keep failing in the background w/o affecting the rest
+            printf("[%s:%d] GPU #%d: retrying\n",__FILE__, __LINE__, threadNum);
         }
     }
 }
@@ -198,6 +432,142 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
     arith_uint256 hashTarget = arith_uint256().SetCompact(nBits);
     bool found = false;
 
+#ifdef MINER_OPENCL
+    uint256 target;
+    target.SetHex(hashTarget.GetHex());
+#ifdef GPU_VERIFY_STEPS
+    printf( "target: %s\tstartNonce: %u\n", target.GetHex().c_str(), g_nonces[extra] );
+#endif
+    cl_int ret = clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferTarget[ extra ], CL_TRUE, 0, 32, &target.begin()[ 0 ], 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to set target, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
+
+    std::vector<uint32_t> hash;
+    hash.resize(11);
+    for ( int i = 0; i < 9; i++ ) hash[ i ] = 0;
+    memcpy( &hash[0], headerCommitment.begin(), 32 );
+    ((uint8_t*)&hash[8])[0] = 8;
+    // unique per gpu
+    ((uint8_t*)&hash[8])[1] = extra + 1;
+    *(uint16_t*)(&((uint8_t*)&hash[8])[2]) = g_noncesExtra[ extra ]; // extra nonce
+
+    ret = clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferInput[ extra ], CL_TRUE, 0, 11 * sizeof(cl_uint), &hash[ 0 ], 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to set input, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
+
+    cl_ulong zero = 0;
+    ret = clEnqueueWriteBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, sizeof(cl_ulong), &zero, 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to reset output buffer, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
+
+    if (nonce.size() < 8)
+        nonce.resize(8);
+
+    for ( int i = 0; i < 8; i++ )
+        nonce[i] = 0;
+
+    uint32_t startNonce = g_nonces[extra];
+
+    uint256 miningHash;
+
+    SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
+    SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_secp256k1_64, 6, sizeof(cl_uint), &g_curveBits );
+
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow_start, 6, sizeof(cl_uint), &g_curveBits );
+
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 4, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pubkey ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 5, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pubkey2 ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 6, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_pj ] );	
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 7, sizeof(cl_mem), &g_bufferExtra[ extra ][ secp256k1_precomp ] );
+    SET_KERNEL_ARG_GPU( extra, kernel_nexapow, 8, sizeof(cl_uint), &g_curveBits );
+
+    multiRunJob64( extra, kernel_sha256_40, g_bufferInput[ extra ], g_bufferHash[ extra ], startNonce );
+#ifdef GPU_VERIFY_STEPS
+    {
+        uint32_t verify[16];
+        clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferHash[ extra ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
+        memcpy( miningHash.begin(), verify, 32 );
+        printf( "hash sha256 gpu: %s\n", miningHash.GetHex().c_str() );
+    }
+#endif
+
+    multiRunJob64( extra, kernel_sha256_32, g_bufferHash[ extra ], g_bufferHash[ extra ] );
+
+#ifdef GPU_VERIFY_STEPS
+    {
+        uint32_t verify[16];
+        clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferHash[ extra ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
+        memcpy( miningHash.begin(), verify, 32 );
+        printf( "hash mid256 gpu: %s\n", miningHash.GetHex().c_str() );
+    }
+#endif
+
+    multiRunJob64( extra, kernel_secp256k1_64, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_pubkey ] );
+
+    multiRunJob64( extra, kernel_nexapow_start, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_pubkey2 ] );
+
+    multiRunJob64( extra, kernel_nexapow, g_bufferHash[ extra ], g_bufferExtra[ extra ][ secp256k1_hashOut ] );
+
+    multiRunJob64( extra, kernel_sha256_64, g_bufferExtra[ extra ][ secp256k1_hashOut ], g_bufferExtra[ extra ][ secp256k1_hashOut ] );
+
+#ifdef GPU_VERIFY_STEPS
+    {
+        uint32_t verify[16];
+        clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferExtra[ extra ][ secp256k1_hashOut ], CL_TRUE, 0, 16 * sizeof(cl_uint), &verify[ 0 ], 0, nullptr, nullptr );
+        memcpy( miningHash.begin(), verify, 32 );
+        printf( "hash final gpu: %s\n", miningHash.GetHex().c_str() );
+    }
+#endif
+
+    multiCheckHash( extra, g_bufferExtra[ extra ][ secp256k1_hashOut ] );
+
+    uint64_t nonces[32];
+    ret = clEnqueueReadBuffer( g_deviceCommandQueue[ extra ], g_bufferOutput[ extra ], CL_TRUE, 0, 32 * sizeof(cl_ulong), &nonces[ 0 ], 0, nullptr, nullptr );
+	if ( ret != CL_SUCCESS )
+	{
+		printf("[%s:%d] GPU #%i: Failed to read result, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+		return false;
+	}
+
+    for ( uint64_t i = 0; i < ( nonces[ 0 ] <= 16 ? nonces[ 0 ] : 16 ); i++ )
+    {
+        nonce[0] = extra + 1;
+        ((uint32_t*)&nonce[4])[0] = startNonce + nonces[ i + 1 ];
+        *((uint16_t*)&nonce[1]) = g_noncesExtra[ extra ];
+        printf( "GPU #%i: found solution for nonce %u with extra nonce %u\n", extra, startNonce + nonces[ i + 1 ], g_noncesExtra[ extra ] );
+
+        miningHash = GetMiningHash(headerCommitment, nonce);
+        if (CheckProofOfWork(miningHash, nBits, conp))
+        {
+            //g_nonces[ extra ] = 0;
+            // Found a solution
+            found = true;
+            printf("%s: proof-of-work found  \n  mining puzzle solution: %s  \ntarget: %s\n", now().c_str(),
+                miningHash.GetHex().c_str(), hashTarget.GetHex().c_str());
+            return found;
+        }
+    }
+
+    // increment extra nonce if needed
+    if ( g_nonces[ extra ] + g_rawIntensity < g_nonces[ extra ] )
+        g_noncesExtra[ extra ]++;
+
+    g_nonces[ extra ] += g_rawIntensity;
+
+    return false; // Give up leave
+#else
     /* Eventually when hashing performance improved dramatically we may need to start with 6 bytes.
 
     // Note that since I have a coinbase that is unique to my hashing effort, my hashing won't duplicate a competitor's
@@ -242,6 +612,7 @@ static bool CpuMineBlockHasherNextChain(int &ntries,
     }
 
     return found;
+#endif
 }
 
 /* this is target inf float number rather than hex */
@@ -353,8 +724,8 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
 
     int64_t start = GetTimeMillis();
     std::vector<unsigned char> nonce;
-    int ChunkAmt = 10000;
-    int checked = 0;
+    uint32_t ChunkAmt = 10000;
+    uint32_t checked = 0;
     uint32_t startCount = 1;
     if (!deterministicStartCount)
         startCount = randFunc();
@@ -369,10 +740,17 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
         // and the block will be rejected.  So do not advance time (let it be advanced by nexad every time we
         // request a new block).
         // header.nTime = (header.nTime < GetTime()) ? GetTime() : header.nTime;
+#ifdef MINER_OPENCL
+        int tries = g_rawIntensity;
+        found = CpuMineBlockHasherNextChain(
+            tries, headerCommitment, nBits, randFunc, conp, startCount, rollAt, threadNum, nonce);
+        checked += g_rawIntensity;
+#else
         int tries = ChunkAmt;
         found = CpuMineBlockHasherNextChain(
             tries, headerCommitment, nBits, randFunc, conp, startCount, rollAt, threadNum, nonce);
         checked += ChunkAmt - tries;
+#endif
     }
 
     // Leave if not found:
@@ -380,8 +758,13 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
     if (!found)
     {
         const float elapsed = GetTimeMillis() - start;
-        printf("%s: Checked %d possibilities in %5.1f secs, %3.3f MH/s\n", rightnow.c_str(), checked, elapsed / 1000,
+#ifdef MINER_OPENCL
+        printf("GPU #%i: Checked %u possibilities in %5.1f secs, %3.3f MH/s\n", threadNum, rightnow.c_str(), checked, elapsed / 1000,
             (checked / 1e6) / (elapsed / 1e3));
+#else
+        printf("%s: Checked %u possibilities in %5.1f secs, %3.3f MH/s\n", rightnow.c_str(), checked, elapsed / 1000,
+            (checked / 1e6) / (elapsed / 1e3));
+#endif
         return ret;
     }
 
@@ -624,6 +1007,273 @@ static bool CheckForNewMiningCandidate()
 
 int CpuMiner(int threadNum)
 {
+#ifdef MINER_OPENCL
+    cl_uint numPlatforms = 0;
+    cl_int ret;
+
+    ret = clGetPlatformIDs( 0, nullptr, &numPlatforms );
+    if ( ret != CL_SUCCESS )
+    {
+        throw std::runtime_error("OpenCL: failed on clGetPlatformIDs");
+    }
+
+    cl_platform_id *platforms = new cl_platform_id[ numPlatforms ];
+    ret = clGetPlatformIDs( numPlatforms, platforms, nullptr );
+    if ( ret != CL_SUCCESS )
+    {
+        throw std::runtime_error( "OpenCL: failed on clGetPlatformIDs" );
+    }
+
+    int offset = 0;
+    for ( int platform = 0; platform < numPlatforms; platform++ )
+    {
+        char buf[128];
+        ret = clGetPlatformInfo( platforms[ platform ], CL_PLATFORM_VENDOR, sizeof(buf), buf, nullptr );
+
+        if ( ret == CL_SUCCESS )
+        {
+            printf( "OpenCL platform: %s\n", buf );
+        }
+
+        bool isNvidia = strstr( buf, "NVIDIA" );
+
+        cl_uint numDevices;
+        ret = clGetDeviceIDs( platforms[ platform ], CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices );
+        if ( ret != CL_SUCCESS || numDevices == 0 )
+        {
+            printf( "OpenCL: no devices, skip\n" );
+            continue;
+        }
+
+        if ( threadNum - offset >= numDevices )
+        {
+            offset += numDevices;
+            continue;
+        }
+
+        cl_device_id *devices = new cl_device_id[ numDevices ];
+        ret = clGetDeviceIDs( platforms[ platform ], CL_DEVICE_TYPE_GPU, numDevices, devices, nullptr );
+        if ( ret != CL_SUCCESS )
+        {
+            throw std::runtime_error( "OpenCL: failed on clGetDeviceIDs" );
+        }
+
+        g_deviceId[ threadNum ] = devices[ threadNum - offset ];
+
+        char ver[128] = { 0 };
+        if ( clGetDeviceInfo( g_deviceId[ threadNum ], CL_DRIVER_VERSION, sizeof(ver), ver, nullptr ) == CL_SUCCESS )
+        {
+            printf( "OpenCL: driver version is \"%s\"\n", ver );
+        }
+
+        char gpuCodename[256] = {0};
+        if ( clGetDeviceInfo( g_deviceId[ threadNum ], CL_DEVICE_NAME, 256, gpuCodename, nullptr ) == CL_SUCCESS )
+        {
+            printf( "OpenCL: device name is \"%s\"\n", gpuCodename );
+        }
+
+        g_isNvidia[ threadNum ] = isNvidia;
+        g_deviceContext[ threadNum ] = clCreateContext( nullptr, 1, &g_deviceId[ threadNum ], nullptr, nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "OpenCL: failed on clCreateContext for device" << threadNum;
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        const cl_command_queue_properties commandQueueProperties = { 0 };
+        g_deviceCommandQueue[ threadNum ] = clCreateCommandQueue( g_deviceContext[ threadNum ], g_deviceId[ threadNum ], commandQueueProperties, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "OpenCL: failed on clCreateCommandQueue for device" << threadNum;
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        g_bufferInput[ threadNum ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, 256 * 256, nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate input buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+        g_bufferOutput[ threadNum ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, ( 1 + 512 + 512 ) * sizeof(cl_ulong), nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate output buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+        g_bufferTarget[ threadNum ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, 8 * sizeof(cl_ulong), nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate target buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        g_bufferHash[ threadNum ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, g_rawIntensity * 24 * sizeof(cl_uint), nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate hash buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        g_bufferExtra[ threadNum ][ secp256k1_hashOut ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, g_rawIntensity * 16 * sizeof(cl_uint), nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate hashOut buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        g_bufferExtra[ threadNum ][ secp256k1_pubkey ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, g_rawIntensity * 24 * sizeof(cl_uint), nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate pubkey buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        g_bufferExtra[ threadNum ][ secp256k1_pubkey2 ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, g_rawIntensity * 24 * sizeof(cl_uint), nullptr, &ret );
+        if ( ret != CL_SUCCESS )
+        {
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate pubkey2 buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+        }
+
+        size_t windows = (256 / g_curveBits) + 1;
+	    size_t window_size = (1 << (g_curveBits - 1));
+	    size_t precomp_size = 64UL * windows * window_size;
+
+		g_bufferExtra[ threadNum ][ secp256k1_pj ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, 128UL * (uint64_t)g_rawIntensity, nullptr, &ret );
+		if ( ret != CL_SUCCESS )
+		{
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate gej buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+		}
+
+		g_bufferExtra[ threadNum ][ secp256k1_precomp ] = clCreateBuffer( g_deviceContext[ threadNum ], CL_MEM_READ_WRITE, precomp_size, nullptr, &ret );
+		if ( ret != CL_SUCCESS )
+		{
+            std::stringstream errMsg;
+            errMsg << "GPU #" << threadNum << ": failed to allocate precomp buffer";
+            throw std::runtime_error( errMsg.str().c_str() );
+		}
+
+        printf( "GPU #%i: start fill precompute\n", threadNum );
+		for ( size_t i = 0; i < precomp_size; i += 1024 * 1024 )
+		{
+			void *precomp = &((uint8_t*)g_secp256k1_precompute_20)[ i ];
+			if ( i > precomp_size - 1024 * 1024 )
+			{
+				clEnqueueWriteBuffer( g_deviceCommandQueue[ threadNum ], g_bufferExtra[ threadNum ][ secp256k1_precomp ], CL_TRUE, i, precomp_size - i, precomp, 0, nullptr, nullptr );
+			}
+			else
+			{
+				clEnqueueWriteBuffer( g_deviceCommandQueue[ threadNum ], g_bufferExtra[ threadNum ][ secp256k1_precomp ], CL_TRUE, i, 1024 * 1024, precomp, 0, nullptr, nullptr );
+			}
+		}
+        printf( "GPU #%i: finish fill precompute\n", threadNum );
+
+        // AMD OpenCL compiler sucks for RDNA+... so lets make it work via some hack
+        char src[MAX_PATH], cwd[MAX_PATH];
+        getcwd(cwd,sizeof(cwd));
+        sprintf(src,"#include \"%s/secp256k1.cl\"", cwd);
+        const char *source = src;
+
+        g_program[ threadNum ] = clCreateProgramWithSource( g_deviceContext[ threadNum ], 1, &source, nullptr, &ret );
+        if ( g_isNvidia[ threadNum ] )
+        {
+            ret = clBuildProgram( g_program[ threadNum ], 1, &g_deviceId[ threadNum ], "-DOPENCL -DNVIDIA -cl-nv-cstd=CL2.0 -nv-m64", nullptr, nullptr );
+        }
+        else
+        {
+            ret = clBuildProgram( g_program[ threadNum ], 1, &g_deviceId[ threadNum ], "-DOPENCL -cl-std=CL2.0 -O3 -m64", nullptr, nullptr );
+        }
+        if ( ret != CL_SUCCESS )
+        {
+            size_t len;
+            printf( "OpenCL: failed when on clBuildProgram\n" );
+
+            if ( ( ret = clGetProgramBuildInfo( g_program[ threadNum ], g_deviceId[ threadNum ], CL_PROGRAM_BUILD_LOG, 0, nullptr, &len ) ) != CL_SUCCESS )
+            {
+                throw std::runtime_error( "OpenCL: failed on clGetProgramBuildInfo for length of build log output" );
+            }
+
+            char* buildLog = (char*)malloc( len + 1 );
+            buildLog[ 0 ] = '\0';
+
+            if ( ( ret = clGetProgramBuildInfo( g_program[ threadNum ], g_deviceId[ threadNum ], CL_PROGRAM_BUILD_LOG, len, buildLog, NULL ) ) != CL_SUCCESS )
+            {
+                free( buildLog );
+                throw std::runtime_error( "OpenCL: failed on clGetProgramBuildInfo for build log" );
+            }
+            printf( buildLog );
+            printf("\n");
+            free( buildLog );
+
+            throw std::runtime_error("");
+        }
+
+        printf( "GPU #%i: kernel compiled\n", threadNum );
+
+        g_kernels[ threadNum ][ kernel_nexapow ] = clCreateKernel( g_program[ threadNum ], "nexapow", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel nexapow, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+        g_kernels[ threadNum ][ kernel_nexapow_start ] = clCreateKernel( g_program[ threadNum ], "nexapow_start", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel nexapow_start, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+
+        g_kernels[ threadNum ][ kernel_secp256k1_64 ] = clCreateKernel( g_program[ threadNum ], "secp256k1_64", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel secp256k1_64, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+
+        g_kernels[ threadNum ][ kernel_sha256_32 ] = clCreateKernel( g_program[ threadNum ], "sha256_32", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel sha256_32, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+
+        g_kernels[ threadNum ][ kernel_sha256_40 ] = clCreateKernel( g_program[ threadNum ], "sha256_40", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel sha256_40, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+
+        g_kernels[ threadNum ][ kernel_sha256_64 ] = clCreateKernel( g_program[ threadNum ], "sha256_64", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel sha256_64, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+
+        g_kernels[ threadNum ][ kernel_checkhash_64 ] = clCreateKernel( g_program[ threadNum ], "checkhash_64", &ret );
+        if (ret != CL_SUCCESS)
+        {
+            printf("[%s:%d] Cannot create kernel checkhash_64, error: %d.%s\n", __FILE__,__LINE__, ret, getClErrorString(ret));
+            continue;
+        }
+
+        delete []devices;
+        break;
+    }
+#endif
+
     // Initialize random number generator lambda. This is per-thread and
     // is thread-safe.  std::rand() is not thread-safe and can result
     // in multiple threads doing redundant proof-of-work.
@@ -797,6 +1447,10 @@ int CpuMiner(int threadNum)
         // See:   RPCSubmitSolution(mineresult,nblocks);
         // This is so RPC Exceptions are handled in one place.
     }
+
+#ifdef MINER_OPENCL
+    delete []platforms;
+#endif
     return 0;
 }
 
@@ -836,14 +1490,58 @@ int main(int argc, char *argv[])
     minerName = GetArg("-name", "");
 
     // Launch miner threads
+#ifdef MINER_OPENCL
+    int nThreads = GetArg("-gpus", 1);
+    if (nThreads > MAX_GPUS)
+    {
+        nThreads = MAX_GPUS;
+        printf("%s: Number of gpu's reduced to the maximum allowed value: %d.\n", now().c_str(), nThreads);
+    }
+
+    int nIntensity = GetArg("-intensity", 18);
+    printf( "Set intensity to %i\n", nIntensity );
+    g_rawIntensity = 1 << nIntensity;
+#else
     int nThreads = GetArg("-cpus", 1);
     if (nThreads > 256)
     {
         nThreads = 256;
         printf("%s: Number of threads reduced to the maximum allowed value: %d.\n", now().c_str(), nThreads);
     }
+#endif
     std::vector<std::thread> minerThreads;
+#ifdef MINER_OPENCL
+    printf("%s: Running %d gpus.\n", now().c_str(), nThreads);
+
+    size_t windows = (256 / g_curveBits) + 1;
+    size_t window_size = (1 << (g_curveBits - 1));
+    size_t precomp_size = 64UL * windows * window_size;
+
+    g_secp256k1_gej_temp = (void*)malloc( 128 * window_size );
+    if ( !g_secp256k1_gej_temp )
+    {
+        fprintf(stderr, "ERROR: low mem!\n" );
+        return 0;
+    }
+    g_secp256k1_z_ratio = (void*)malloc( 4 * 10 * window_size );
+    if ( !g_secp256k1_z_ratio )
+    {
+        fprintf(stderr, "ERROR: low mem!\n" );
+        return 0;
+    }
+    g_secp256k1_precompute_20 = (void*)malloc( precomp_size );
+    if ( !g_secp256k1_precompute_20 )
+    {
+        fprintf(stderr, "ERROR: low mem!\n" );
+        return 0;
+    }
+					
+    printf( "CPU: start precompute\n" );
+    secp256k1_ecmult_big_create( g_curveBits, (secp256k1_gej*)g_secp256k1_gej_temp, (uint32_t*)g_secp256k1_z_ratio, (secp256k1_ge_storage*)g_secp256k1_precompute_20 );
+    printf( "CPU: finish precompute\n" );
+#else
     printf("%s: Running %d threads.\n", now().c_str(), nThreads);
+#endif
     minerThreads.resize(nThreads);
     for (int i = 0; i < nThreads; i++)
         minerThreads[i] = std::thread(MinerThread, i);

@@ -770,7 +770,7 @@ nexa_miner_SOURCES = nexa-miner.cpp \
 
 nexa_miner_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) $(EVENT_CFLAGS)
 nexa_miner_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-nexa_miner_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+nexa_miner_LDFLAGS = "-lOpenCL" $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
 nexa_miner_SOURCES += nexa-miner-res.rc
