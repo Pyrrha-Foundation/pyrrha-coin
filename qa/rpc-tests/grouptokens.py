@@ -1141,6 +1141,20 @@ class GroupTokensTest (BitcoinTestFramework):
         assert_equal(self.nodes[2].token("authority", "count", authGrpId4)["rescript"], "0")
         assert_equal(self.nodes[2].token("authority", "count", authGrpId4)["subgroup"], "0")
 
+        regtestGrp = "trzgxdv9tl7c046ae6gmynylsk42n08xpgum4gqh8tsl3t3sccqqqkqaa3uac"
+        not_regtestGrp = "tqq926j2j3utcthgtp4rkku4zewgqe8az4zjxzxgrxjq6heypsqqqns3xlzjm"
+
+        try:  # can not remove whitelisted group
+            self.nodes[0].token("tracker", "remove", str(regtestGrp))
+            assert(0)
+        except JSONRPCException as e:
+            assert("failed to remove token tracker from wallet" in e.error["message"])
+
+        try:  # can not add tracker for whitelisted group ticker
+            self.nodes[0].token("tracker", "add", str(not_regtestGrp), "NUSD")
+            assert(0)
+        except JSONRPCException as e:
+            assert("failed to add token tracker to wallet" in e.error["message"])
 
         ###### Test that the token genesis address is correctly saved and retrieved
         logging.info("testing genesis address is saved and retreived")

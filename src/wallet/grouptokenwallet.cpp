@@ -1603,13 +1603,14 @@ extern UniValue token(const UniValue &params, bool fHelp)
                 }
                 if (!GetGroupTicker(_grpID, strTokenTicker))
                 {
-                    return "failed to add token tracker to wallet, could not find all token info";
+                    throw JSONRPCError(
+                        RPC_WALLET_ERROR, "failed to add token tracker to wallet, could not find all token info");
                 }
                 if (wallet->AddTokenTracker(grpID, strTokenTicker) == 0)
                 {
                     return "added token tracker to wallet";
                 }
-                return "failed to add token tracker to wallet";
+                throw JSONRPCError(RPC_WALLET_ERROR, "failed to add token tracker to wallet");
             }
             strTokenTicker = params[3].get_str();
             if (strTokenTicker.size() > 8)
@@ -1621,7 +1622,7 @@ extern UniValue token(const UniValue &params, bool fHelp)
             {
                 return "added token tracker to wallet";
             }
-            return "failed to add token tracker to wallet";
+            throw JSONRPCError(RPC_WALLET_ERROR, "failed to add token tracker to wallet");
         }
         else if (suboperation == "remove")
         {
@@ -1630,7 +1631,7 @@ extern UniValue token(const UniValue &params, bool fHelp)
             {
                 return "removed token tracker from wallet";
             }
-            return "failed to remove token tracker from wallet";
+            throw JSONRPCError(RPC_WALLET_ERROR, "failed to remove token tracker from wallet");
         }
         else
         {
