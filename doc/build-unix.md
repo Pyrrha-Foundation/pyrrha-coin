@@ -1,6 +1,6 @@
 # UNIX BUILD NOTES
 
-Some notes on how to build Nexa in Unix. Mostly with at Ubuntu / Debian focus.
+Some notes on how to build Pyrrha in Unix. Mostly with at Ubuntu / Debian focus.
 
 For RPM based distros, see [build-unix-rpm.md](build-unix-rpm.md).
 For OpenBSD specific instructions, see [build-openbsd.md](build-openbsd.md).
@@ -64,11 +64,11 @@ BerkeleyDB is required for the wallet. If you don't need wallet support, but jus
 Ubuntu and Debian have their own libdb-dev and libdb++-dev packages, these will install
 BerkeleyDB 5.3 or later.
 
-See the section "Disable-wallet mode" to build Nexa without wallet.
+See the section "Disable-wallet mode" to build Pyrrha without wallet.
 
 ## Installing dependencies for the GUI
 
-If you want to build Nexa-Qt, make sure that the required packages for Qt development
+If you want to build Pyrrha-Qt, make sure that the required packages for Qt development
 are installed. Qt 5.3 or higher is necessary to build the GUI.
 To build without GUI pass `--without-gui`.
 
@@ -111,7 +111,7 @@ Optional dependencies:
 
 For the versions used, see [dependencies.md](dependencies.md)
 
-# Building Nexa
+# Building Pyrrha
 
 Start out by fetching the code
 
@@ -182,7 +182,7 @@ the usage of the absolute path.
 ## System requirements
 
 C++ compilers are memory-hungry. It is recommended to have at least 1 GB of
-memory available when compiling Nexa. With 512MB of memory or less
+memory available when compiling Pyrrha. With 512MB of memory or less
 compilation will take much longer due to swap thrashing.
 
 ## Strip debug symbols
@@ -194,7 +194,7 @@ symbols, which reduces the executable size by about 90%.
 
 ## Security
 
-To help make your Nexa installation more secure by making certain attacks impossible to
+To help make your Pyrrha installation more secure by making certain attacks impossible to
 exploit even if a vulnerability is found, binaries are hardened by default.
 This can be disabled with:
 

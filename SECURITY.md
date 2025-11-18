@@ -1,12 +1,40 @@
-# Security Policy
+# 🔐 Pyrrha Security Policy
 
-To report a security issue, please contact us at security@bitcoinunlimited.info, please use this GPG keys to communicate sensible info with BU developers:
+The Pyrrha project takes security seriously.  
+If you discover a vulnerability that could impact the network, miners, wallets, or users, please report it responsibly.
 
-| Name | Public key |
-|------|-------------|
-|Andrew Stone | D9CFD61AC5EE8935718643194718601972AB33C2 |
-|Andrea Suisani | 17D16F72C0091B1FED7795FBA9CA1D0EE3789741 |
-|Awemany | 9D2FDC1BB5012E4BE44BCAAFD78D75A46101B81F |
+---
 
-To import a dev key in your keys ring use: `gpg --recv-keys "<Public key>"`
+## 📫 Reporting a Vulnerability
 
+To report a security issue, contact:
+
+**security@pyrrha.org**  
+*(temporary placeholder — replace when official mailbox is ready)*
+
+Please include:
+- A clear description of the issue  
+- Steps to reproduce (if possible)  
+- Potential impact  
+- Your preferred method of contact  
+
+We ask researchers **not to disclose vulnerabilities publicly** until the Pyrrha team has reviewed and fixed them.
+
+---
+
+## 🔑 Secure Communication (PGP)
+
+If your report includes sensitive technical details, please encrypt it using our PGP keys.
+
+| Name / Role        | PGP Public Key Fingerprint |
+|--------------------|----------------------------|
+| Pyrrha Security 1  | **TBD**                    |
+| Pyrrha Security 2  | **TBD**                    |
+| Pyrrha Security 3  | **TBD**                    |
+
+*(PGP keys will be published before testnet launch.)*
+
+To import a PGP key:
+
+```bash
+gpg --recv-keys "<fingerprint>"

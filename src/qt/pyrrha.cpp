@@ -146,7 +146,7 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext &context, cons
 /** Class encapsulating Nexa startup and shutdown.
  * Allows running startup and shutdown in a different thread from the UI thread.
  */
-class Nexa : public QObject
+class Pyrrha : public QObject
 {
     Q_OBJECT
 public:
@@ -167,12 +167,12 @@ private:
 };
 
 /** Main Nexa application object */
-class NexaApplication : public QApplication
+class PyrrhaApplication : public QApplication
 {
     Q_OBJECT
 public:
-    explicit NexaApplication(int &argc, char **argv);
-    ~NexaApplication();
+    explicit  PyrrhaApplication(int &argc, char **argv);
+    ~ PyrrhaApplication();
 
 #ifdef ENABLE_WALLET
     /// Create payment server
@@ -230,14 +230,14 @@ private:
 
 #include "nexa.moc"
 
-Nexa::Nexa() : QObject() {}
-void Nexa::handleRunawayException(const std::exception *e)
+Pyrrha::Nexa() : QObject() {}
+void Pyrrha::handleRunawayException(const std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
     Q_EMIT runawayException(QString::fromStdString(strMiscWarning));
 }
 
-void Nexa::initialize(Config *cfg)
+void Pyrrha::initialize(Config *cfg)
 {
     Config &config(*cfg);
     try
@@ -256,7 +256,7 @@ void Nexa::initialize(Config *cfg)
     }
 }
 
-void Nexa::shutdown()
+void Pyrrha::shutdown()
 {
     try
     {
@@ -278,7 +278,7 @@ void Nexa::shutdown()
     }
 }
 
-NexaApplication::NexaApplication(int &argc, char **argv)
+PyrrhaApplication:: PyrrhaApplication(int &argc, char **argv)
     : QApplication(argc, argv), coreThread(0), optionsModel(0), unlimitedModel(0), clientModel(0), window(0),
       pollShutdownTimer(0),
 #ifdef ENABLE_WALLET
@@ -289,7 +289,7 @@ NexaApplication::NexaApplication(int &argc, char **argv)
     setQuitOnLastWindowClosed(false);
 }
 
-NexaApplication::~NexaApplication()
+PyrrhaApplication::~ PyrrhaApplication()
 {
     if (coreThread)
     {
@@ -314,10 +314,10 @@ NexaApplication::~NexaApplication()
 }
 
 #ifdef ENABLE_WALLET
-void NexaApplication::createPaymentServer() { paymentServer = new PaymentServer(this); }
+void PyrrhaApplication::createPaymentServer() { paymentServer = new PaymentServer(this); }
 #endif
 
-void NexaApplication::createPlatformStyle()
+void PyrrhaApplication::createPlatformStyle()
 {
     std::string platformName;
     platformName = GetArg("-uiplatform", DEFAULT_UIPLATFORM);
@@ -327,13 +327,13 @@ void NexaApplication::createPlatformStyle()
     assert(platformStyle);
 }
 
-void NexaApplication::createOptionsModel(bool resetSettings)
+void PyrrhaApplication::createOptionsModel(bool resetSettings)
 {
     optionsModel = new OptionsModel(nullptr, resetSettings);
     unlimitedModel = new UnlimitedModel(); // BU
 }
 
-void NexaApplication::createWindow(const Config *config, const NetworkStyle *networkStyle)
+void PyrrhaApplication::createWindow(const Config *config, const NetworkStyle *networkStyle)
 {
     window = new BitcoinGUI(config, platformStyle, networkStyle, 0);
 
@@ -342,7 +342,7 @@ void NexaApplication::createWindow(const Config *config, const NetworkStyle *net
     pollShutdownTimer->start(200);
 }
 
-void NexaApplication::createSplashScreen(const NetworkStyle *networkStyle)
+void PyrrhaApplication::createSplashScreen(const NetworkStyle *networkStyle)
 {
     SplashScreen *splash = new SplashScreen(0, networkStyle);
     // We don't hold a direct pointer to the splash screen after creation, but the splash
@@ -351,7 +351,7 @@ void NexaApplication::createSplashScreen(const NetworkStyle *networkStyle)
     connect(this, SIGNAL(splashFinished(QWidget *)), splash, SLOT(slotFinish(QWidget *)));
 }
 
-void NexaApplication::startThread()
+void PyrrhaApplication::startThread()
 {
     if (coreThread)
         return;
@@ -372,20 +372,20 @@ void NexaApplication::startThread()
     coreThread->start();
 }
 
-void NexaApplication::parameterSetup()
+void PyrrhaApplication::parameterSetup()
 {
     InitLogging();
     InitParameterInteraction();
 }
 
-void NexaApplication::requestInitialize(Config &config)
+void PyrrhaApplication::requestInitialize(Config &config)
 {
     qDebug() << __func__ << ": Requesting initialize";
     startThread();
     Q_EMIT requestedInitialize(&config);
 }
 
-void NexaApplication::requestShutdown()
+void PyrrhaApplication::requestShutdown()
 {
     qDebug() << __func__ << ": Requesting shutdown";
     startThread();
@@ -409,7 +409,7 @@ void NexaApplication::requestShutdown()
     Q_EMIT requestedShutdown();
 }
 
-void NexaApplication::initializeResult(int retval)
+void PyrrhaApplication::initializeResult(int retval)
 {
     qDebug() << __func__ << ": Initialization result: " << retval;
     // Set exit result: 0 if successful, 1 if failure
@@ -467,13 +467,13 @@ void NexaApplication::initializeResult(int retval)
     }
 }
 
-void NexaApplication::shutdownResult(int retval)
+void PyrrhaApplication::shutdownResult(int retval)
 {
     qDebug() << __func__ << ": Shutdown result: " << retval;
     quit(); // Exit main loop after shutdown finished
 }
 
-void NexaApplication::handleRunawayException(const QString &message)
+void PyrrhaApplication::handleRunawayException(const QString &message)
 {
     QMessageBox::critical(0, "Runaway exception",
         BitcoinGUI::tr("A fatal error occurred. Nexa can no longer continue safely and will quit.") + QString("\n\n") +
@@ -481,7 +481,7 @@ void NexaApplication::handleRunawayException(const QString &message)
     ::exit(EXIT_FAILURE);
 }
 
-WId NexaApplication::getMainWinId() const
+WId PyrrhaApplication::getMainWinId() const
 {
     if (!window)
         return 0;
@@ -630,7 +630,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(bitcoin_locale);
 
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    NexaApplication app(argc, argv);
+     PyrrhaApplication app(argc, argv);
 #ifdef Q_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
@@ -658,7 +658,7 @@ int main(int argc, char *argv[])
     catch (const std::exception &e)
     {
         QMessageBox::critical(
-            0, QObject::tr("Nexa"), QObject::tr("Error: Cannot parse program options: %1.").arg(e.what()));
+            0, QObject::tr("Pyrrha"), QObject::tr("Error: Cannot parse program options: %1.").arg(e.what()));
         return EXIT_FAILURE;
     }
 

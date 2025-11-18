@@ -84,10 +84,10 @@ public:
     ~Secp256k1Init() { ECC_Stop(); }
 };
 
-class NexaMinerArgs : public AllowedArgs::NexaCli
+class PyrrhaMinerArgs : public AllowedArgs::PyrrhaCli
 {
 public:
-    NexaMinerArgs(CTweakMap *pTweaks = nullptr)
+     PyrrhaMinerArgs(CTweakMap *pTweaks = nullptr)
     {
         addHeader(_("Mining options:"))
             .addArg("blockversion=<n>", ::AllowedArgs::requiredInt,
@@ -814,7 +814,7 @@ int main(int argc, char *argv[])
     {
         std::string appname("nexa-miner");
         std::string usage = "\n" + _("Usage:") + "\n" + "  " + appname + " [options] " + "\n";
-        ret = AppInitRPC(usage, NexaMinerArgs(), argc, argv);
+        ret = AppInitRPC(usage,  PyrrhaMinerArgs(), argc, argv);
         if (ret != CONTINUE_EXECUTION)
             return ret;
     }

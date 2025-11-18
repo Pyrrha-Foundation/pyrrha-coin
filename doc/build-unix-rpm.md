@@ -1,6 +1,6 @@
 # UNIX BUILD NOTES (RPM)
 
-Some notes on how to build Nexa in Unix. Mostly with CentOS / RHEL focus.
+Some notes on how to build Pyrrha in Unix. Mostly with CentOS / RHEL focus.
 
 For apt (Debian / Ubuntu) based distros, see [build-unix.md](build-unix.md).
 For OpenBSD specific instructions, see [build-openbsd.md](build-openbsd.md)
@@ -57,7 +57,7 @@ For the versions used, see [dependencies.md](dependencies.md)
 ## System requirements
 
 C++ compilers are memory-hungry. It is recommended to have at least 1 GB of
-memory available when compiling Nexa. With 512MB of memory or less
+memory available when compiling Pyrrha. With 512MB of memory or less
 compilation will take much longer due to swap thrashing.
 
 ## Dependency Build Instructions: CentOS & RHEL
@@ -92,7 +92,7 @@ sudo ln -fs /user/bin/python2 /usr/bin/python
 ```
 
 
-See the section "Disable-wallet mode" to build Nexa without wallet.
+See the section "Disable-wallet mode" to build Pyrrha without wallet.
 
 Optional:
 
@@ -108,7 +108,7 @@ sudo yum install zeromq-devel (provides ZMQ API 4.x)
 
 ## Dependencies for the GUI: CentOS & RHEL
 
-If you want to build Nexa-Qt, make sure that the required packages for Qt development
+If you want to build Pyrrha-Qt, make sure that the required packages for Qt development
 are installed. Qt 5.3 or higher is necessary to build the GUI (QT 4 is not supported).
 To build without GUI pass `--without-gui`.
 
@@ -169,7 +169,7 @@ cd db-5.3.30.NC/build_unix/
 ../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$BDB_PREFIX
 make install
 
-# Configure Nexa to use our own-built instance of BDB
+# Configure Pyrrha to use our own-built instance of BDB
 cd $NEXA_ROOT
 ./autogen.sh
 ./configure LDFLAGS="-L${BDB_PREFIX}/lib/" CPPFLAGS="-I${BDB_PREFIX}/include/" # (other args...)
@@ -188,7 +188,7 @@ sudo su
 
 ## Security
 
-To help make your Nexa installation more secure by making certain attacks impossible to
+To help make your Pyrrha installation more secure by making certain attacks impossible to
 exploit even if a vulnerability is found, binaries are hardened by default.
 This can be disabled with:
 

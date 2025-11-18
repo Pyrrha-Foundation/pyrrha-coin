@@ -4,7 +4,7 @@
 
 ## Overview
 
-Nexa includes support for electrum server (from version 1.6, Linux x64 only).
+Pyrrha includes support for electrum server (from version 1.6, Linux x64 only).
 
 The server is maintained as a [separate piece of software](https://github.com/BitcoinUnlimited/ElectrsCash), but is integrated with the node software. Its process has the same lifetime as the bitcoind process, uses the same log files and adds functionality to the same RPC interface.  Detailed documentation exists [here](https://github.com/BitcoinUnlimited/ElectrsCash/blob/master/doc/usage.md).
 
@@ -28,7 +28,7 @@ First install dependencies (rust version has to be 1.34+):
 sudo apt install python3-git cargo clang
 ```
 
-The latest stable release used by the node software can be compiled from the Nexa source tree by running
+The latest stable release used by the node software can be compiled from the Pyrrha source tree by running
 
 ```sh
 make electrscash

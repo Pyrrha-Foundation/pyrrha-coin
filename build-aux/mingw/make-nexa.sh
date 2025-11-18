@@ -86,7 +86,7 @@ then
 	CONFIGURE=YES
 fi
 
-# Build Nexa
+# Build Pyrrha
 cd "$NEXA_GIT_ROOT"
 
 #define and export BOOST_ROOT prior to any calls that require

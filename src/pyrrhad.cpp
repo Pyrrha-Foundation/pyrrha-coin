@@ -76,7 +76,7 @@ bool AppInit(int argc, char *argv[])
     // Parameters
     //
     // If Qt is used, parameters/nexa.conf are parsed in qt/nexa.cpp's main()
-    AllowedArgs::Nexad allowedArgs(&tweaks);
+    AllowedArgs::Pyrrhad allowedArgs(&tweaks);
     try
     {
         ParseParameters(argc, argv, allowedArgs);

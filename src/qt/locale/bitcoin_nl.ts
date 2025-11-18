@@ -85,13 +85,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>These are your Nexa addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Dit zijn uw Nexaadressen om betalingen mee te doen. Controleer altijd het bedrag en het ontvang adres voordat u uw coins verstuurt.</translation>
+        <source>These are your Pyrrha addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Dit zijn uw Pyrrhaadressen om betalingen mee te doen. Controleer altijd het bedrag en het ontvang adres voordat u uw coins verstuurt.</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>These are your Nexa addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Dit zijn uw Nexaadressen waarmee u kunt betalen. We raden u aan om een nieuw ontvangstadres voor elke transactie te gebruiken.</translation>
+        <source>These are your Pyrrha addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Dit zijn uw Pyrrhaadressen waarmee u kunt betalen. We raden u aan om een nieuw ontvangstadres voor elke transactie te gebruiken.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -201,8 +201,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEXA COINS&lt;/b&gt;!</source>
-        <translation>Waarschuwing: Als u uw portemonnee versleutelt en uw wachtwoord vergeet, zult u &lt;b&gt;AL UW NEXA COINS VERLIEZEN&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PYRR COINS&lt;/b&gt;!</source>
+        <translation>Waarschuwing: Als u uw portemonnee versleutelt en uw wachtwoord vergeet, zult u &lt;b&gt;AL UW PYRR COINS VERLIEZEN&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -440,8 +440,8 @@
     </message>
     <message>
         <location line="-498"/>
-        <source>Send coins to a Nexa address</source>
-        <translation>Verstuur munten naar een Nexaadres</translation>
+        <source>Send coins to a Pyrrha address</source>
+        <translation>Verstuur munten naar een Pyrrhaadres</translation>
     </message>
     <message>
         <location line="+77"/>
@@ -470,8 +470,8 @@
     </message>
     <message>
         <location line="+495"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="-726"/>
@@ -505,13 +505,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>Sign messages with your Nexa addresses to prove you own them</source>
-        <translation>Onderteken berichten met uw Nexaadressen om te bewijzen dat u deze adressen bezit</translation>
+        <source>Sign messages with your Pyrrha addresses to prove you own them</source>
+        <translation>Onderteken berichten met uw Pyrrhaadressen om te bewijzen dat u deze adressen bezit</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Verify messages to ensure they were signed with specified Nexa addresses</source>
-        <translation>Verifiëer handtekeningen om zeker te zijn dat de berichten zijn ondertekend met de gespecificeerde Nexaadressen</translation>
+        <source>Verify messages to ensure they were signed with specified Pyrrha addresses</source>
+        <translation>Verifiëer handtekeningen om zeker te zijn dat de berichten zijn ondertekend met de gespecificeerde Pyrrhaadressen</translation>
     </message>
     <message>
         <location line="+63"/>
@@ -550,10 +550,10 @@
     </message>
     <message numerus="yes">
         <location line="+366"/>
-        <source>%n active connection(s) to Nexa network</source>
+        <source>%n active connection(s) to Pyrrha network</source>
         <translation>
-            <numerusform>%n actieve verbinding met Nexanetwerk</numerusform>
-            <numerusform>%n actieve verbindingen met Nexanetwerk</numerusform>
+            <numerusform>%n actieve verbinding met Pyrrhanetwerk</numerusform>
+            <numerusform>%n actieve verbindingen met Pyrrhanetwerk</numerusform>
         </translation>
     </message>
     <message>
@@ -611,8 +611,8 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Show the %1 help message to get a list with possible Nexa command-line options</source>
-        <translation>Toon het %1 helpbericht om een lijst met mogelijke Nexa-opdrachtregelopties te krijgen</translation>
+        <source>Show the %1 help message to get a list with possible Pyrrha command-line options</source>
+        <translation>Toon het %1 helpbericht om een lijst met mogelijke Pyrrha-opdrachtregelopties te krijgen</translation>
     </message>
     <message>
         <location line="+185"/>
@@ -1025,8 +1025,8 @@
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Nexa address.</source>
-        <translation>Het opgegeven adres &quot;%1&quot; is een ongeldig Nexaadres</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Pyrrha address.</source>
+        <translation>Het opgegeven adres &quot;%1&quot; is een ongeldig Pyrrhaadres</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1120,8 +1120,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>%1 will download and store a copy of the Nexa block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>%1 zal een kopie van de Nexa-blokketen downloaden en opslaan. Er wordt ten minste %2GB aan gegevens opgeslagen in deze map en deze zal in de loop van de tijd groeien. De portemonnee wordt ook in deze map opgeslagen.</translation>
+        <source>%1 will download and store a copy of the Pyrrha block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>%1 zal een kopie van de Pyrrha-blokketen downloaden en opslaan. Er wordt ten minste %2GB aan gegevens opgeslagen in deze map en deze zal in de loop van de tijd groeien. De portemonnee wordt ook in deze map opgeslagen.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1177,8 +1177,8 @@
     </message>
     <message>
         <location line="+119"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
-        <translation>De weergegeven informatie kan verouderd zijn. Uw portemonnee synchroniseert automatisch met het Nexa-netwerk nadat een verbinding tot stand is gebracht, maar dit proces is nog niet voltooid. Dit betekent dat recente transacties niet zichtbaar zijn en het saldo pas up-to-date is als dit proces is voltooid.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
+        <translation>De weergegeven informatie kan verouderd zijn. Uw portemonnee synchroniseert automatisch met het Pyrrha-netwerk nadat een verbinding tot stand is gebracht, maar dit proces is nog niet voltooid. Dit betekent dat recente transacties niet zichtbaar zijn en het saldo pas up-to-date is als dit proces is voltooid.</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -1397,8 +1397,8 @@
     </message>
     <message>
         <location line="+54"/>
-        <source>Automatically open the Nexa client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Open de Nexapoort automatisch op de router. Dit werkt alleen als de router UPnP ondersteunt en het aanstaat.</translation>
+        <source>Automatically open the Pyrrha client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Open de Pyrrhapoort automatisch op de router. Dit werkt alleen als de router UPnP ondersteunt en het aanstaat.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1412,8 +1412,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Connect to the Nexa network through a SOCKS5 proxy.</source>
-        <translation>Verbind met het Nexanetwerk via een SOCKS5 proxy.</translation>
+        <source>Connect to the Pyrrha network through a SOCKS5 proxy.</source>
+        <translation>Verbind met het Pyrrhanetwerk via een SOCKS5 proxy.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1460,8 +1460,8 @@
     </message>
     <message>
         <location line="+25"/>
-        <source>Connect to the Nexa network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>Maak verbinding met Nexanetwerk door een aparte SOCKS5-proxy voor verborgen diensten van Tor.</translation>
+        <source>Connect to the Pyrrha network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>Maak verbinding met Pyrrhanetwerk door een aparte SOCKS5-proxy voor verborgen diensten van Tor.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1602,8 +1602,8 @@
     <message>
         <location line="+59"/>
         <location line="+386"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet.</source>
-        <translation>De weergegeven informatie kan verouderd zijn. Uw portemonnee synchroniseert automaticsh met het Nexanetwerk nadat een verbinding is gelegd, maar dit proces is nog niet voltooid.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet.</source>
+        <translation>De weergegeven informatie kan verouderd zijn. Uw portemonnee synchroniseert automaticsh met het Pyrrhanetwerk nadat een verbinding is gelegd, maar dit proces is nog niet voltooid.</translation>
     </message>
     <message>
         <location line="-139"/>
@@ -1747,8 +1747,8 @@
     </message>
     <message>
         <location line="+24"/>
-        <source>URI cannot be parsed! This can be caused by an invalid Nexa address or malformed URI parameters.</source>
-        <translation>URI kan niet verwerkt worden! Dit kan het gevolg zijn van een ongeldig Nexaadres of misvormde URI-parameters.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid Pyrrha address or malformed URI parameters.</source>
+        <translation>URI kan niet verwerkt worden! Dit kan het gevolg zijn van een ongeldig Pyrrhaadres of misvormde URI-parameters.</translation>
     </message>
     <message>
         <location line="+36"/>
@@ -1839,8 +1839,8 @@
     </message>
     <message>
         <location filename="../guiutil.cpp" line="+135"/>
-        <source>Enter a NEXA address (e.g. %1)</source>
-        <translation>Voer een NEXA-adres in (bijv. %1)</translation>
+        <source>Enter a PYRR address (e.g. %1)</source>
+        <translation>Voer een PYRR-adres in (bijv. %1)</translation>
     </message>
     <message>
         <location line="+832"/>
@@ -2512,8 +2512,8 @@
     <message>
         <location line="+21"/>
         <location line="+23"/>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Nexa network.</source>
-        <translation>Een optioneel bericht om bij te voegen aan het betalingsverzoek, welke zal getoond worden wanneer het verzoek is geopend. Opmerking: Het bericht zal niet worden verzonden met de betaling over het Nexanetwerk.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Pyrrha network.</source>
+        <translation>Een optioneel bericht om bij te voegen aan het betalingsverzoek, welke zal getoond worden wanneer het verzoek is geopend. Opmerking: Het bericht zal niet worden verzonden met de betaling over het Pyrrhanetwerk.</translation>
     </message>
     <message>
         <location line="-63"/>
@@ -2890,8 +2890,8 @@
     <message>
         <location line="+30"/>
         <location line="+13"/>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for nexa transactions than the network can process.</source>
-        <translation>De minimale toeslag betalen is prima mits het transactievolume kleiner is dan de ruimte in de blokken. Let wel op dat dit tot gevolg kan hebben dat een transactie nooit wordt bevestigd als er meer vraag is naar nexatransacties dan het netwerk kan verwerken.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for pyrrha transactions than the network can process.</source>
+        <translation>De minimale toeslag betalen is prima mits het transactievolume kleiner is dan de ruimte in de blokken. Let wel op dat dit tot gevolg kan hebben dat een transactie nooit wordt bevestigd als er meer vraag is naar pyrrhatransacties dan het netwerk kan verwerken.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3103,8 +3103,8 @@
     </message>
     <message>
         <location line="+255"/>
-        <source>Warning: Invalid Nexa address</source>
-        <translation>Waarschuwing: Ongeldig Nexaadres</translation>
+        <source>Warning: Invalid Pyrrha address</source>
+        <translation>Waarschuwing: Ongeldig Pyrrhaadres</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -3178,8 +3178,8 @@
     </message>
     <message>
         <location line="+51"/>
-        <source>The Nexa address to send the payment to</source>
-        <translation>Het Nexaadres om betaling aan te versturen</translation>
+        <source>The Pyrrha address to send the payment to</source>
+        <translation>Het Pyrrhaadres om betaling aan te versturen</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -3205,8 +3205,8 @@
     </message>
     <message>
         <location line="-1037"/>
-        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>Een bericht dat aan de munt was gehecht: URI die ter referentie bij de transactie wordt opgeslagen. Opmerking: dit bericht wordt niet via het Nexa-netwerk verzonden.</translation>
+        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>Een bericht dat aan de munt was gehecht: URI die ter referentie bij de transactie wordt opgeslagen. Opmerking: dit bericht wordt niet via het Pyrrha-netwerk verzonden.</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -3246,8 +3246,8 @@
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="-12"/>
-        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>Een bericht dat werd toegevoegd aan de %1 URI welke wordt opgeslagen met de transactie ter referentie. Opmerking: Dit bericht zal niet worden verzonden over het Nexanetwerk.</translation>
+        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>Een bericht dat werd toegevoegd aan de %1 URI welke wordt opgeslagen met de transactie ter referentie. Opmerking: Dit bericht zal niet worden verzonden over het Pyrrhanetwerk.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -3299,8 +3299,8 @@
     </message>
     <message>
         <location line="+18"/>
-        <source>The Nexa address to sign the message with</source>
-        <translation>Het Nexaadres om bericht mee te ondertekenen</translation>
+        <source>The Pyrrha address to sign the message with</source>
+        <translation>Het Pyrrhaadres om bericht mee te ondertekenen</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3341,8 +3341,8 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Nexa address</source>
-        <translation>Onderteken een bericht om te bewijzen dat u een bepaald Nexaadres bezit</translation>
+        <source>Sign the message to prove you own this Pyrrha address</source>
+        <translation>Onderteken een bericht om te bewijzen dat u een bepaald Pyrrhaadres bezit</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3372,13 +3372,13 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>The Nexa address the message was signed with</source>
-        <translation>Het Nexaadres waarmee het bericht ondertekend is</translation>
+        <source>The Pyrrha address the message was signed with</source>
+        <translation>Het Pyrrhaadres waarmee het bericht ondertekend is</translation>
     </message>
     <message>
         <location line="+37"/>
-        <source>Verify the message to ensure it was signed with the specified Nexa address</source>
-        <translation>Controleer een bericht om te verifiëren dat het gespecificeerde Nexaadres het bericht heeft ondertekend.</translation>
+        <source>Verify the message to ensure it was signed with the specified Pyrrha address</source>
+        <translation>Controleer een bericht om te verifiëren dat het gespecificeerde Pyrrhaadres het bericht heeft ondertekend.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4215,7 +4215,7 @@
     </message>
 </context>
 <context>
-    <name>nexa</name>
+    <name>pyrrha</name>
     <message>
         <location filename="../nexastrings.cpp" line="+56"/>
         <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
@@ -4513,8 +4513,8 @@
     </message>
     <message>
         <location line="-125"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="+1"/>

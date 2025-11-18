@@ -50,7 +50,7 @@ static int AppInitRawTx(int argc, char *argv[])
     //
     // Parameters
     //
-    AllowedArgs::NexaTx allowedArgs;
+    AllowedArgs::PyrrhaTx allowedArgs;
     try
     {
         ParseParameters(argc, argv, allowedArgs);

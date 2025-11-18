@@ -657,15 +657,15 @@ fs::path static StartupShortcutPath()
 {
     std::string chain = ChainNameFromCommandLine();
     if (chain == CBaseChainParams::NEXA)
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Nexa.lnk";
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "Pyrrha.lnk";
     if (chain == CBaseChainParams::TESTNET) // Remove this special case when CBaseChainParams::TESTNET = "testnet4"
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Nexa (testnet).lnk";
-    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("Nexa (%s).lnk", chain);
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "Pyrrha (testnet).lnk";
+    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("Pyrrha (%s).lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
 {
-    // check for Nexa*.lnk
+    // check for Pyrrha*.lnk
     return fs::exists(StartupShortcutPath());
 }
 
@@ -757,8 +757,8 @@ fs::path static GetAutostartFilePath()
 {
     std::string chain = ChainNameFromCommandLine();
     if (chain == CBaseChainParams::NEXA)
-        return GetAutostartDir() / "Nexa.desktop";
-    return GetAutostartDir() / strprintf("Nexa-%s.lnk", chain);
+        return GetAutostartDir() / "Pyrrha.desktop";
+    return GetAutostartDir() / strprintf("Pyrrha-%s.lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
@@ -796,13 +796,13 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         if (!optionFile.good())
             return false;
         std::string chain = ChainNameFromCommandLine();
-        // Write a Nexa.desktop file to the autostart directory:
+        // Write a Pyrrha.desktop file to the autostart directory:
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
         if (chain == CBaseChainParams::NEXA)
-            optionFile << "Name=Nexa\n";
+            optionFile << "Name=Pyrrha\n";
         else
-            optionFile << strprintf("Name=Nexa (%s)\n", chain);
+            optionFile << strprintf("Name=Pyrrha (%s)\n", chain);
         optionFile << "Exec=" << pszExePath
                    << strprintf(" -min -testnet=%d -regtest=%d\n", GetBoolArg("-testnet", false),
                           GetBoolArg("-regtest", false));

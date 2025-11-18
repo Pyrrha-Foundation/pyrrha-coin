@@ -34,10 +34,10 @@ sudo systemctl enable nexa-miner
 
 ### Full node
 
- * edit nexa.service and change User= and Group= to your username (current the user/group "nexa" is chosen)
+ * edit pyrrha.service and change User= and Group= to your username (current the user/group "nexa" is chosen)
  * change every instance of /home/nexa to /home/<your username>
  
- * copy this file to /etc/systemd/system/nexa.service on the target machine
+ * copy this file to /etc/systemd/system/pyrrha.service on the target machine
  
 ### Miner
 

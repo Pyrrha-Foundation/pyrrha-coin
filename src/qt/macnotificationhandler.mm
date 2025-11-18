@@ -14,7 +14,7 @@
 - (NSString *)__bundleIdentifier
 {
     if (self == [NSBundle mainBundle]) {
-        return @"org.bitcoinunlimited.Nexa-Qt";
+        return @"org.pyrrha.Pyrrha-Qt";
     } else {
         return [self __bundleIdentifier];
     }

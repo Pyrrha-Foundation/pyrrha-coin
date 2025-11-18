@@ -120,28 +120,28 @@ public:
     std::string helpMessage() const;
 };
 
-class NexaCli : public AllowedArgs
+class PyrrhaCli : public AllowedArgs
 {
 public:
-    NexaCli();
+    PyrrhaCli();
 };
 
-class Nexad : public AllowedArgs
+class Pyrrhad : public AllowedArgs
 {
 public:
-    Nexad(CTweakMap *pTweaks = nullptr);
+    Pyrrhad(CTweakMap *pTweaks = nullptr);
 };
 
-class NexaQt : public AllowedArgs
+class PyrrhaQt : public AllowedArgs
 {
 public:
-    NexaQt(CTweakMap *pTweaks = nullptr);
+    PyrrhaQt(CTweakMap *pTweaks = nullptr);
 };
 
-class NexaTx : public AllowedArgs
+class PyrrhaTx : public AllowedArgs
 {
 public:
-    NexaTx();
+    PyrrhaTx();
 };
 
 class ConfigFile : public AllowedArgs
@@ -150,10 +150,10 @@ public:
     ConfigFile(CTweakMap *pTweaks);
 };
 
-class NexaBench : public AllowedArgs
+class PyrrhaBench : public AllowedArgs
 {
 public:
-    NexaBench();
+    PyrrhaBench();
 };
 
 

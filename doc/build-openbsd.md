@@ -34,15 +34,15 @@ gmake install
 See [dependencies.md](dependencies.md) for a complete overview.
 
 
-## Building Nexa
+## Building Pyrrha
 
 As your normal (non root) user, go through the steps below
 
 ### Fetch the code
 
 ```bash
-git clone https://gitlab.com/nexa/nexa.git Nexa
-cd Nexa/
+git clone https://gitlab.com/nexa/nexa.git Pyrrha
+cd Pyrrha/
 ```
 
 ### Preparation
@@ -59,7 +59,7 @@ Now you need to choose to build without or with wallet functionality. If you jus
 
 ### To build without wallet
 
-While in the `Nexa` directory
+While in the `Pyrrha` directory
 
 ```bash
 ./autogen.sh
@@ -113,7 +113,7 @@ You should now have the required files in `db4/lib/` and `db4/include/`.
 
 Make sure `BDB_PREFIX` is set to the appropriate path from building BDB. See above.
 
-While in the `Nexa` directory.
+While in the `Pyrrha` directory.
 
 ```bash
 ./autogen.sh

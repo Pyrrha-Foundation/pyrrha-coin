@@ -16,7 +16,7 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Nexa"
+            VALUE "CompanyName",        "Pyrrha"
             VALUE "FileDescription",    "nexa-miner"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "nexa-miner"

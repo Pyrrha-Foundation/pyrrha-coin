@@ -1,9 +1,9 @@
 
-# Nexa Addressing
+# Pyrrha Addressing
 
 ## Bech32
 
-Nexa uses Bech32 addressing.  It follows the [CashAddr](https://reference.cash/protocol/blockchain/encoding/cashaddr) format, with a few modifications as described below.  
+Pyrrha uses Bech32 addressing.  It follows the [CashAddr](https://reference.cash/protocol/blockchain/encoding/cashaddr) format, with a few modifications as described below.  
 
 For succinctness, this specification does not stand alone -- it defines a change set to CashAddr.
 

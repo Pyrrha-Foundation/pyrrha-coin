@@ -662,13 +662,13 @@ nodist_libnexa_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
 # nexad binary #
-nexad_SOURCES = nexad.cpp
+nexad_SOURCES = pyrrhad.cpp
 nexad_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
 nexad_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 nexad_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexad_SOURCES += nexad-res.rc
+nexad_SOURCES += pyrrhad-res.rc
 endif
 
 nexad_LDADD = \
@@ -692,13 +692,13 @@ nexad_LDADD = \
 nexad_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
 # nexa-cli binary #
-nexa_cli_SOURCES = nexa-cli.cpp
+nexa_cli_SOURCES = pyrrha-cli.cpp
 nexa_cli_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) $(EVENT_CFLAGS)
 nexa_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 nexa_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexa_cli_SOURCES += nexa-cli-res.rc
+nexa_cli_SOURCES += pyrrha-cli-res.rc
 endif
 
 nexa_cli_LDADD = \
@@ -715,13 +715,13 @@ nexa_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # nexa tx binary #
-nexa_tx_SOURCES = nexa-tx.cpp
+nexa_tx_SOURCES = pyrrha-tx.cpp
 nexa_tx_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
 nexa_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 nexa_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexa_tx_SOURCES += nexa-tx-res.rc
+nexa_tx_SOURCES += pyrrha-tx-res.rc
 endif
 
 nexa_tx_LDADD = \
@@ -739,7 +739,7 @@ nexa_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
 # nexa-miner binary #
-nexa_miner_SOURCES = nexa-miner.cpp \
+nexa_miner_SOURCES = pyrrha-miner.cpp \
   pow.cpp \
   daa.cpp \
   arith_uint256.cpp \
@@ -755,7 +755,7 @@ nexa_miner_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 nexa_miner_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexa_miner_SOURCES += nexa-miner-res.rc
+nexa_miner_SOURCES += pyrrha-miner-res.rc
 endif
 
 nexa_miner_LDADD = \

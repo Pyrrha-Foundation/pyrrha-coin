@@ -40,7 +40,7 @@ if "%BUILD_32_BIT%" NEQ "" set BUILD_ARCH=T
 if "%BUILD_64_BIT%" NEQ "" set BUILD_ARCH=T
 if "%BUILD_ARCH%" NEQ "T" (
 	echo You must specify building at least one of 32-bit or 64-bit version
-	echo of the Nexa client in SET_ENV_VARS.bat.
+	echo of the Pyrrha client in SET_ENV_VARS.bat.
 	echo Aborting initial configuration...
 	pause
 	exit /b -1
@@ -69,7 +69,7 @@ if not exist %CMD_7ZIP% (
 
 REM Verify that DEPS_ROOT is specified and exists
 if "%DEPS_ROOT%" EQU "" (
-	echo You must specify a valid path to install Nexa client dependencies in
+	echo You must specify a valid path to install Pyrrha client dependencies in
 	echo the SET_ENV_VARS.bat file.
 	echo Current DEPS_ROOT = %DEPS_ROOT%
 	echo Aborting initial configuration...
@@ -262,7 +262,7 @@ if %errorlevel% neq 0 (
 
 endlocal
 REM ##################################################################################################
-REM Time to build Nexa
+REM Time to build Pyrrha
 REM ##################################################################################################
 echo Building nexa...
 %MSYS_SH% "%INST_DIR%\make-nexa.sh"

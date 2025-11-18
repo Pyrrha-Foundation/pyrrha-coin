@@ -15,7 +15,7 @@ static const struct
     const int iconColorHueShift;
     const int iconColorSaturationReduction;
     const char *titleAddText;
-} network_styles[] = {{"main", QAPP_APP_NAME, 0, 0, "Nexa"},
+} network_styles[] = {{"main", QAPP_APP_NAME, 0, 0, "Pyrrha"},
     {"testnet", QAPP_APP_NAME_TESTNET, 70, 30, QT_TRANSLATE_NOOP("SplashScreen", "[testnet]")},
     {"nexa", QAPP_APP_NAME, 0, 0, QT_TRANSLATE_NOOP("SplashScreen", "")}, // BU
     {"regtest", QAPP_APP_NAME_REGTEST, 160, 30, "[regtest]"}};

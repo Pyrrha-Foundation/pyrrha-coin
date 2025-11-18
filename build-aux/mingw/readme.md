@@ -1,8 +1,8 @@
-Building Nexa on Native Windows (Semi-Automated Install & Configuration)
+Building Pyrrha on Native Windows (Semi-Automated Install & Configuration)
 ===========================================================================
 
 This document describes how to use the included scripts to perform a semi-
-automated installation & configuration of the full Nexa development
+automated installation & configuration of the full Pyrrha development
 environment on Native Windows using MinGW from scratch.  These scripts simply
 automate most of the steps found in [build-windows-mingw.md](/doc/build-windows-mingw.md).
 
@@ -13,7 +13,7 @@ Quick Summary
 #### Initial Development Environment Installation
 
 1. Manually install a git client.
-2. Clone the Nexa repository.
+2. Clone the Pyrrha repository.
 3. Manually install 7-zip.
 4. Manually install MinGW base package.
 5. Configure `/build-aux/mingw/SET_ENV_VARS.bat` to match your local system
@@ -23,7 +23,7 @@ Quick Summary
 7. Optional: Install ZMQ for mingw64 if desired and update make-nexa.sh
 
 
-#### (Re)Build Nexa
+#### (Re)Build Pyrrha
 
 1. If necessary, modify configuration of `/build-aux/mingw/SET_ENV_VARS.bat`
 2. Execute `/build-aux/mingw/rebuild-nexa.bat` to build nexa from source.
@@ -136,7 +136,7 @@ NOTE: The `SET_ENV_VARS.bat` file uses MS-DOS style comments.  Any line that
    build scripts located outside of the git repository download for some reason.
    This variable should point to the root path of the source.
 7. `BUILD_32_BIT` is commented out by default.  If you wish to build 32-bit
-   versions of the Nexa executables, uncomment this line.
+   versions of the Pyrrha executables, uncomment this line.
 8. `BUILD_64_BIT` is enabled by default.  If you do not wish to build 64-bit
    executables then comment out this line.
 9. `MAKE_CORES` will improve build speed by compiling multiple object files in
@@ -145,21 +145,21 @@ NOTE: The `SET_ENV_VARS.bat` file uses MS-DOS style comments.  Any line that
 10. `ENABLE_TESTS` is disabled by default.  As the tests do not currently run
    when built natively under Windows, it is recommended to leave this off.
    NOTE: If for some reason you do want to build with tests enabled, be sure
-   you run a full rebuild of all dependencies, as well as the Nexa client, as
+   you run a full rebuild of all dependencies, as well as the Pyrrha client, as
    some of the dependencies require extra compiler options to enable tests.
 11. `CLEAN_BUILD` is disabled by default.  This will force a `make clean` prior
-   to build of the Nexa client.
-   NOTE: This only affects the build of the Nexa client, it does not affect
+   to build of the Pyrrha client.
+   NOTE: This only affects the build of the Pyrrha client, it does not affect
    the build of dependencies.
 12. `STRIP` is enabled by default.  This will strip out debugging symbols from
    the generated executables, greatly reducing the file size.
 13. `AUTOGEN` is enabled by default.  This is a convenience feature that
-   should only be used when rebuilding Nexa, not while doing the initial
+   should only be used when rebuilding Pyrrha, not while doing the initial
    development environment configuration.  This is merely a convenience feature
    for when you know you will be rebuilding without any changes to autogen file
    settings.  **If in doubt, leave this commented out.**
 14. `CONFIGURE` is enabled by default.  This is a convenience feature that
-   should only be used when rebuilding Nexa, not while doing the initial
+   should only be used when rebuilding Pyrrha, not while doing the initial
    development environment configuration.  This is merely a convenience feature
    for when you know you will be rebuilding without needing to re-evaluate the
    configuration settings for make.  **If in doubt, leave this commented out.**
@@ -169,7 +169,7 @@ NOTE: The `SET_ENV_VARS.bat` file uses MS-DOS style comments.  Any line that
 
 The development environment supports installing both 32-bit and 64-bit versions
 of the toolchain and dependencies, allowing you to build the statically linked
-Nexa binaries as either 32-bit or 64-bit.  The configuration scripts allow
+Pyrrha binaries as either 32-bit or 64-bit.  The configuration scripts allow
 you to build just 32-bit, just 64-bit, or both 32 and 64 bit at a single go.
 This is controlled via the `BUILD_32_BIT` and `BUILD_64_BIT` options.
 
@@ -193,7 +193,7 @@ all of your dependencies download and built in your `DEPS_ROOT` folder.  32-bit
 binaries will reside under x86 sub-folder and 64-bit binaries will reside under
 the x64 sub-folder.
 
-The initial configuration process is also set up to build the Nexa client
+The initial configuration process is also set up to build the Pyrrha client
 upon completion of the development environment setup.  All build outputs will
 be placed under `/build-output` with 32-bit binaries under the x86 sub-folder
 and 64-bit binaries under the x64 sub-folder.

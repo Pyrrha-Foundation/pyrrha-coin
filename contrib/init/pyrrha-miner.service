@@ -1,5 +1,5 @@
 [Unit]
-Description=Nexa Miner
+Description=Pyrrha Miner
 After=nexa.service
 Requires=nexa.service
 

@@ -18,8 +18,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Nexa"
-            VALUE "FileDescription",    PACKAGE_NAME " (GUI node for Nexa)"
+            VALUE "CompanyName",        "Pyrrha"
+            VALUE "FileDescription",    PACKAGE_NAME " (GUI node for Pyrrha)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "nexa-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR

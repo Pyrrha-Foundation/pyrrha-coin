@@ -85,13 +85,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>These are your Nexa addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Bunlar ödemeleri göndermek için kullanacağınız Nexa adreslerinizdir. Nexa yollamadan önce miktarı ve alıcının alım adresini daima kontrol ediniz.</translation>
+        <source>These are your Pyrrha addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Bunlar ödemeleri göndermek için kullanacağınız Pyrrha adreslerinizdir. Pyrrha yollamadan önce miktarı ve alıcının alım adresini daima kontrol ediniz.</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>These are your Nexa addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Bunlar ödemeleri almak için kullanacağınız Nexa adreslerinizdir. Her işlem için yeni bir alım adresi kullanmanız tavsiye edilir.</translation>
+        <source>These are your Pyrrha addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Bunlar ödemeleri almak için kullanacağınız Pyrrha adreslerinizdir. Her işlem için yeni bir alım adresi kullanmanız tavsiye edilir.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -201,8 +201,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEXA COINS&lt;/b&gt;!</source>
-        <translation>Uyarı: Eğer cüzdanınızı şifrelerseniz ve parolanızı kaybederseniz, &lt;b&gt;TÜM NEXA COİNLERİNİZİ KAYBEDERSİNİZ&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PYRR COINS&lt;/b&gt;!</source>
+        <translation>Uyarı: Eğer cüzdanınızı şifrelerseniz ve parolanızı kaybederseniz, &lt;b&gt;TÜM PYRR COİNLERİNİZİ KAYBEDERSİNİZ&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -440,8 +440,8 @@
     </message>
     <message>
         <location line="-498"/>
-        <source>Send coins to a Nexa address</source>
-        <translation>Bir Nexa adresine Nexa yolla</translation>
+        <source>Send coins to a Pyrrha address</source>
+        <translation>Bir Pyrrha adresine Pyrrha yolla</translation>
     </message>
     <message>
         <location line="+77"/>
@@ -470,8 +470,8 @@
     </message>
     <message>
         <location line="+495"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="-726"/>
@@ -505,13 +505,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>Sign messages with your Nexa addresses to prove you own them</source>
-        <translation>Mesajları adreslerin size ait olduğunu ispatlamak için Nexa adresleri ile imzala</translation>
+        <source>Sign messages with your Pyrrha addresses to prove you own them</source>
+        <translation>Mesajları adreslerin size ait olduğunu ispatlamak için Pyrrha adresleri ile imzala</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Verify messages to ensure they were signed with specified Nexa addresses</source>
-        <translation>Belirtilen Nexa adresleri ile imzalandıklarından emin olmak için mesajları kontrol et</translation>
+        <source>Verify messages to ensure they were signed with specified Pyrrha addresses</source>
+        <translation>Belirtilen Pyrrha adresleri ile imzalandıklarından emin olmak için mesajları kontrol et</translation>
     </message>
     <message>
         <location line="+63"/>
@@ -550,9 +550,9 @@
     </message>
     <message numerus="yes">
         <location line="+366"/>
-        <source>%n active connection(s) to Nexa network</source>
+        <source>%n active connection(s) to Pyrrha network</source>
         <translation>
-            <numerusform>Nexa şebekesine %n faal bağlantı</numerusform>
+            <numerusform>Pyrrha şebekesine %n faal bağlantı</numerusform>
         </translation>
     </message>
     <message>
@@ -609,8 +609,8 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Show the %1 help message to get a list with possible Nexa command-line options</source>
-        <translation>Olası Nexa komut satırı seçeneklerini içeren bir liste almak için %1 yardım mesajını gösterin</translation>
+        <source>Show the %1 help message to get a list with possible Pyrrha command-line options</source>
+        <translation>Olası Pyrrha komut satırı seçeneklerini içeren bir liste almak için %1 yardım mesajını gösterin</translation>
     </message>
     <message>
         <location line="+185"/>
@@ -1023,8 +1023,8 @@
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Nexa address.</source>
-        <translation>Girilen &quot;%1&quot; adresi geçerli bir Nexa adresi değildir.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Pyrrha address.</source>
+        <translation>Girilen &quot;%1&quot; adresi geçerli bir Pyrrha adresi değildir.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1118,8 +1118,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>%1 will download and store a copy of the Nexa block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>%1, Nexa blok zincirinin bir kopyasını indirecek ve saklayacak. Bu dizinde en az %2GB veri depolanacak ve zamanla büyüyecek. M-cüzdan da bu dizinde saklanacaktır.</translation>
+        <source>%1 will download and store a copy of the Pyrrha block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>%1, Pyrrha blok zincirinin bir kopyasını indirecek ve saklayacak. Bu dizinde en az %2GB veri depolanacak ve zamanla büyüyecek. M-cüzdan da bu dizinde saklanacaktır.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1173,8 +1173,8 @@
     </message>
     <message>
         <location line="+119"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
-        <translation>Görüntülenen bilgiler güncel olmayabilir. Bir bağlantı kurulduktan sonra cüzdanınız Nexa ağı ile otomatik olarak senkronize olur, ancak bu işlem henüz tamamlanmamıştır. Bu, son işlemlerin görünmeyeceği ve bu işlem tamamlanana kadar bakiyenin güncel olmayacağı anlamına gelir.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
+        <translation>Görüntülenen bilgiler güncel olmayabilir. Bir bağlantı kurulduktan sonra cüzdanınız Pyrrha ağı ile otomatik olarak senkronize olur, ancak bu işlem henüz tamamlanmamıştır. Bu, son işlemlerin görünmeyeceği ve bu işlem tamamlanana kadar bakiyenin güncel olmayacağı anlamına gelir.</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -1393,8 +1393,8 @@
     </message>
     <message>
         <location line="+54"/>
-        <source>Automatically open the Nexa client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Yönlendiricide Nexa istemci portlarını otomatik olarak açar. Bu, sadece yönlendiricinizin UPnP desteği bulunuyorsa ve etkinse çalışabilir.</translation>
+        <source>Automatically open the Pyrrha client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Yönlendiricide Pyrrha istemci portlarını otomatik olarak açar. Bu, sadece yönlendiricinizin UPnP desteği bulunuyorsa ve etkinse çalışabilir.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1408,8 +1408,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Connect to the Nexa network through a SOCKS5 proxy.</source>
-        <translation>Nexa şebekesine SOCKS5 vekil sunucusu vasıtasıyla bağlan.</translation>
+        <source>Connect to the Pyrrha network through a SOCKS5 proxy.</source>
+        <translation>Pyrrha şebekesine SOCKS5 vekil sunucusu vasıtasıyla bağlan.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1456,8 +1456,8 @@
     </message>
     <message>
         <location line="+25"/>
-        <source>Connect to the Nexa network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>Nexa şebekesine gizli Tor servisleri için ayrı bir SOCKS5 vekil sunucusu vasıtasıyla bağlan.</translation>
+        <source>Connect to the Pyrrha network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>Pyrrha şebekesine gizli Tor servisleri için ayrı bir SOCKS5 vekil sunucusu vasıtasıyla bağlan.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1507,7 +1507,7 @@
     <message>
         <location line="+13"/>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Nexa gönderildiğinde arayüzde gösterilecek varsayılan alt birimi seçiniz.</translation>
+        <translation>Pyrrha gönderildiğinde arayüzde gösterilecek varsayılan alt birimi seçiniz.</translation>
     </message>
     <message>
         <location line="-502"/>
@@ -1598,7 +1598,7 @@
     <message>
         <location line="+59"/>
         <location line="+386"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet.</source>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet.</source>
         <translation>Görüntülenen veriler zaman aşımına uğramış olabilir. Bağlantı kurulduğunda cüzdanınız otomatik olarak şebeke ile eşleşir ancak bu işlem henüz tamamlanmamıştır.</translation>
     </message>
     <message>
@@ -1743,8 +1743,8 @@
     </message>
     <message>
         <location line="+24"/>
-        <source>URI cannot be parsed! This can be caused by an invalid Nexa address or malformed URI parameters.</source>
-        <translation>URI okunamadı! Sebebi geçersiz bir Nexa adresi veya hatalı URI parametreleri olabilir.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid Pyrrha address or malformed URI parameters.</source>
+        <translation>URI okunamadı! Sebebi geçersiz bir Pyrrha adresi veya hatalı URI parametreleri olabilir.</translation>
     </message>
     <message>
         <location line="+36"/>
@@ -1835,8 +1835,8 @@
     </message>
     <message>
         <location filename="../guiutil.cpp" line="+135"/>
-        <source>Enter a NEXA address (e.g. %1)</source>
-        <translation>Bir NEXA adresi girin (ör. %1)</translation>
+        <source>Enter a PYRR address (e.g. %1)</source>
+        <translation>Bir PYRR adresi girin (ör. %1)</translation>
     </message>
     <message>
         <location line="+832"/>
@@ -2502,8 +2502,8 @@
     <message>
         <location line="+21"/>
         <location line="+23"/>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Nexa network.</source>
-        <translation>Talep açıldığında gösterilecek, isteğinize dayalı, ödeme talebi ile ilişkilendirilecek bir mesaj. Not: Bu mesaj ödeme ile birlikte Nexa şebekesi üzerinden gönderilmeyecektir.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Pyrrha network.</source>
+        <translation>Talep açıldığında gösterilecek, isteğinize dayalı, ödeme talebi ile ilişkilendirilecek bir mesaj. Not: Bu mesaj ödeme ile birlikte Pyrrha şebekesi üzerinden gönderilmeyecektir.</translation>
     </message>
     <message>
         <location line="-63"/>
@@ -2880,8 +2880,8 @@
     <message>
         <location line="+30"/>
         <location line="+13"/>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for nexa transactions than the network can process.</source>
-        <translation>Asgari ücreti ödemek, bloklarda boşluktan daha az muamele hacmi olduğu sürece bir sorun çıkarmaz. Fakat şebekenin işleyecebileceğinden daha çok nexa muameleleri talebi olduğunda bunun asla teyit edilmeyen bir muamele olabileceğinin farkında olmalısınız.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for pyrrha transactions than the network can process.</source>
+        <translation>Asgari ücreti ödemek, bloklarda boşluktan daha az muamele hacmi olduğu sürece bir sorun çıkarmaz. Fakat şebekenin işleyecebileceğinden daha çok pyrrha muameleleri talebi olduğunda bunun asla teyit edilmeyen bir muamele olabileceğinin farkında olmalısınız.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3093,8 +3093,8 @@
     </message>
     <message>
         <location line="+255"/>
-        <source>Warning: Invalid Nexa address</source>
-        <translation>Uyarı: geçersiz Nexa adresi</translation>
+        <source>Warning: Invalid Pyrrha address</source>
+        <translation>Uyarı: geçersiz Pyrrha adresi</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -3168,8 +3168,8 @@
     </message>
     <message>
         <location line="+51"/>
-        <source>The Nexa address to send the payment to</source>
-        <translation>Ödemenin yollanacağı Nexa adresi</translation>
+        <source>The Pyrrha address to send the payment to</source>
+        <translation>Ödemenin yollanacağı Pyrrha adresi</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -3195,8 +3195,8 @@
     </message>
     <message>
         <location line="-1037"/>
-        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>Madeni paraya iliştirilmiş bir mesaj: Referansınız için işlemle birlikte saklanacak olan URI. Not: Bu mesaj Nexa ağı üzerinden gönderilmeyecektir.</translation>
+        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>Madeni paraya iliştirilmiş bir mesaj: Referansınız için işlemle birlikte saklanacak olan URI. Not: Bu mesaj Pyrrha ağı üzerinden gönderilmeyecektir.</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -3236,8 +3236,8 @@
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="-12"/>
-        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>Referans için %1 URI&apos;siyle iliştirilmiş işlemle birlikte depolanacak bir ileti. Not: Bu mesaj Nexa ağı üzerinden gönderilmeyecektir.</translation>
+        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>Referans için %1 URI&apos;siyle iliştirilmiş işlemle birlikte depolanacak bir ileti. Not: Bu mesaj Pyrrha ağı üzerinden gönderilmeyecektir.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -3289,8 +3289,8 @@
     </message>
     <message>
         <location line="+18"/>
-        <source>The Nexa address to sign the message with</source>
-        <translation>Mesajın imzalanmasında kullanılacak Nexa adresi</translation>
+        <source>The Pyrrha address to sign the message with</source>
+        <translation>Mesajın imzalanmasında kullanılacak Pyrrha adresi</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3331,8 +3331,8 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Nexa address</source>
-        <translation>Bu Nexa adresinin sizin olduğunu ispatlamak için mesajı imzalayın</translation>
+        <source>Sign the message to prove you own this Pyrrha address</source>
+        <translation>Bu Pyrrha adresinin sizin olduğunu ispatlamak için mesajı imzalayın</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3362,13 +3362,13 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>The Nexa address the message was signed with</source>
-        <translation>Mesajın imzalanmasında kullanılan Nexa adresi</translation>
+        <source>The Pyrrha address the message was signed with</source>
+        <translation>Mesajın imzalanmasında kullanılan Pyrrha adresi</translation>
     </message>
     <message>
         <location line="+37"/>
-        <source>Verify the message to ensure it was signed with the specified Nexa address</source>
-        <translation>Belirtilen Nexa adresi ile imzalandığını doğrulamak için mesajı kontrol et</translation>
+        <source>Verify the message to ensure it was signed with the specified Pyrrha address</source>
+        <translation>Belirtilen Pyrrha adresi ile imzalandığını doğrulamak için mesajı kontrol et</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4201,7 +4201,7 @@
     </message>
 </context>
 <context>
-    <name>nexa</name>
+    <name>pyrrha</name>
     <message>
         <location filename="../nexastrings.cpp" line="+56"/>
         <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
@@ -4240,7 +4240,7 @@
     <message>
         <location line="+7"/>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
-        <translation>Bu yayın öncesi bir deneme sürümüdür - tüm riski siz üstlenmiş olursunuz -  nexa ya da ticari uygulamalar için kullanmayınız</translation>
+        <translation>Bu yayın öncesi bir deneme sürümüdür - tüm riski siz üstlenmiş olursunuz -  pyrrha ya da ticari uygulamalar için kullanmayınız</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -4499,8 +4499,8 @@
     </message>
     <message>
         <location line="-125"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="+1"/>

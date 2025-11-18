@@ -9,7 +9,7 @@
 #define UNUSED
 #endif
 static const char UNUSED *bitcoin_strings[] = {
-    QT_TRANSLATE_NOOP("nexa", "Nexa"),
+    QT_TRANSLATE_NOOP("nexa", "Pyrrha"),
     QT_TRANSLATE_NOOP("nexa", "The %s developers"),
     QT_TRANSLATE_NOOP("nexa", "Bitcoin Bitcoin XT and Bitcoin Unlimited"),
     QT_TRANSLATE_NOOP("nexa",

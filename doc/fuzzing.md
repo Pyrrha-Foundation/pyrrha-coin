@@ -1,4 +1,4 @@
-# Fuzz-testing Nexa
+# Fuzz-testing Pyrrha
 
 A special test harness `test_nexa_fuzzy` is provided to provide an easy
 entry point for fuzzers and the like. In this document we'll describe how to
@@ -30,7 +30,7 @@ the `llvm_mode` subdirectory of AFL.
 
 ## Instrumentation
 
-To build Nexa using AFL instrumentation (this assumes that the
+To build Pyrrha using AFL instrumentation (this assumes that the
 `AFLPATH` was set as above):
 ```
 ./configure [--disable-ccache] --disable-shared --enable-tests CC=${AFLPATH}/afl-clang-fast CXX=${AFLPATH}/afl-clang-fast++

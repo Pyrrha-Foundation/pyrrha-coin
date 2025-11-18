@@ -29,17 +29,17 @@ brew install librsvg
 
 NOTE: Must build with QT 5.9 or higher. Building with Qt4 is not supported.
 
-## Build Nexa
+## Build Pyrrha
 
-1. Clone the Nexa source code and cd into `Nexa`
+1. Clone the Pyrrha source code and cd into `Pyrrha`
     ```bash
-    git clone https://gitlab.com/nexa/nexa.git Nexa
-    cd Nexa/
+    git clone https://gitlab.com/nexa/nexa.git Pyrrha
+    cd Pyrrha/
     ```
 
 2.  Build:
 
-    Configure and build the headless Nexa binaries as well as the GUI (if Qt is found).
+    Configure and build the headless Pyrrha binaries as well as the GUI (if Qt is found).
 
     You can disable the GUI build by passing `--without-gui` to configure.
 
@@ -63,14 +63,14 @@ NOTE: Must build with QT 5.9 or higher. Building with Qt4 is not supported.
 
 ## Running
 
-Nexa is now available at `./src/nexad`
+Pyrrha is now available at `./src/nexad`
 
 Before running, it's recommended you create an RPC configuration file.
 
 ```bash
-echo -e "rpcuser=nexarpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Nexa/nexa.conf"
+echo -e "rpcuser=nexarpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Pyrrha/nexa.conf"
 
-chmod 600 "/Users/${USER}/Library/Application Support/Nexa/nexa.conf"
+chmod 600 "/Users/${USER}/Library/Application Support/Pyrrha/nexa.conf"
 ```
 
 The first time you run nexad, it will start downloading the blockchain. This process could take several hours.
@@ -78,20 +78,20 @@ The first time you run nexad, it will start downloading the blockchain. This pro
 You can monitor the download process by looking at the debug.log file:
 
 ```bash
-tail -f $HOME/Library/Application\ Support/Nexa/debug.log
+tail -f $HOME/Library/Application\ Support/Pyrrha/debug.log
 ```
 
 ## Other commands:
 
 ```bash
-./src/nexad -daemon # Starts the Nexa daemon.
+./src/nexad -daemon # Starts the Pyrrha daemon.
 ./src/nexa-cli --help # Outputs a list of command-line options.
 ./src/nexa-cli help # Outputs a list of RPC commands when the daemon is running.
 ```
 
 ## Using Qt Creator as IDE
 
-You can use Qt Creator as an IDE, for Nexa development.
+You can use Qt Creator as an IDE, for Pyrrha development.
 Download and install the community edition of [Qt Creator](https://www.qt.io/download/).
 Uncheck everything except Qt Creator during the installation process.
 

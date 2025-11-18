@@ -85,13 +85,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>These are your Nexa addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>這些是你要付款過去的 Nexa 位址。在付錢之前，務必要檢查金額和收款位址是否正確。</translation>
+        <source>These are your Pyrrha addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>這些是你要付款過去的 Pyrrha 位址。在付錢之前，務必要檢查金額和收款位址是否正確。</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>These are your Nexa addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>這些是你用來收款的 Nexa 位址。建議在每次交易時，都使用一個新的收款位址。</translation>
+        <source>These are your Pyrrha addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>這些是你用來收款的 Pyrrha 位址。建議在每次交易時，都使用一個新的收款位址。</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -201,8 +201,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEXA COINS&lt;/b&gt;!</source>
-        <translation>警告: 如果把錢包加密後又忘記密碼，你就會從此&lt;b&gt;失去其中所有的 Nexa 了&lt;/b&gt;！</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PYRR COINS&lt;/b&gt;!</source>
+        <translation>警告: 如果把錢包加密後又忘記密碼，你就會從此&lt;b&gt;失去其中所有的 Pyrrha 了&lt;/b&gt;！</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -435,8 +435,8 @@
     </message>
     <message>
         <location line="-498"/>
-        <source>Send coins to a Nexa address</source>
-        <translation>付錢給一個 Nexa 位址</translation>
+        <source>Send coins to a Pyrrha address</source>
+        <translation>付錢給一個 Pyrrha 位址</translation>
     </message>
     <message>
         <location line="+77"/>
@@ -465,8 +465,8 @@
     </message>
     <message>
         <location line="+495"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="-726"/>
@@ -500,13 +500,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>Sign messages with your Nexa addresses to prove you own them</source>
-        <translation>用 Nexa 位址簽署訊息來證明位址是你的</translation>
+        <source>Sign messages with your Pyrrha addresses to prove you own them</source>
+        <translation>用 Pyrrha 位址簽署訊息來證明位址是你的</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Verify messages to ensure they were signed with specified Nexa addresses</source>
-        <translation>驗證訊息是用來確定訊息是用指定的 Nexa 位址簽署的</translation>
+        <source>Verify messages to ensure they were signed with specified Pyrrha addresses</source>
+        <translation>驗證訊息是用來確定訊息是用指定的 Pyrrha 位址簽署的</translation>
     </message>
     <message>
         <location line="+63"/>
@@ -550,9 +550,9 @@
     </message>
     <message numerus="yes">
         <location line="+366"/>
-        <source>%n active connection(s) to Nexa network</source>
+        <source>%n active connection(s) to Pyrrha network</source>
         <translation>
-            <numerusform>%n 個運作中的 Nexa 網路連線</numerusform>
+            <numerusform>%n 個運作中的 Pyrrha 網路連線</numerusform>
         </translation>
     </message>
     <message>
@@ -609,7 +609,7 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Show the %1 help message to get a list with possible Nexa command-line options</source>
+        <source>Show the %1 help message to get a list with possible Pyrrha command-line options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1023,8 +1023,8 @@
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Nexa address.</source>
-        <translation>輸入的位址 %1 並不是有效的 Nexa 位址。</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Pyrrha address.</source>
+        <translation>輸入的位址 %1 並不是有效的 Pyrrha 位址。</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1118,7 +1118,7 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>%1 will download and store a copy of the Nexa block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>%1 will download and store a copy of the Pyrrha block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1173,7 +1173,7 @@
     </message>
     <message>
         <location line="+119"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1393,8 +1393,8 @@
     </message>
     <message>
         <location line="+54"/>
-        <source>Automatically open the Nexa client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>自動在路由器上開放 Nexa 的客戶端通訊埠。只有在你的路由器支援且開啓「通用即插即用」協定(UPnP)時才有作用。</translation>
+        <source>Automatically open the Pyrrha client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>自動在路由器上開放 Pyrrha 的客戶端通訊埠。只有在你的路由器支援且開啓「通用即插即用」協定(UPnP)時才有作用。</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1408,8 +1408,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Connect to the Nexa network through a SOCKS5 proxy.</source>
-        <translation>透過 SOCKS5 代理伺服器來連線到 Nexa 網路。</translation>
+        <source>Connect to the Pyrrha network through a SOCKS5 proxy.</source>
+        <translation>透過 SOCKS5 代理伺服器來連線到 Pyrrha 網路。</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1456,8 +1456,8 @@
     </message>
     <message>
         <location line="+25"/>
-        <source>Connect to the Nexa network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>透過另外的 SOCKS5 代理伺服器來連線到 Nexa 網路中的 Tor 隱藏服務。</translation>
+        <source>Connect to the Pyrrha network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>透過另外的 SOCKS5 代理伺服器來連線到 Pyrrha 網路中的 Tor 隱藏服務。</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1598,8 +1598,8 @@
     <message>
         <location line="+59"/>
         <location line="+386"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet.</source>
-        <translation>顯示的資訊可能是過期的。跟 Nexa 網路的連線建立後，你的錢包會自動和網路同步，但是這個步驟還沒完成。</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet.</source>
+        <translation>顯示的資訊可能是過期的。跟 Pyrrha 網路的連線建立後，你的錢包會自動和網路同步，但是這個步驟還沒完成。</translation>
     </message>
     <message>
         <location line="-139"/>
@@ -1743,8 +1743,8 @@
     </message>
     <message>
         <location line="+24"/>
-        <source>URI cannot be parsed! This can be caused by an invalid Nexa address or malformed URI parameters.</source>
-        <translation>沒辦法解析資源識別碼(URI)！可能是因為 Nexa 位址無效，或是 URI 參數格式錯誤。</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid Pyrrha address or malformed URI parameters.</source>
+        <translation>沒辦法解析資源識別碼(URI)！可能是因為 Pyrrha 位址無效，或是 URI 參數格式錯誤。</translation>
     </message>
     <message>
         <location line="+36"/>
@@ -1835,7 +1835,7 @@
     </message>
     <message>
         <location filename="../guiutil.cpp" line="+135"/>
-        <source>Enter a NEXA address (e.g. %1)</source>
+        <source>Enter a PYRR address (e.g. %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2502,8 +2502,8 @@
     <message>
         <location line="+21"/>
         <location line="+23"/>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Nexa network.</source>
-        <translation>附加在付款要求中的訊息，可以不填，打開要求內容時會顯示。注意: 這個訊息不會隨著付款送到 Nexa 網路上。</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Pyrrha network.</source>
+        <translation>附加在付款要求中的訊息，可以不填，打開要求內容時會顯示。注意: 這個訊息不會隨著付款送到 Pyrrha 網路上。</translation>
     </message>
     <message>
         <location line="-63"/>
@@ -2880,7 +2880,7 @@
     <message>
         <location line="+30"/>
         <location line="+13"/>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for nexa transactions than the network can process.</source>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for pyrrha transactions than the network can process.</source>
         <translation>當交易量少於區塊可容納的空間時，只付最低手續費不會有什麽問題。但是當交易量的需求成長到超過整體網路可以處理的量時，可能會造成一筆一直不會被確認的交易。</translation>
     </message>
     <message>
@@ -3093,8 +3093,8 @@
     </message>
     <message>
         <location line="+255"/>
-        <source>Warning: Invalid Nexa address</source>
-        <translation>警告: Nexa 位址無效</translation>
+        <source>Warning: Invalid Pyrrha address</source>
+        <translation>警告: Pyrrha 位址無效</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -3168,8 +3168,8 @@
     </message>
     <message>
         <location line="+51"/>
-        <source>The Nexa address to send the payment to</source>
-        <translation>接收付款的 Nexa 位址</translation>
+        <source>The Pyrrha address to send the payment to</source>
+        <translation>接收付款的 Pyrrha 位址</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -3195,7 +3195,7 @@
     </message>
     <message>
         <location line="-1037"/>
-        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
+        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3236,8 +3236,8 @@
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="-12"/>
-        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>附加在 Nexa 付款協議的資源識別碼(URI)中的訊息，會和交易內容一起存起來，給你自己做參考。注意: 這個訊息不會送到 Nexa 網路上。</translation>
+        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>附加在 Pyrrha 付款協議的資源識別碼(URI)中的訊息，會和交易內容一起存起來，給你自己做參考。注意: 這個訊息不會送到 Pyrrha 網路上。</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -3289,8 +3289,8 @@
     </message>
     <message>
         <location line="+18"/>
-        <source>The Nexa address to sign the message with</source>
-        <translation>用來簽署訊息的 Nexa 位址</translation>
+        <source>The Pyrrha address to sign the message with</source>
+        <translation>用來簽署訊息的 Pyrrha 位址</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3331,8 +3331,8 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Nexa address</source>
-        <translation>簽署這個訊息來證明這個 Nexa 位址是你的</translation>
+        <source>Sign the message to prove you own this Pyrrha address</source>
+        <translation>簽署這個訊息來證明這個 Pyrrha 位址是你的</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3362,13 +3362,13 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>The Nexa address the message was signed with</source>
-        <translation>簽署這個訊息的 Nexa 位址</translation>
+        <source>The Pyrrha address the message was signed with</source>
+        <translation>簽署這個訊息的 Pyrrha 位址</translation>
     </message>
     <message>
         <location line="+37"/>
-        <source>Verify the message to ensure it was signed with the specified Nexa address</source>
-        <translation>驗證這個訊息來確定是用指定的 Nexa 位址簽署的</translation>
+        <source>Verify the message to ensure it was signed with the specified Pyrrha address</source>
+        <translation>驗證這個訊息來確定是用指定的 Pyrrha 位址簽署的</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4201,7 +4201,7 @@
     </message>
 </context>
 <context>
-    <name>nexa</name>
+    <name>pyrrha</name>
     <message>
         <location filename="../nexastrings.cpp" line="+56"/>
         <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
@@ -4494,8 +4494,8 @@
     </message>
     <message>
         <location line="-125"/>
-        <source>Nexa</source>
-        <translation type="unfinished">Nexa</translation>
+        <source>Pyrrha</source>
+        <translation type="unfinished">Pyrrha</translation>
     </message>
     <message>
         <location line="+1"/>

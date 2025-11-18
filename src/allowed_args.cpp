@@ -719,7 +719,7 @@ static void addAllNodeOptions(AllowedArgs &allowedArgs, HelpMessageMode mode, CT
 }
 
 // nexa-cli does not know about tweaks so we have to silently ignore unknown options
-NexaCli::NexaCli() : AllowedArgs(true)
+PyrrhaCli::PyrrhaCli() : AllowedArgs(true)
 {
     addHelpOptions(*this);
     addChainSelectionOptions(*this);
@@ -742,11 +742,11 @@ NexaCli::NexaCli() : AllowedArgs(true)
               "(recommended for sensitive information such as passphrases)"));
 }
 
-NexaBench::NexaBench() : AllowedArgs(true)
+PyrrhaBench::PyrrhaBench() : AllowedArgs(true)
 {
     addHelpOptions(*this);
 
-    addHeader("Nexa Bench options:")
+    addHeader("Pyrrha Bench options:")
         .addArg("-list", ::AllowedArgs::optionalStr,
             "List benchmarks without executing them. Can be combined with -scaling and -filter")
         .addArg("-evals=<n>", ::AllowedArgs::requiredInt,
@@ -767,9 +767,9 @@ NexaBench::NexaBench() : AllowedArgs(true)
             strprintf("Plot height in pixel (default: %u)", DEFAULT_PLOT_HEIGHT));
 };
 
-Nexad::Nexad(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_NEXAD, pTweaks); }
-NexaQt::NexaQt(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_NEXA_QT, pTweaks); }
-NexaTx::NexaTx() : AllowedArgs(false)
+Pyrrhad::Pyrrhad(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_NEXAD, pTweaks); }
+PyrrhaQt::PyrrhaQt(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_NEXA_QT, pTweaks); }
+PyrrhaTx::PyrrhaTx() : AllowedArgs(false)
 {
     addHelpOptions(*this);
     addChainSelectionOptions(*this);
@@ -788,9 +788,9 @@ ConfigFile::ConfigFile(CTweakMap *pTweaks) : AllowedArgs(false)
     // from the config file. Does not set a help message, because the
     // program does not output a config file help message anywhere.
 
-    NexaCli nexaCli;
-    Nexad nexad(pTweaks);
-    NexaQt nexaQt;
+    PyrrhaCli pyrrhaCli;
+    Pyrrhad pyrrhad(pTweaks);
+    PyrrhaQt pyrrhaQt;
 
     m_args.insert(nexaCli.getArgs().begin(), nexaCli.getArgs().end());
     m_args.insert(nexad.getArgs().begin(), nexad.getArgs().end());

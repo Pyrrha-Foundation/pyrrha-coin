@@ -26,7 +26,7 @@ ZeroLeastSignificantSetBit(blockHeight) = blockHeight & (blockHeight - 1)
 
  * First line:  By zeroing the least significant set bit, the height jumps backwards by a variable and exponentially increasing amount.  Additionally, ancestors of ancestors (recursively) of arbitrary blocks "funnel" to the same ancestor set.  This allows light clients to only keep the headers of a very few old blocks, yet still have the entire ancestor tree.
 
- * Second line: If the block height is odd, the algorithm in the first line produces the previous block as the ancestor.  This is redundant with the prevBlockHash field.  So instead, a linear ancestor is chosen with a nontrivial, but humanly useful backwards hop amount.  In this case, 5040 blocks is 1 week of Nexa's 2 minute average block interval.
+ * Second line: If the block height is odd, the algorithm in the first line produces the previous block as the ancestor.  This is redundant with the prevBlockHash field.  So instead, a linear ancestor is chosen with a nontrivial, but humanly useful backwards hop amount.  In this case, 5040 blocks is 1 week of Pyrrha's 2 minute average block interval.
  
 These two different hop algorithms allow code to go backwards by either linear or exponential hops.  If the code is "at" a block with an undesirable hop algorithm, just follow the hashPrevBlock pointer to get to a block with the desired algorithm.
 

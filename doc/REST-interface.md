@@ -1,6 +1,6 @@
 # Unauthenticated REST Interface
 
-The REST API can be enabled with the `-rest` option on the command line, or `rest=1` in the nexa.conf configuration file.  REST access occurs via the same port as JSON-RPC requests.  For example, to access the chain information on Nexa mainnet, use:
+The REST API can be enabled with the `-rest` option on the command line, or `rest=1` in the nexa.conf configuration file.  REST access occurs via the same port as JSON-RPC requests.  For example, to access the chain information on Pyrrha mainnet, use:
 `curl http://localhost:7227/rest/chaininfo.json`
 
 Note that the REST API uses the same access rules as RPC.  To enable external access to these interfaces, you must use the `rpcallowip` option.  For example, add `rpcallowip=192.168.0.0/16` to nexa.conf to allow the REST API to be accessed from 192.168.* private networks.

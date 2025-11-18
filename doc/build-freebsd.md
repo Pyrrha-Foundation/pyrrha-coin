@@ -18,15 +18,15 @@ pkg install autoconf automake gmake git libevent libtool boost-libs pkgconf open
 See [dependencies.md](dependencies.md) for a complete overview.
 
 
-## Building Nexa
+## Building Pyrrha
 
 As your normal (non root) user, go through the steps below
 
 ### Fetch the code
 
 ```bash
-git clone https://gitlab.com/nexa/nexa.git Nexa
-cd Nexa/
+git clone https://gitlab.com/nexa/nexa.git Pyrrha
+cd Pyrrha/
 ```
 
 ### Preparation

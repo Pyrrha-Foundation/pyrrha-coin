@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
                             " [options] help                " + _("List commands") + "\n" + "  " + appname +
                             " [options] help <command>      " + _("Get help for a command") + "\n";
 
-        int ret = AppInitRPC(usage, AllowedArgs::NexaCli(), argc, argv);
+        int ret = AppInitRPC(usage, AllowedArgs::PyrrhaCli(), argc, argv);
         if (ret != CONTINUE_EXECUTION)
             return ret;
     }

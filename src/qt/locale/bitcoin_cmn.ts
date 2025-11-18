@@ -109,6 +109,6 @@
     <name>WalletView</name>
     </context>
 <context>
-    <name>nexa</name>
+    <name>pyrrha</name>
     </context>
 </TS>

@@ -1,4 +1,4 @@
-Nexa x.y.z.k is now available from:
+Pyrrha x.y.z.k is now available from:
 
   <https://gitlab.com/nexa/nexa/-/releases/>
 

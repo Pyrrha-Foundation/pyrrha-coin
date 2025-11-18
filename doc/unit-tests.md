@@ -1,6 +1,6 @@
-# About Nexa unit tests
+# About Pyrrha unit tests
 
-The Nexa software currently includes couple of types of unit tests:
+The Pyrrha software currently includes couple of types of unit tests:
 
 - Boost Test based unit tests for the non-GUI parts of the C/C++ code
 - QtTest based unit tests for the GUI code
@@ -45,7 +45,7 @@ You can run these tests manually by launching `src/qt/test/test_-qt`.
 There is a wrapper tool in contrib/testtools/gtest-parallel-
 which can execute the Boost-based C++ unit tests in parallel
 
-NOTE: only works if Nexa has been compiled against Boost 1.59 or later,
+NOTE: only works if Pyrrha has been compiled against Boost 1.59 or later,
 as it uses some command line argument features only provided by Boost Test
 from that version onwards.
 

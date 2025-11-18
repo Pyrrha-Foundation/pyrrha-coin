@@ -85,13 +85,13 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>These are your Nexa addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Reni reng kekang Nexa address king pamagpadalang kabayaran. Lawan mulang masalese reng alaga ampo ing address na ning tumanggap bayu ka magpadalang barya.</translation>
+        <source>These are your Pyrrha addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Reni reng kekang Pyrrha address king pamagpadalang kabayaran. Lawan mulang masalese reng alaga ampo ing address na ning tumanggap bayu ka magpadalang barya.</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>These are your Nexa addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Reni reng kekang Nexa addresses keng pamananggap bayad. Rerekomenda mi na gumamit kang bayung address keng balang transaksiyon.</translation>
+        <source>These are your Pyrrha addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Reni reng kekang Pyrrha addresses keng pamananggap bayad. Rerekomenda mi na gumamit kang bayung address keng balang transaksiyon.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -206,8 +206,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEXA COINS&lt;/b&gt;!</source>
-        <translation>Kapabaluan: Istung in-encrypt me ing kekang wallet at meala ya ing passphrase na, ma-&lt;b&gt;ALA NO NGAN RING KEKANG NEXA COINS&lt;/b&gt;</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PYRR COINS&lt;/b&gt;!</source>
+        <translation>Kapabaluan: Istung in-encrypt me ing kekang wallet at meala ya ing passphrase na, ma-&lt;b&gt;ALA NO NGAN RING KEKANG PYRR COINS&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -430,13 +430,13 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>Sign messages with your Nexa addresses to prove you own them</source>
-        <translation>Mag-sign ng mga mensahe gamit ang iyong mga Nexa address para patunayan na pagmamay-ari mo ang mga ito</translation>
+        <source>Sign messages with your Pyrrha addresses to prove you own them</source>
+        <translation>Mag-sign ng mga mensahe gamit ang iyong mga Pyrrha address para patunayan na pagmamay-ari mo ang mga ito</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Verify messages to ensure they were signed with specified Nexa addresses</source>
-        <translation>I-verify ang mga mensahe upang matiyak na nilagdaan ang mga ito gamit ang mga tinukoy na Nexa address</translation>
+        <source>Verify messages to ensure they were signed with specified Pyrrha addresses</source>
+        <translation>I-verify ang mga mensahe upang matiyak na nilagdaan ang mga ito gamit ang mga tinukoy na Pyrrha address</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -455,8 +455,8 @@
     </message>
     <message>
         <location line="-95"/>
-        <source>Send coins to a Nexa address</source>
-        <translation>Magpadalang barya king Nexa address</translation>
+        <source>Send coins to a Pyrrha address</source>
+        <translation>Magpadalang barya king Pyrrha address</translation>
     </message>
     <message>
         <location line="+77"/>
@@ -485,8 +485,8 @@
     </message>
     <message>
         <location line="+495"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="-726"/>
@@ -520,8 +520,8 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Show the %1 help message to get a list with possible Nexa command-line options</source>
-        <translation>Ipakita ang %1 na mensahe ng tulong upang makakuha ng listahan na may mga posibleng opsyon sa command-line ng Nexa</translation>
+        <source>Show the %1 help message to get a list with possible Pyrrha command-line options</source>
+        <translation>Ipakita ang %1 na mensahe ng tulong upang makakuha ng listahan na may mga posibleng opsyon sa command-line ng Pyrrha</translation>
     </message>
     <message>
         <location line="+42"/>
@@ -555,9 +555,9 @@
     </message>
     <message numerus="yes">
         <location line="+178"/>
-        <source>%n active connection(s) to Nexa network</source>
+        <source>%n active connection(s) to Pyrrha network</source>
         <translation>
-            <numerusform>%n (mga) aktibong koneksyon sa Nexa network</numerusform>
+            <numerusform>%n (mga) aktibong koneksyon sa Pyrrha network</numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1020,8 +1020,8 @@
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Nexa address.</source>
-        <translation>Ing pepalub yung address &quot;%1&quot; ali ya katanggap-tanggap a Nexa address.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Pyrrha address.</source>
+        <translation>Ing pepalub yung address &quot;%1&quot; ali ya katanggap-tanggap a Pyrrha address.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1115,8 +1115,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>%1 will download and store a copy of the Nexa block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Ang %1 ay magda-download at mag-imbak ng kopya ng Nexa block chain. Hindi bababa sa %2GB ng data ang maiimbak sa direktoryong ito, at lalago ito sa paglipas ng panahon. Ang pitaka ay maiimbak din sa direktoryong ito.</translation>
+        <source>%1 will download and store a copy of the Pyrrha block chain. At least %2GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Ang %1 ay magda-download at mag-imbak ng kopya ng Pyrrha block chain. Hindi bababa sa %2GB ng data ang maiimbak sa direktoryong ito, at lalago ito sa paglipas ng panahon. Ang pitaka ay maiimbak din sa direktoryong ito.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1172,8 +1172,8 @@
     </message>
     <message>
         <location line="+119"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
-        <translation>Maaaring luma na ang ipinapakitang impormasyon. Awtomatikong nagsi-synchronize ang iyong pitaka sa network ng Nexa pagkatapos maitatag ang isang koneksyon, ngunit hindi pa nakumpleto ang prosesong ito. Nangangahulugan ito na ang mga kamakailang transaksyon ay hindi makikita, at ang balanse ay hindi magiging up-to-date hanggang sa makumpleto ang prosesong ito.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet. This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed.</source>
+        <translation>Maaaring luma na ang ipinapakitang impormasyon. Awtomatikong nagsi-synchronize ang iyong pitaka sa network ng Pyrrha pagkatapos maitatag ang isang koneksyon, ngunit hindi pa nakumpleto ang prosesong ito. Nangangahulugan ito na ang mga kamakailang transaksyon ay hindi makikita, at ang balanse ay hindi magiging up-to-date hanggang sa makumpleto ang prosesong ito.</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -1375,8 +1375,8 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Automatically open the Nexa client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Ibuklat yang antimanu ing Nexa client port king router. Gagana yamu ini istung ing router mu susuporta yang UPnP at magsilbi ya.</translation>
+        <source>Automatically open the Pyrrha client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Ibuklat yang antimanu ing Pyrrha client port king router. Gagana yamu ini istung ing router mu susuporta yang UPnP at magsilbi ya.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1395,8 +1395,8 @@
     </message>
     <message>
         <location line="+7"/>
-        <source>Connect to the Nexa network through a SOCKS5 proxy.</source>
-        <translation>Kumonekta sa Nexa network sa pamamagitan ng SOCKS5 proxy.</translation>
+        <source>Connect to the Pyrrha network through a SOCKS5 proxy.</source>
+        <translation>Kumonekta sa Pyrrha network sa pamamagitan ng SOCKS5 proxy.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1456,8 +1456,8 @@
     </message>
     <message>
         <location line="+25"/>
-        <source>Connect to the Nexa network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>Kumonekta sa Nexa network sa pamamagitan ng isang hiwalay na SOCKS5 proxy para sa Tor hidden services.</translation>
+        <source>Connect to the Pyrrha network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>Kumonekta sa Pyrrha network sa pamamagitan ng isang hiwalay na SOCKS5 proxy para sa Tor hidden services.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1602,8 +1602,8 @@
     <message>
         <location line="+16"/>
         <location line="+386"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Nexa network after a connection is established, but this process has not completed yet.</source>
-        <translation>Ing makaltong impormasion mapalyaring luma ne. Ing kekang wallet otomatiku yang mag-synchronize keng Nexa network istung mekakonekta ne king network, oneng ing prosesung ini ali ya pa kumpletu.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Pyrrha network after a connection is established, but this process has not completed yet.</source>
+        <translation>Ing makaltong impormasion mapalyaring luma ne. Ing kekang wallet otomatiku yang mag-synchronize keng Pyrrha network istung mekakonekta ne king network, oneng ing prosesung ini ali ya pa kumpletu.</translation>
     </message>
     <message>
         <location line="-333"/>
@@ -1717,7 +1717,7 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>URI cannot be parsed! This can be caused by an invalid Nexa address or malformed URI parameters.</source>
+        <source>URI cannot be parsed! This can be caused by an invalid Pyrrha address or malformed URI parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1834,8 +1834,8 @@
     </message>
     <message>
         <location filename="../guiutil.cpp" line="+135"/>
-        <source>Enter a NEXA address (e.g. %1)</source>
-        <translation>Maglagay ng NEXA address (hal. %1)</translation>
+        <source>Enter a PYRR address (e.g. %1)</source>
+        <translation>Maglagay ng PYRR address (hal. %1)</translation>
     </message>
     <message>
         <location line="+832"/>
@@ -2534,8 +2534,8 @@
     <message>
         <location line="+7"/>
         <location line="+23"/>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Nexa network.</source>
-        <translation>Isang opsyonal na mensahe upang ilakip sa kahilingan sa pagbabayad, na ipapakita kapag binuksan ang kahilingan. Tandaan: Ang mensahe ay hindi ipapadala kasama ang pagbabayad sa network ng Nexa.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Pyrrha network.</source>
+        <translation>Isang opsyonal na mensahe upang ilakip sa kahilingan sa pagbabayad, na ipapakita kapag binuksan ang kahilingan. Tandaan: Ang mensahe ay hindi ipapadala kasama ang pagbabayad sa network ng Pyrrha.</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -2890,8 +2890,8 @@
     <message>
         <location line="+30"/>
         <location line="+13"/>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for nexa transactions than the network can process.</source>
-        <translation>Ang pagbabayad lamang ng pinakamababang bayad ay ayos lang hangga&apos;t may mas kaunting dami ng transaksyon kaysa sa espasyo sa mga bloke. Ngunit magkaroon ng kamalayan na ito ay maaaring mauwi sa isang transaksyong hindi kailanman nagkukumpirma kapag may higit na pangangailangan para sa mga transaksyong nexa kaysa sa maaaring iproseso ng network.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for pyrrha transactions than the network can process.</source>
+        <translation>Ang pagbabayad lamang ng pinakamababang bayad ay ayos lang hangga&apos;t may mas kaunting dami ng transaksyon kaysa sa espasyo sa mga bloke. Ngunit magkaroon ng kamalayan na ito ay maaaring mauwi sa isang transaksyong hindi kailanman nagkukumpirma kapag may higit na pangangailangan para sa mga transaksyong pyrrha kaysa sa maaaring iproseso ng network.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3113,8 +3113,8 @@
     </message>
     <message>
         <location line="+128"/>
-        <source>Warning: Invalid Nexa address</source>
-        <translation>Babala: Di-wastong Nexa address</translation>
+        <source>Warning: Invalid Pyrrha address</source>
+        <translation>Babala: Di-wastong Pyrrha address</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3178,8 +3178,8 @@
     </message>
     <message>
         <location line="+51"/>
-        <source>The Nexa address to send the payment to</source>
-        <translation>Ang address ng Nexa kung saan ipadala ang bayad</translation>
+        <source>The Pyrrha address to send the payment to</source>
+        <translation>Ang address ng Pyrrha kung saan ipadala ang bayad</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3210,8 +3210,8 @@
     </message>
     <message>
         <location line="-1037"/>
-        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>Isang mensahe na naka-attach sa coin: URI na maiimbak kasama ng transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng Nexa.</translation>
+        <source>A message that was attached to the coin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>Isang mensahe na naka-attach sa coin: URI na maiimbak kasama ng transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng Pyrrha.</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -3253,8 +3253,8 @@
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="-12"/>
-        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Nexa network.</source>
-        <translation>Isang mensahe na naka-attach sa %1 URI na maiimbak kasama ng transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng Nexa.</translation>
+        <source>A message that was attached to the %1 URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Pyrrha network.</source>
+        <translation>Isang mensahe na naka-attach sa %1 URI na maiimbak kasama ng transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng Pyrrha.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -3294,8 +3294,8 @@
     </message>
     <message>
         <location line="+18"/>
-        <source>The Nexa address to sign the message with</source>
-        <translation>Ang address ng Nexa kung saan pirmahan ang mensahe</translation>
+        <source>The Pyrrha address to sign the message with</source>
+        <translation>Ang address ng Pyrrha kung saan pirmahan ang mensahe</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3336,8 +3336,8 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Nexa address</source>
-        <translation>Pirman ing mensayi ban patune na keka ya ining Nexa address</translation>
+        <source>Sign the message to prove you own this Pyrrha address</source>
+        <translation>Pirman ing mensayi ban patune na keka ya ining Pyrrha address</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3367,13 +3367,13 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>The Nexa address the message was signed with</source>
-        <translation>Ang address ng Nexa kung saan nilagdaan ang mensahe</translation>
+        <source>The Pyrrha address the message was signed with</source>
+        <translation>Ang address ng Pyrrha kung saan nilagdaan ang mensahe</translation>
     </message>
     <message>
         <location line="+37"/>
-        <source>Verify the message to ensure it was signed with the specified Nexa address</source>
-        <translation>Beripikan ing mensayi ban asiguradu a me pirma ya ini gamit ing mepiling Nexa address</translation>
+        <source>Verify the message to ensure it was signed with the specified Pyrrha address</source>
+        <translation>Beripikan ing mensayi ban asiguradu a me pirma ya ini gamit ing mepiling Pyrrha address</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4210,7 +4210,7 @@
     </message>
 </context>
 <context>
-    <name>nexa</name>
+    <name>pyrrha</name>
     <message>
         <location filename="../nexastrings.cpp" line="+144"/>
         <source>Corrupted block database detected</source>
@@ -4363,8 +4363,8 @@
     </message>
     <message>
         <location line="-125"/>
-        <source>Nexa</source>
-        <translation>Nexa</translation>
+        <source>Pyrrha</source>
+        <translation>Pyrrha</translation>
     </message>
     <message>
         <location line="+1"/>

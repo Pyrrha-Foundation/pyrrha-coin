@@ -63,7 +63,7 @@ static const int MAX_URI_LENGTH = 255;
 
 #define QAPP_ORG_NAME "BitcoinUnlimited"
 #define QAPP_ORG_DOMAIN "bitcoinunlimited.info"
-#define QAPP_APP_NAME "Nexa"
+#define QAPP_APP_NAME "Pyrrha"
 #define QAPP_APP_NAME_TESTNET "Nexa-testnet"
 #define QAPP_APP_NAME_REGTEST "Nexa-regtest"
 

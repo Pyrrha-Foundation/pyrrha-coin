@@ -1,14 +1,14 @@
 [Website](https://www.bitcoinunlimited.info)  | [Download](https://www.bitcoinunlimited.info/download) | [Setup](../README.md)   |   [Miner](miner.md)  |  [ElectronCash](bu-electrum-integration.md)  |  [UnconfirmedChains](unconfirmedTxChainLimits.md)
 
-# Using Nexa for Mining
+# Using Pyrrha for Mining
 
-Nexa has an ASIC resistant mining algorithm and has specific features to facilitate CPU mining.
+Pyrrha has an ASIC resistant mining algorithm and has specific features to facilitate CPU mining.
 
 ## ***getminingcandidate*** and ***submitminingsolution***
 
 *efficient protocol to access block candidates and submit block solutions*
 
-Nexa provides 2 mining RPC functions that can be used instead of the traditional "getblocktemplate" and "submitblock".  These RPCs do not pass the entire block to mining pools.  Instead, the candidate block header, proposed coinbase transaction, and coinbase merkle proof are passed.  This is the approximately the same data that is passed to hashing hardware via the Stratum protocol, so if you are familiar with Stratum, you are familiar with how this is possible.
+Pyrrha provides 2 mining RPC functions that can be used instead of the traditional "getblocktemplate" and "submitblock".  These RPCs do not pass the entire block to mining pools.  Instead, the candidate block header, proposed coinbase transaction, and coinbase merkle proof are passed.  This is the approximately the same data that is passed to hashing hardware via the Stratum protocol, so if you are familiar with Stratum, you are familiar with how this is possible.
 
 A mining pool uses ***getminingcandidate*** to receive the previously described block information and a tracking identifier.  It then may modify or completely replace the coinbase transaction and many block header fields, to create different candidates for hashing hardware.  It then forwards these candidates to the hashing hardware via Stratum.  When a solution is found, the mining pool can submit the solution back to nexad via ***submitminingsolution***.
 
@@ -143,7 +143,7 @@ This parameter can be accessed or changed at any time via the "get" and "set" RP
 
 ## Setting your subversion string (spoofing the user agent)
 
-To hide that this is a Nexa node, set the "net.subversionOverride" to a string of your choice, in the nexa.conf file or using ./nexa-cli:
+To hide that this is a Pyrrha node, set the "net.subversionOverride" to a string of your choice, in the nexa.conf file or using ./nexa-cli:
 
 ```sh
  nexa-cli set net.subversionOverride="Your Choice Here"
@@ -161,7 +161,7 @@ To change this field in nexa.conf or on the command line, use:
 
 ## Setting your maximum mined block
 
-By default Nexa uses an adaptive block size algorithm. (see adaptive-blocksize.md)
+By default Pyrrha uses an adaptive block size algorithm. (see adaptive-blocksize.md)
 
 You may want to lower the largest blocksize you're willing to create by the following settings.
 
@@ -182,7 +182,7 @@ You can discover the maximum block size by running:
 ```sh
 nexa-cli getminingmaxblock
 ```
- - WARNING: Setting this max block size parameter means that Nexa may mine blocks of that size on the NEXT block.
+ - WARNING: Setting this max block size parameter means that Pyrrha may mine blocks of that size on the NEXT block.
  
 
 ## Setting your block version
@@ -223,7 +223,7 @@ Here is an easy conversion in Linux: python -c "print '%d' % 0x30000000"
 
 ## Setting your block retry intervals
 
-Nexa tracks multiple sources for data an can rapidly request blocks or transactions from other sources if one source does not deliver the requested data.
+Pyrrha tracks multiple sources for data an can rapidly request blocks or transactions from other sources if one source does not deliver the requested data.
 To change the retry rate, set it in microseconds in your nexa.conf:
 
 Transaction retry interval:
@@ -255,7 +255,7 @@ To show the current string:
 nexa-cli getminercomment
 ```
 
- - WARNING: some mining software and pools also add to the coinbase string and do not validate the total string length (it must be < 100 bytes).  This can cause the mining pool to generate invalid blocks.  Please ensure that your mining pool software validates total string length, or keep the string you add to Nexa short.
+ - WARNING: some mining software and pools also add to the coinbase string and do not validate the total string length (it must be < 100 bytes).  This can cause the mining pool to generate invalid blocks.  Please ensure that your mining pool software validates total string length, or keep the string you add to Pyrrha short.
 
 
 ## Filling a new node's transaction pool
@@ -269,7 +269,7 @@ nexa-cli pushtx <new node's IP:port>
 
 ## Validating unsolved blocks
 
-Nexa can be used to validate block templates received from other Nexa releases or other nexa clients.  This ensures that Nexa will accept the block once it is mined, allowing miners to deploy multiple clients in their mining networks.  Note that this API will return an error if the block is not built off of the chain tip seen by this client.  So it is important that the client be fully synchronized with the client that creates the block template.  You can do this by explicitly connecting them via "addnode".
+Pyrrha can be used to validate block templates received from other Pyrrha releases or other nexa clients.  This ensures that Pyrrha will accept the block once it is mined, allowing miners to deploy multiple clients in their mining networks.  Note that this API will return an error if the block is not built off of the chain tip seen by this client.  So it is important that the client be fully synchronized with the client that creates the block template.  You can do this by explicitly connecting them via "addnode".
 
 The block validation RPC uses the same call syntax as the "submitblock" RPC, and returns a JSONRPCException if the block validation fails.  See "qa/rpc-tests/validateblocktemplate.py" for detailed python examples.
 

@@ -58,7 +58,7 @@ REM Set the dependency path.  This is where all of the nexa dependencies will be
 REM IMPORTANT: DO NOT USE PATHS WITH SPACES for the dependencies root!  If you do, you WILL run into build errors
 set "DEPS_ROOT=C:\deps"
 
-REM Set the path to your Nexa git checkout.
+REM Set the path to your Pyrrha git checkout.
 REM NOTE: If you are running these scripts from the nexa checkout location, you do not need to modify this
 set "NEXA_GIT_ROOT=%CD%\..\..\"
 
@@ -73,8 +73,8 @@ REM    3. Build cores disabled (means make without the -jN parameter)
 REM    4. Tests disabled
 REM    5. Clean disabled
 REM    6. Strip enabled
-REM    7. Nexa autogen.sh step enabled (useful for rebuilding local changes only)
-REM    8. Nexa configure step enabled (useful for rebuilding local changes only)
+REM    7. Pyrrha autogen.sh step enabled (useful for rebuilding local changes only)
+REM    8. Pyrrha configure step enabled (useful for rebuilding local changes only)
 REM
 REM NOTE: If you set to build both 32-bit and 64-bit at the same time:
 REM    1. Clean will be enabled

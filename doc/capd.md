@@ -8,7 +8,7 @@ Counterparty discovery is currently a barrier to using many crypto-financial pro
 
 One valuable "degenerate case" of this protocol is to enable discovery of, or low bandwidth peer-to-peer-like communications between, 2 specific entities that are both behind firewalls and have dynamic IP addresses.
 
-We propose a counterparty and protocol discovery service (CAPD) running on Nexa nodes, taking advantage of existing P2P and blockchain features.
+We propose a counterparty and protocol discovery service (CAPD) running on Pyrrha nodes, taking advantage of existing P2P and blockchain features.
 
 ## Related Work
 
@@ -24,7 +24,7 @@ Counterparty discovery protocols are a part of decentralized exchanges. Work on 
 
 ## Architecture
 
-The network architecture consists of a set of anonymous, permissionless, IP accessible peer-to-peer nodes (called "peers") that store messages, and a set of "clients" that communicate with any peer to submit, retrieve, or search for messages, but do not store messages themselves. This is a semantic, not architectural distinction. A single node may behave as both peer and client. Nexa "full" nodes are leveraged to provide the peer nodes of this network (but it would be possible to make specialized CAPD-only nodes), and clients are typically light cryptocurrency wallets but actually may be any application. Leveraging the existing P2P architecture makes implementing this functionality much simpler since it amounts to the addition of a few new P2P messages types and CAPD message storage.
+The network architecture consists of a set of anonymous, permissionless, IP accessible peer-to-peer nodes (called "peers") that store messages, and a set of "clients" that communicate with any peer to submit, retrieve, or search for messages, but do not store messages themselves. This is a semantic, not architectural distinction. A single node may behave as both peer and client. Pyrrha "full" nodes are leveraged to provide the peer nodes of this network (but it would be possible to make specialized CAPD-only nodes), and clients are typically light cryptocurrency wallets but actually may be any application. Leveraging the existing P2P architecture makes implementing this functionality much simpler since it amounts to the addition of a few new P2P messages types and CAPD message storage.
 
 ### Message Pool
 
@@ -42,7 +42,7 @@ Ideally, Clients could query announcements through a ternary content-addressable
 
 However, it is possible to achieve full generality and tremendous performance by using hardware TCAMs. TCAM chips are an essential part of network routers and 20Mbit capacity cascadable TCAM chips that are capable of 320 million lookups per second are available (Renseas) today. There is every indication that these chips will be needed for networking routers for the foreseeable future, and will grow in capacity as silicon process technology allows.
 
-Since the first 16 bytes of each message are TCAM addressable, these bytes are used to allow peers to find messages of interest. The exact content of these bytes is application specific, but for example, the first 2 bytes could define a "protocol id", and the next 6 client constraints. If "atomic swap" was implemented as protocol id 1, then 3 bytes of offer ticker, and 3 of ask ticker then "01BCHNEX" could request a Bitcoin Cash to Nexa cryptocurrency trade. The end client would then be presented with every open trade offer, and would use additional message bytes to determine the offer details (ask price for example). If different message types have a collision in these bytes, service degradation is graceful. Peers receive some useless messages.
+Since the first 16 bytes of each message are TCAM addressable, these bytes are used to allow peers to find messages of interest. The exact content of these bytes is application specific, but for example, the first 2 bytes could define a "protocol id", and the next 6 client constraints. If "atomic swap" was implemented as protocol id 1, then 3 bytes of offer ticker, and 3 of ask ticker then "01BCHNEX" could request a Bitcoin Cash to Pyrrha cryptocurrency trade. The end client would then be presented with every open trade offer, and would use additional message bytes to determine the offer details (ask price for example). If different message types have a collision in these bytes, service degradation is graceful. Peers receive some useless messages.
 
 By convention, message replies are addressed to the original sender by setting the 16 TCAM bytes of the reply to the last bytes (the opposite bytes as used for POW) of the hash of the original message.
 
@@ -88,7 +88,7 @@ Any other data (optional): Additional conversation-specific data that may be use
 
 *nonce*: a byte vector used in calculating proof of work, containing between 1 and 8 bytes, inclusive
 
-*difficultyBits*: (uint32) Message proof of work must meet or exceed this target.  This field is specified in the same format as Nexa's "nBits" field (eg. nBits as 0xSSVVVVVV becomes VVVVVV << ((SS-3)*8))
+*difficultyBits*: (uint32) Message proof of work must meet or exceed this target.  This field is specified in the same format as Pyrrha's "nBits" field (eg. nBits as 0xSSVVVVVV becomes VVVVVV << ((SS-3)*8))
 
 #### Message Proof of Work
 
@@ -98,7 +98,7 @@ SHA256(SHA256(nonce ++ SHA256(data ++ create time ++ rescind hash ++ expiration 
 
 where ++ denotes binary string concatenation of nexa-style serialized objects. Use 0s for any unpopulated optional field (e.g. rescind hash or expiration).
 
-Note that the innermost SHA256 reduces the message to a 32 byte data object to "grind" against the nonce. The outer two SHA256 are how proof-of-work is calculated. Like Nexa proof-of-work, it is necessary to use a double SHA256 so that an algorithm cannot save intermediate states of the SHA256 operation to check a nonce in less time than 1 SHA256.
+Note that the innermost SHA256 reduces the message to a 32 byte data object to "grind" against the nonce. The outer two SHA256 are how proof-of-work is calculated. Like Pyrrha proof-of-work, it is necessary to use a double SHA256 so that an algorithm cannot save intermediate states of the SHA256 operation to check a nonce in less time than 1 SHA256.
 
 To eliminate spam, message creators must generate proof-of-work before forwarding a message to nodes, and this proof-of-work is used to calculate the message priority. Nodes calculate the minimum acceptable forwarding and ban priority by looking at the contents of their msgPool, and forward these values to peer nodes. The forwarding priority minimum is implementation defined, but generally calculated so that at least 1/4 to 1/2 of the messages in the msgPool contain a lower priority. If a message is in the lower tier, it is no longer announced, but is available to clients via query requests.
 
@@ -128,7 +128,7 @@ Message replies are not distinguishable from other messages, except that they ar
 
 ## Node Protocol
 
-Nodes follow the Nexa P2P protocol, which is beyond the scope of this specification.  The information provided here is sufficient to allow anyone already familiar with the P2P node protocol to add the CAPD specific messages.
+Nodes follow the Pyrrha P2P protocol, which is beyond the scope of this specification.  The information provided here is sufficient to allow anyone already familiar with the P2P node protocol to add the CAPD specific messages.
 
 ### CAPD message serialization
 
@@ -199,7 +199,7 @@ To enable access from javascript browser plugins and programatically simple acce
 
 ### Payment
 
-The first version of this protocol assumes that this service is offered for free. However, most conceived uses eventually involve transactions on the Nexa network, so this "free" service will create additional fee paying transactions, and creates use and adoption of the Nexa cryptocurrency. Therefore it may be reasonable to expect that this service will be offered for free by miners and holders of BCH for some time.
+The first version of this protocol assumes that this service is offered for free. However, most conceived uses eventually involve transactions on the Pyrrha network, so this "free" service will create additional fee paying transactions, and creates use and adoption of the Pyrrha cryptocurrency. Therefore it may be reasonable to expect that this service will be offered for free by miners and holders of BCH for some time.
 
 However, it is possible to introduce a micropayments system to pay for the use of certain aspects of the protocol, namely the filtering service provided through the Query and QueryNotify messages.
 

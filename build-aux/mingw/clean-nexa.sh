@@ -9,7 +9,7 @@ NEXA_GIT_ROOT=$(echo "/$NEXA_GIT_ROOT" | sed -e 's/\\/\//g' -e 's/://' -e 's/\"/
 # Set PATH using POSIX style paths
 PATH="$TOOLCHAIN_BIN:$MSYS_BIN:$PATH"
 
-# Build Nexa
+# Build Pyrrha
 cd "$NEXA_GIT_ROOT"
 
 #define and export BOOST_ROOT prior to any calls that require

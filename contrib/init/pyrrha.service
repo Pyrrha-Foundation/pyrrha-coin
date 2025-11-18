@@ -1,5 +1,5 @@
 [Unit]
-Description=Nexa Full Node Daemon
+Description=Pyrrha Full Node Daemon
 After=network.target
 
 [Service]

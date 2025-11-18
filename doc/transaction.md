@@ -65,7 +65,7 @@ for each input:
 
 An "amount" field was included in each input.  This field MUST match the amount (nValue) in the output that is spent.  The existence of this field helps stop wallets from making errors where they incorrectly track input amounts, resulting in accidentally giving extremely large fees to miners.  It also provides this information to signing-only wallets, which defuses a theoretical attack where a such a wallet is tricked into giving large fees to miners.
 
-Note that Nexa requires that the amount field be part of the sighash, solving the above without solving HOW wallets learn about the previous amount.  This change simply provides a convenient and default way to communicate this amount.
+Note that Pyrrha requires that the amount field be part of the sighash, solving the above without solving HOW wallets learn about the previous amount.  This change simply provides a convenient and default way to communicate this amount.
 
 Note that this field is redundant information to the full node and so in theory does not need to be stored or passed over the network.  However, this implementation stores it, and until this space and bandwidth are at a premium, this optimization makes little sense.
 

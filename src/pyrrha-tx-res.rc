@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Nexa"
-            VALUE "FileDescription",    "nexa-tx (CLI Nexa transaction editor utility)"
+            VALUE "CompanyName",        "Pyrrha"
+            VALUE "FileDescription",    "nexa-tx (CLI Pyrrha transaction editor utility)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "nexa-tx"
             VALUE "LegalCopyright",     COPYRIGHT_STR

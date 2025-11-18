@@ -1,6 +1,6 @@
-# Nexa Signature Hash Type
+# Pyrrha Signature Hash Type
 
-A Nexa signature consists of a Schnorr signature and additional bytes called the signature hash type (sighashtype).  As with all secure Schnorr signature schemes, the signature does not sign the message bytes (in this case the transaction) directly; it signs a cryptographic hash of some subset of the transaction data.  The "signature hash type" identifies what data within the transaction is passed to which cryptographic hash algorithm to generate the actual data signed by the Schnorr signature algorithm.
+A Pyrrha signature consists of a Schnorr signature and additional bytes called the signature hash type (sighashtype).  As with all secure Schnorr signature schemes, the signature does not sign the message bytes (in this case the transaction) directly; it signs a cryptographic hash of some subset of the transaction data.  The "signature hash type" identifies what data within the transaction is passed to which cryptographic hash algorithm to generate the actual data signed by the Schnorr signature algorithm.
 
 # Identifying Sighashtype Bytes
 

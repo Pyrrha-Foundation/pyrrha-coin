@@ -43,7 +43,7 @@ if "%BUILD_32_BIT%" NEQ "" set BUILD_ARCH=T
 if "%BUILD_64_BIT%" NEQ "" set BUILD_ARCH=T
 if "%BUILD_ARCH%" NEQ "T" (
 	echo You must specify building at least one of 32-bit or 64-bit version
-	echo of the Nexa client in SET_ENV_VARS.bat.
+	echo of the Pyrrha client in SET_ENV_VARS.bat.
 	echo Aborting initial configuration...
 	pause
 	exit /b -1
@@ -55,18 +55,18 @@ if not exist "%MINGW_ROOT%" (
 	echo executed mingw-setup.exe, updated SET_ENV_VARS.bat to list the install
 	echo location you chose in the variable MINGW_ROOT, and run config-mingw.bat.
 	echo Current MINGW_ROOT = %MINGW_ROOT%
-	echo Aborting build of Nexa client...
+	echo Aborting build of Pyrrha client...
 	pause
 	exit /b -1
 )
 
 REM Verify that MSYS was correctly installed and updated by previous steps
 if not exist "%MSYS_SH%" (
-	echo MSYS does not appear to have installed correctly.  Build of Nexa client
+	echo MSYS does not appear to have installed correctly.  Build of Pyrrha client
 	echo cannot continue without MSYS being properly installed and config-mingw.bat
 	echo having been successfully executed at least once.
 	echo Current MSYS_SH = %MSYS_SH%
-	echo Aborting build of Nexa client...
+	echo Aborting build of Pyrrha client...
 	pause
 	exit /b -1
 )

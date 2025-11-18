@@ -11,7 +11,7 @@ OP_GROUP tokens are a method for implementing representative tokens -- also name
 
 OP_GROUP tokens differ in significant aspects from other existing or proposed "colored coins" techniques:
 
-* Implemented as a single opcode within Nexa's Script language.
+* Implemented as a single opcode within Pyrrha's Script language.
 	 + Integration with Script means that OP_GROUP functionality will grow as Script grows, and maintenance is minimal compared to colored coins that use "piggy-back" blockchains.
 
 * Is miner validated
@@ -39,7 +39,7 @@ intended to be removed from the final version of this document.
 
 ## Risks and philosophical approach
 
-The purpose of OP_GROUP is to enable colored coins on the Nexa blockchain and in SPV (phone) wallets, covering major use cases with a fraction of the development effort and maintenance of other token proposals.  These use cases include ICOs (initial coin offerings), representative tokens for stocks, bonds and currencies, and other uses I haven't considered.  But these use cases notably do not include "smart" contracts, since the introduction of a sophisticated programming language would add tremendous complexity and competes with the evolving Nexa Script language.
+The purpose of OP_GROUP is to enable colored coins on the Pyrrha blockchain and in SPV (phone) wallets, covering major use cases with a fraction of the development effort and maintenance of other token proposals.  These use cases include ICOs (initial coin offerings), representative tokens for stocks, bonds and currencies, and other uses I haven't considered.  But these use cases notably do not include "smart" contracts, since the introduction of a sophisticated programming language would add tremendous complexity and competes with the evolving Pyrrha Script language.
 
 This proposal also limits itself to exactly one opcode.  It is possible to include additional functionality via additional opcodes but I believe that the discussion and decision around these possible features should occur once OP_GROUP is successfully deployed and employed. 
 

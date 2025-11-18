@@ -18,8 +18,8 @@ NEXAD_BIN=${NEXAD_BIN:-/usr/bin/nexad}
 NEXAD_NICE=${NEXAD_NICE:-${NICELEVEL:-0}}
 NEXAD_OPTS="${NEXAD_OPTS:-${NEXA_OPTS}}"
 
-name="Nexa Daemon"
-description="Nexa cryptocurrency P2P network daemon"
+name="Pyrrha Daemon"
+description="Pyrrha cryptocurrency P2P network daemon"
 
 command="/usr/bin/nexad"
 command_args="-pid=\"${NEXAD_PIDFILE}\" \

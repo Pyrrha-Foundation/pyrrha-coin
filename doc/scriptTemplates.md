@@ -2,7 +2,7 @@
 *Allows 3 agent (covenant, owner, and spender) trustless interaction*
 
 ## Introduction
-A script template is a generalization of the P2SH (pay-to-script-hash) format, that allows for the implementation of covenants.  It is perhaps conceptually difficult to understand at first, but is both easy to implement over the existing Nexa scripting system and is powerful.
+A script template is a generalization of the P2SH (pay-to-script-hash) format, that allows for the implementation of covenants.  It is perhaps conceptually difficult to understand at first, but is both easy to implement over the existing Pyrrha scripting system and is powerful.
 
 A script template factors all data in a traditional script out into arguments that are furnished by the owner and spender.  For example, a traditional pay-to-pubkey-hash script looks like this:
 
