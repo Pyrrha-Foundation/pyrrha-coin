@@ -95,6 +95,14 @@ CDBWrapper::CDBWrapper(const fs::path &path,
     // Modify default database options
     OverrideOptions(options, pOverride);
 
+    // path needs to be a std::wstring on windows converted to a std::string
+#ifdef WIN32
+    const std::u8string &utf8Path = path.u8string();
+    std::string strPath = std::string{utf8Path.begin(), utf8Path.end()};
+#else
+    std::string strPath = path.string();
+#endif
+
     if (fMemory)
     {
         penv = leveldb::NewMemEnv(leveldb::Env::Default());
@@ -104,14 +112,14 @@ CDBWrapper::CDBWrapper(const fs::path &path,
     {
         if (fWipe)
         {
-            LOGA("Wiping LevelDB in %s\n", path.string());
-            leveldb::Status result = leveldb::DestroyDB(path.string(), options);
+            LOGA("Wiping LevelDB in %s\n", strPath.c_str());
+            leveldb::Status result = leveldb::DestroyDB(strPath, options);
             dbwrapper_private::HandleError(result);
         }
         TryCreateDirectories(path);
-        LOGA("Opening LevelDB in %s\n", path.string());
+        LOGA("Opening LevelDB in %s\n", strPath.c_str());
     }
-    leveldb::Status status = leveldb::DB::Open(options, path.string(), &pdb);
+    leveldb::Status status = leveldb::DB::Open(options, strPath, &pdb);
     dbwrapper_private::HandleError(status);
     LOGA("Opened LevelDB successfully\n");
 
@@ -130,10 +138,10 @@ CDBWrapper::CDBWrapper(const fs::path &path,
         Write(OBFUSCATE_KEY_KEY, new_key);
         obfuscate_key = new_key;
 
-        LOGA("Wrote new obfuscate key for %s: %s\n", path.string(), HexStr(obfuscate_key));
+        LOGA("Wrote new obfuscate key for %s: %s\n", strPath.c_str(), HexStr(obfuscate_key));
     }
 
-    LOGA("Using obfuscation key for %s: %s\n", path.string(), HexStr(obfuscate_key));
+    LOGA("Using obfuscation key for %s: %s\n", strPath.c_str(), HexStr(obfuscate_key));
 }
 
 CDBWrapper::~CDBWrapper()

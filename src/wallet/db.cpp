@@ -79,17 +79,42 @@ bool CDBEnv::Open(const fs::path &pathIn)
 
     boost::this_thread::interruption_point();
 
+    // path needs to be a std::wstring on windows converted to a std::string
+#ifdef WIN32
+    const std::u8string &utf8PathIn = pathIn.u8string();
+    strPath = std::string{utf8PathIn.begin(), utf8PathIn.end()};
+#else
     strPath = pathIn.string();
+#endif
+
     fs::path pathLogDir = pathIn / "database";
     TryCreateDirectories(pathLogDir);
+#ifdef WIN32
+    const std::u8string &utf8PathLogDir = pathLogDir.u8string();
+    std::string strPathLogDir = std::string{utf8PathLogDir.begin(), utf8PathLogDir.end()};
+#else
+    std::string strPathLogDir = pathIn.string();
+#endif
+
     fs::path pathErrorFile = pathIn / "db.log";
-    LOGA("CDBEnv::Open: LogDir=%s ErrorFile=%s\n", pathLogDir.string(), pathErrorFile.string());
+#ifdef WIN32
+    const std::u8string &utf8PathErrorFile = pathErrorFile.u8string();
+    std::string strPathErrorFile = std::string{utf8PathErrorFile.begin(), utf8PathErrorFile.end()};
+#else
+    std::string strPathErrorFile = pathIn.string();
+#endif
+    LOGA("CDBEnv::Open: LogDir=%s ErrorFile=%s\n", strPathLogDir, strPathErrorFile);
 
     unsigned int nEnvFlags = 0;
     if (GetBoolArg("-privdb", DEFAULT_WALLET_PRIVDB))
         nEnvFlags |= DB_PRIVATE;
 
-    dbenv->set_lg_dir(pathLogDir.string().c_str());
+    // NOTE FROM BDB API DOCS:
+    // When using a Unicode build on Windows (the default),
+    // the db_home argument will be interpreted as a UTF-8 string,
+    // which is equivalent to ASCII for Latin characters.
+    dbenv->set_lg_dir(strPathLogDir.c_str());
+
     dbenv->set_cachesize(0, 0x100000, 1); // 1 MiB should be enough for just the wallet
     dbenv->set_lg_bsize(0x10000);
     dbenv->set_lg_max(1048576);
@@ -99,6 +124,10 @@ bool CDBEnv::Open(const fs::path &pathIn)
     dbenv->set_flags(DB_AUTO_COMMIT, 1);
     dbenv->set_flags(DB_TXN_WRITE_NOSYNC, 1);
     dbenv->log_set_config(DB_LOG_AUTO_REMOVE, 1);
+    // NOTE FROM BDB API DOCS:
+    // When using a Unicode build on Windows (the default),
+    // the db_home argument will be interpreted as a UTF-8 string,
+    // which is equivalent to ASCII for Latin characters.
     int ret = dbenv->open(strPath.c_str(),
         DB_CREATE | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL | DB_INIT_TXN | DB_THREAD | DB_RECOVER | nEnvFlags,
         S_IRUSR | S_IWUSR);

@@ -929,5 +929,5 @@ bool ParseFixedPoint(const std::string &val, int decimals, int64_t *amount_out)
 std::string concatenateVector(std::vector<std::string> &strings, std::string separator)
 {
     return std::accumulate(strings.begin(), strings.end(), std::string(),
-        [&separator](std::string &x, std::string &y) { return x.empty() ? y : x + separator + y; });
+        [&separator](const std::string &x, const std::string &y) { return x.empty() ? y : x + separator + y; });
 }

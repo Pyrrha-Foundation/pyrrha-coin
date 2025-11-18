@@ -51,7 +51,13 @@
 #include <sys/resource.h>
 #include <sys/stat.h>
 
+#else // ifdef WIN32
+
+#ifdef UNICODE
+typedef LPWSTR LPTSTR;
 #else
+typedef LPSTR LPTSTR;
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4786)
@@ -354,7 +360,7 @@ const fs::path &GetDataDir(bool fNetSpecific)
     }
     if (fNetSpecific)
     {
-        path /= BaseParams().DataDir();
+        path /= fs::path(BaseParams().DataDir());
         // InitLogging calls GetDataDir(true) which will set this if something has not
         // previously done so
         if (pathDebugLog.empty())
@@ -632,13 +638,15 @@ void ShrinkDebugFile()
 #ifdef WIN32
 fs::path GetSpecialFolderPath(int nFolder, bool fCreate)
 {
-    char pszPath[MAX_PATH] = "";
+    LPTSTR pszPath = (LPTSTR)std::malloc(MAX_PATH * sizeof(LPTSTR));
 
     if (SHGetSpecialFolderPathA(nullptr, pszPath, nFolder, fCreate))
     {
-        return fs::path(pszPath);
+        fs::path retPath(pszPath);
+        free(pszPath);
+        return retPath;
     }
-
+    free(pszPath);
     LOGA("SHGetSpecialFolderPathA() failed, could not obtain requested path.\n");
     return fs::path("");
 }
