@@ -98,6 +98,10 @@ struct Params
     uint256 hashGenesisBlock;
     int nSubsidyHalvingInterval;
 
+    /** Linear subsidy model (optional) */
+    CAmount subsidyStep = 0;      // How much to subtract each interval (e.g. 3 * COIN)
+    CAmount minSubsidy  = 0;      // Tail emission floor (e.g. 10 * COIN)
+
     /**
      * Deployment parameters for the 29 bits (0..28) defined by bip135
      */

@@ -30,6 +30,6 @@ COPY . .
 # Build Pyrrha completely inside the container, with LOW parallelism
 RUN ./autogen.sh && \
     ./configure --disable-tests --disable-bench && \
-    make -j16
+    make -j20
 
 CMD ["bash"]

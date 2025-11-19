@@ -219,8 +219,8 @@ public:
     {
         // this network is going to be deleted soon, still here to get some unit tests passing
         strNetworkID = "main"; // Do not use the const string because of ctor execution order issues
-        consensus.nSubsidyHalvingInterval = 210000;
-        // 00000000000000ce80a7e057163a4db1d5ad7b20fb6f598c9597b9665c8fb0d4 - April 1, 2012
+        consensus.nSubsidyHalvingInterval = 64800; // 90 days * 720 blocks/day
+
 
         uint32_t tgtBits = 0x1e0fffff;
         bool fNegative;
@@ -233,7 +233,9 @@ public:
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
         consensus.powAlgorithm = 0;
-        consensus.initialSubsidy = 50 * 1000000 * COIN;
+        consensus.initialSubsidy = 200 * COIN;
+        consensus.subsidyStep    = 3 * COIN;     // -3 PYRR per epoch
+        consensus.minSubsidy     = 10 * COIN;    // floor at 10 PYRR
         consensus.coinbaseMaturity = COINBASE_MATURITY_TESTNET;
         // The half life for the ASERT DAA. For every (nASERTHalfLife) seconds behind schedule the blockchain gets,
         // difficulty is cut in half. Doubled if blocks are ahead of schedule.
@@ -326,13 +328,15 @@ public:
     CRegTestParams()
     {
         strNetworkID = "regtest"; // Do not use the const string because of ctor execution order issues
-        consensus.nSubsidyHalvingInterval = 150;
+        consensus.nSubsidyHalvingInterval = 64800; // 90 days * 720 blocks/day
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetSpacing = 10 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         consensus.powAlgorithm = 1;
-        consensus.initialSubsidy = 10 * 1000000 * COIN;
+        consensus.initialSubsidy = 200 * COIN;
+        consensus.subsidyStep    = 3 * COIN;     // -3 PYRR per epoch
+        consensus.minSubsidy     = 10 * COIN;    // floor at 10 PYRR
         consensus.coinbaseMaturity = COINBASE_MATURITY_TESTNET;
         // The half life for the ASERT DAA. For every (nASERTHalfLife) seconds behind schedule the blockchain gets,
         // difficulty is cut in half. Doubled if blocks are ahead of schedule.
@@ -408,8 +412,7 @@ public:
     CTestNetParams()
     {
         strNetworkID = "testnet"; // Do not use the const string because of ctor execution order issues
-
-        consensus.nSubsidyHalvingInterval = 210000 * 5; // 2 minute blocks rather than 10 min -> * 5
+        consensus.nSubsidyHalvingInterval = 64800; // 90 days * 720 blocks/day
         uint32_t tgtBits = 0x1e0fffff;
         bool fNegative;
         bool fOverflow;
@@ -421,7 +424,9 @@ public:
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
         consensus.powAlgorithm = 1;
-        consensus.initialSubsidy = 10 * 1000000 * COIN;
+        consensus.initialSubsidy = 200 * COIN;
+        consensus.subsidyStep    = 3 * COIN;     // -3 PYRR per epoch
+        consensus.minSubsidy     = 10 * COIN;    // floor at 10 PYRR
         consensus.coinbaseMaturity = COINBASE_MATURITY_TESTNET;
         // The half life for the ASERT DAA. For every (nASERTHalfLife) seconds behind schedule the blockchain gets,
         // difficulty is cut in half. Doubled if blocks are ahead of schedule.
@@ -514,8 +519,8 @@ public:
     {
         strNetworkID = "pyrrha"; // Do not use the const string because of ctor execution order issues
 
-        consensus.nSubsidyHalvingInterval = 210000 * 5; // 2 minute blocks rather than 10 min -> * 5
-        uint32_t tgtBits = 503382016;
+        consensus.nSubsidyHalvingInterval = 64800; // 90 days * 720 blocks/day
+        uint32_t tgtBits = 0x1e0fffff; //make easier mining for genesis block?
         bool fNegative;
         bool fOverflow;
         arith_uint256 tmp;
@@ -525,8 +530,10 @@ public:
         consensus.nPowTargetSpacing = 2 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
-        consensus.powAlgorithm = 1;
-        consensus.initialSubsidy = 10 * 1000000 * COIN;
+        consensus.powAlgorithm = 1; 
+        consensus.initialSubsidy = 200 * COIN;
+        consensus.subsidyStep    = 3 * COIN;     // -3 PYRR per epoch
+        consensus.minSubsidy     = 10 * COIN;    // floor at 10 PYRR
         consensus.coinbaseMaturity = COINBASE_MATURITY;
         // The half life for the ASERT DAA. For every (nASERTHalfLife) seconds behind schedule the blockchain gets,
         // difficulty is cut in half. Doubled if blocks are ahead of schedule.
@@ -535,10 +542,19 @@ public:
 
         std::vector<unsigned char> nonce; // TODO make this difficulty higher and hard code solution
         std::vector<unsigned char> hardCodedNonce;
-        nonce = hardCodedNonce = ParseHex("03001700");
-        genesis = CreateGenesisBlock("Reuters: Japan PM Kishida backs BOJ ultra-easy policy while yen worries mount "
-                                     "BTC:741711:000000000000000000075f4bc08e1d78a3ab3af8274d13334c0ac2de25309768",
-            CScript() << OP_FALSE, 1655812800, nonce, tgtBits, 0);
+        nonce = hardCodedNonce = ParseHex("ee160300");
+        const char* pszTimestamp =
+            "2025-11-20: After the flood of farms, Pyrrha returns PoW to the people.";
+
+        // 2025-11-20 20:00:00 UTC = 1763668800
+        genesis = CreateGenesisBlock(
+            pszTimestamp,
+            CScript() << OP_1,      // neutral script; no premine address
+            1763668800,             // nTime: fixed launch timestamp
+            nonce,
+            tgtBits,
+            0 * COIN                // no premine: fully fair launch
+        );
 #if 0 // recalculate GB if needed (note that this code will not work with the java pyrrha shared library because it
       // must start before the random numbers (initialized in ECC_Start are hooked up).
         ECC_Start();
@@ -553,11 +569,9 @@ public:
         }
 #else
         consensus.hashGenesisBlock = genesis.GetHash();
-        // assert(
-        //     consensus.hashGenesisBlock == uint256S("edc7144fe1ba4edd0edf35d7eea90f6cb1dba42314aa85da8207e97c5339c801"));
-        // TODO(Pyrrha): update these asserts once final genesis blocks are chosen
-// assert(consensus.hashGenesisBlock == uint256S("508c843a4b98fb25f57cf9ebafb245a5c16468f06519cdd467059a91e7b79d52"));
-// assert(genesis.hashMerkleRoot == uint256S("..."));
+        assert(
+        consensus.hashGenesisBlock == uint256S("592bd483fea323c30e51297e412d5cf262b376db46a00c110a6654f6dc1451c8"));
+
 #endif
         /**
          * The message start string is designed to be unlikely to occur in normal data.

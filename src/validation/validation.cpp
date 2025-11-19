@@ -1382,19 +1382,67 @@ bool TestBlockValidity(CValidationState &state,
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params &consensusParams)
 {
+    // If linear model is configured, use it
+    if (consensusParams.subsidyStep > 0 && consensusParams.minSubsidy > 0 &&
+        consensusParams.nSubsidyHalvingInterval > 0)
+    {
+        // epochs of length nSubsidyHalvingInterval
+        int epochs = nHeight / consensusParams.nSubsidyHalvingInterval;
+
+        CAmount reward = consensusParams.initialSubsidy
+                       - consensusParams.subsidyStep * epochs;
+
+        if (reward < consensusParams.minSubsidy)
+            reward = consensusParams.minSubsidy; // tail emission
+
+        return reward;
+    }
+
+    // Default: legacy halving model
     int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
     if (halvings >= 64)
         return 0;
 
     CAmount nSubsidy = consensusParams.initialSubsidy;
-    // Subsidy is cut in half every 1,050,000 blocks which will occur approximately every 4 years.
     nSubsidy >>= halvings;
     return nSubsidy;
 }
 
+
 uint64_t GetCoinsMinted(int nHeight, const Consensus::Params &consensusParams)
 {
+    // Linear + tail model
+    if (consensusParams.subsidyStep > 0 && consensusParams.minSubsidy > 0 &&
+        consensusParams.nSubsidyHalvingInterval > 0)
+    {
+        uint64_t total_minted = 0;
+        int interval = consensusParams.nSubsidyHalvingInterval;
+        int epochs   = nHeight / interval;
+        int rem      = nHeight % interval;
+
+        // Full epochs
+        for (int i = 0; i < epochs; ++i)
+        {
+            CAmount reward = consensusParams.initialSubsidy
+                           - consensusParams.subsidyStep * i;
+            if (reward < consensusParams.minSubsidy)
+                reward = consensusParams.minSubsidy;
+
+            total_minted += (uint64_t)reward * (uint64_t)interval;
+        }
+
+        // Partial last epoch
+        CAmount reward = consensusParams.initialSubsidy
+                       - consensusParams.subsidyStep * epochs;
+        if (reward < consensusParams.minSubsidy)
+            reward = consensusParams.minSubsidy;
+
+        total_minted += (uint64_t)reward * (uint64_t)rem;
+
+        return total_minted;
+    }
+
+    // Default: legacy halving model
     uint64_t total_minted = 0;
     const int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
     CAmount nSubsidy = consensusParams.initialSubsidy;
@@ -1414,6 +1462,7 @@ uint64_t GetCoinsMinted(int nHeight, const Consensus::Params &consensusParams)
     }
     return total_minted;
 }
+
 
 int32_t ComputeBlockVersion(const CBlockIndex *pindexPrev, const Consensus::Params &params)
 {
