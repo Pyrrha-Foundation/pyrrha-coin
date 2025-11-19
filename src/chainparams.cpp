@@ -350,10 +350,10 @@ public:
 
         consensus.nextForkActivationTime = NEXT_FORK_ACTIVATION_TIME;
 
-        pchMessageStart[0] = 0xea;
-        pchMessageStart[1] = 0xe5;
-        pchMessageStart[2] = 0xef;
-        pchMessageStart[3] = 0xea;
+        pchMessageStart[0] = 0xae;
+        pchMessageStart[1] = 0x5a;
+        pchMessageStart[2] = 0x79;
+        pchMessageStart[3] = 0x72;
         nDefaultPort = DEFAULT_REGTESTNET_PORT;
         nPruneAfterHeight = 1000;
         consensus.nShortBlockWindow = SHORT_BLOCK_WINDOW_REGTEST;
@@ -459,10 +459,10 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0x72;
-        pchMessageStart[1] = 0x27;
-        pchMessageStart[2] = 0x12;
-        pchMessageStart[3] = 0x22;
+        pchMessageStart[0] = 0xce;
+        pchMessageStart[1] = 0x5a;
+        pchMessageStart[2] = 0x79;
+        pchMessageStart[3] = 0x74;
         nDefaultPort = PYRRHA_TESTNET_PORT;
         nPruneAfterHeight = 100000;
 
@@ -578,10 +578,10 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0x72;
-        pchMessageStart[1] = 0x27;
-        pchMessageStart[2] = 0x12;
-        pchMessageStart[3] = 0x21;
+        pchMessageStart[0] = 0xfa;
+        pchMessageStart[1] = 0x5a;
+        pchMessageStart[2] = 0x79;
+        pchMessageStart[3] = 0x72;
         nDefaultPort = PYRRHA_PORT;
         nPruneAfterHeight = 100000;
 
