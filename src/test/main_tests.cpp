@@ -7,7 +7,7 @@
 #include "main.h"
 #include "validation/validation.h"
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <boost/signals2/signal.hpp>
 #include <boost/test/unit_test.hpp>
@@ -57,18 +57,18 @@ static void TestBlockSubsidyHalvings(int nSubsidyHalvingInterval)
 
 BOOST_AUTO_TEST_CASE(block_subsidy_test)
 {
-    TestBlockSubsidyHalvings(Params(CBaseChainParams::NEXA).GetConsensus()); // As in main
+    TestBlockSubsidyHalvings(Params(CBaseChainParams::PYRRHA).GetConsensus()); // As in main
     TestBlockSubsidyHalvings(150); // As in regtest
     TestBlockSubsidyHalvings(1000); // Just another interval
 }
 BOOST_AUTO_TEST_CASE(coin_emission_test)
 {
-    TestCoinEmission(Params(CBaseChainParams::NEXA).GetConsensus()); // As in main
+    TestCoinEmission(Params(CBaseChainParams::PYRRHA).GetConsensus()); // As in main
 }
 
 BOOST_AUTO_TEST_CASE(subsidy_limit_test)
 {
-    const Consensus::Params &consensusParams = Params(CBaseChainParams::NEXA).GetConsensus();
+    const Consensus::Params &consensusParams = Params(CBaseChainParams::PYRRHA).GetConsensus();
     CAmount nSum = 0;
     for (int nHeight = 0; nHeight < 90000000; nHeight += 1000)
     {

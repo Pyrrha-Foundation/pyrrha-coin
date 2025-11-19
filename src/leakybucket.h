@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_LEAKYBUCKET_H
-#define NEXA_LEAKYBUCKET_H
+#ifndef PYRRHA_LEAKYBUCKET_H
+#define PYRRHA_LEAKYBUCKET_H
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include <limits>

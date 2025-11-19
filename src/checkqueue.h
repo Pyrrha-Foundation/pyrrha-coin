@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_CHECKQUEUE_H
-#define NEXA_CHECKQUEUE_H
+#ifndef PYRRHA_CHECKQUEUE_H
+#define PYRRHA_CHECKQUEUE_H
 
 #include <algorithm>
 #include <atomic>
@@ -253,4 +253,4 @@ public:
     }
 };
 
-#endif // NEXA_CHECKQUEUE_H
+#endif // PYRRHA_CHECKQUEUE_H

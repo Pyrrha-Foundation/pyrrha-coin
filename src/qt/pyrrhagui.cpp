@@ -4,17 +4,17 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
-#include "nexagui.h"
+#include "pyrrhagui.h"
 
 #include "clientmodel.h"
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "modaloverlay.h"
 #include "networkstyle.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "notificator.h"
 #include "openuridialog.h"
 #include "optionsdialog.h"
@@ -234,7 +234,7 @@ void BitcoinGUI::createActions()
     tabGroup->addAction(overviewAction);
 
     sendCoinsAction = new QAction(platformStyle->SingleColorIcon(":/icons/send"), tr("&Send"), this);
-    sendCoinsAction->setStatusTip(tr("Send coins to a Nexa address"));
+    sendCoinsAction->setStatusTip(tr("Send coins to a Pyrrha address"));
     sendCoinsAction->setToolTip(sendCoinsAction->statusTip());
     sendCoinsAction->setCheckable(true);
     sendCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
@@ -315,9 +315,9 @@ void BitcoinGUI::createActions()
         new QAction(platformStyle->TextColorIcon(":/icons/key"), tr("&Change Passphrase..."), this);
     changePassphraseAction->setStatusTip(tr("Change the passphrase used for wallet encryption"));
     signMessageAction = new QAction(platformStyle->TextColorIcon(":/icons/edit"), tr("Sign &message..."), this);
-    signMessageAction->setStatusTip(tr("Sign messages with your Nexa addresses to prove you own them"));
+    signMessageAction->setStatusTip(tr("Sign messages with your Pyrrha addresses to prove you own them"));
     verifyMessageAction = new QAction(platformStyle->TextColorIcon(":/icons/verify"), tr("&Verify message..."), this);
-    verifyMessageAction->setStatusTip(tr("Verify messages to ensure they were signed with specified Nexa addresses"));
+    verifyMessageAction->setStatusTip(tr("Verify messages to ensure they were signed with specified Pyrrha addresses"));
 
     openRPCConsoleAction = new QAction(platformStyle->TextColorIcon(":/icons/debugwindow"), tr("&Debug window"), this);
     openRPCConsoleAction->setStatusTip(tr("Open debugging and diagnostic console"));
@@ -338,7 +338,7 @@ void BitcoinGUI::createActions()
         new QAction(platformStyle->TextColorIcon(":/icons/info"), tr("&Command-line options"), this);
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(
-        tr("Show the %1 help message to get a list with possible Nexa command-line options").arg(tr(PACKAGE_NAME)));
+        tr("Show the %1 help message to get a list with possible Pyrrha command-line options").arg(tr(PACKAGE_NAME)));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
@@ -701,7 +701,7 @@ void BitcoinGUI::setNumConnections(int count)
     }
     labelConnectionsIcon->setPixmap(
         platformStyle->SingleColorIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-    labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Nexa network", "", count));
+    labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Pyrrha network", "", count));
 }
 
 void BitcoinGUI::setNumBlocks(int count, const QDateTime &blockDate, double nVerificationProgress, bool fHeader)
@@ -846,7 +846,7 @@ void BitcoinGUI::message(const QString &title, const QString &message, unsigned 
         msgType = title;
     }
 
-    // Append title to "Nexa - "
+    // Append title to "Pyrrha - "
     if (!msgType.isEmpty())
         strTitle += " - " + msgType;
 

@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "askpassphrasedialog.h"
@@ -108,7 +108,7 @@ void AskPassphraseDialog::accept()
         }
         QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm wallet encryption"),
             tr("Warning: If you encrypt your wallet and lose your passphrase, you will <b>LOSE ALL OF YOUR "
-               "NEXA COINS</b>!") +
+               "PYRRHA COINS</b>!") +
                 "<br><br>" + tr("Are you sure you wish to encrypt your wallet?"),
             QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
         if (retval == QMessageBox::Yes)

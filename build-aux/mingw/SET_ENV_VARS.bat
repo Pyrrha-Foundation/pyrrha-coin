@@ -9,8 +9,8 @@ REM    2. Full path to the 7z.exe file (you should have manually installed this)
 REM    3. Drive letter for other directories, if not C: (otherwise the defaults should be fine)
 REM
 REM    NOTE: It is assumed you are running this configure/build script from the check-out location
-REM          of your nexa source under ".\build-aux\mingw\".  If this is true, you do not need
-REM          to modify the NEXA_GIT_ROOT path.  Otherwise update this with the absolute path to
+REM          of your pyrrha source under ".\build-aux\mingw\".  If this is true, you do not need
+REM          to modify the PYRRHA_GIT_ROOT path.  Otherwise update this with the absolute path to
 REM          the root folder of your checkout.
 REM
 REM    IMPORTANT: It is HIGHLY RECOMMENDED you do not use paths with spaces in them.
@@ -42,7 +42,7 @@ REM If python has been installed and this path is provided, a wrapper script wil
 REM python, python2, and python3.
 REM 
 REM NOTE: If you want to run regression tests (once they are working on Windows), you need to have python installed.
-REM The latest versions of the nexa client uses Python3, while previous versions use Python2
+REM The latest versions of the pyrrha client uses Python3, while previous versions use Python2
 REM It is recommended that you at least install Python3.x as it will include the python version selector "py.exe"
 REM This will automatically detect and start the correct installed version of python based on the desired version
 REM
@@ -54,17 +54,17 @@ REM i.e. C:\Python27\python.exe or C:\Users\username\AppData\Local\Programs\Pyth
 REM set PYTHON2_EXE="C:\Python27\python.exe"
 REM set PYTHON3_EXE="C:\Users\username\AppData\Local\Programs\Python\Python36\python.exe"
 
-REM Set the dependency path.  This is where all of the nexa dependencies will be downloaded and built
+REM Set the dependency path.  This is where all of the pyrrha dependencies will be downloaded and built
 REM IMPORTANT: DO NOT USE PATHS WITH SPACES for the dependencies root!  If you do, you WILL run into build errors
 set "DEPS_ROOT=C:\deps"
 
 REM Set the path to your Pyrrha git checkout.
-REM NOTE: If you are running these scripts from the nexa checkout location, you do not need to modify this
-set "NEXA_GIT_ROOT=%CD%\..\..\"
+REM NOTE: If you are running these scripts from the pyrrha checkout location, you do not need to modify this
+set "PYRRHA_GIT_ROOT=%CD%\..\..\"
 
 
 REM ##################################################################################################
-REM These parameters configure how the nexa client and dependencies are built.
+REM These parameters configure how the pyrrha client and dependencies are built.
 REM
 REM The default configuration is:
 REM    1. 32-bit disabled
@@ -106,25 +106,25 @@ REM NOTE: If you are switching between the 32-bit and 64-bit tool chains, you sh
 REM       build outputs with this switch, otherwise you may run into linker issues.
 REM SET CLEAN_BUILD=YES
 
-REM Following will strip debug symbols from the generated nexa executables, greatly reducing file size.
+REM Following will strip debug symbols from the generated pyrrha executables, greatly reducing file size.
 REM This will, however, make it more difficult to debug any issues that may occur while testing.
-REM If you want to keep debug symbols in the generated nexa executables, uncomment the line below.
+REM If you want to keep debug symbols in the generated pyrrha executables, uncomment the line below.
 SET STRIP=YES
 
-REM If you want to skip running "./autogen.sh" when building nexa then comment out the line below
+REM If you want to skip running "./autogen.sh" when building pyrrha then comment out the line below
 REM or set the value to NO.
 REM This is useful to turn off if you have already run this once and not changed the toolchain
 REM or autogen configuration files, as it eleminates a redundant build step.
-REM NOTE: This only affects the build of the nexa executables, not any of the dependencies.
+REM NOTE: This only affects the build of the pyrrha executables, not any of the dependencies.
 REM       Additionally, this does not perform a check to see if autogen.sh has been run before
 REM       so if you turn this on but have not previously run autogen.sh you will run into errors.
 SET AUTOGEN=YES
 
-REM If you want to skip running "./configure" when building nexa comment out the line below
+REM If you want to skip running "./configure" when building pyrrha comment out the line below
 REM or set the value to NO.
 REM This is useful to turn off if you have already run this once and not changed the toolchain
 REM or build configuration, as it eleminates a redundant build step.
-REM NOTE: This only affects the build of the nexa executables, not any of the dependencies.
+REM NOTE: This only affects the build of the pyrrha executables, not any of the dependencies.
 REM       Additionally, this does not perform a check to see if configure has been run before
 REM       so if you turn this on but have not previously run configure you will run into errors.
 REM

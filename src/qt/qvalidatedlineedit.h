@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_QVALIDATEDLINEEDIT_H
-#define NEXA_QT_QVALIDATEDLINEEDIT_H
+#ifndef PYRRHA_QT_QVALIDATEDLINEEDIT_H
+#define PYRRHA_QT_QVALIDATEDLINEEDIT_H
 
 #include <QLineEdit>
 
@@ -41,4 +41,4 @@ private Q_SLOTS:
     void checkValidity();
 };
 
-#endif // NEXA_QT_QVALIDATEDLINEEDIT_H
+#endif // PYRRHA_QT_QVALIDATEDLINEEDIT_H

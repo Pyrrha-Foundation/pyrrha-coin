@@ -12,9 +12,9 @@ with each other, with the help of a P2P network to check for double-spending.
 Setup
 -----
 There are two ways to install Pyrrha on windows. You can either unpack the zip file
-into a directory and run nexa-qt.exe, or you can install using the *.exe install
-program which will put nexa-qt.exe within C:\users\<your account\appdata\roaming\nexa.
-If you want to add startup parameters you can create a config file "nexa.conf"
+into a directory and run pyrrha-qt.exe, or you can install using the *.exe install
+program which will put pyrrha-qt.exe within C:\users\<your account\appdata\roaming\pyrrha.
+If you want to add startup parameters you can create a config file "pyrrha.conf"
 within the corresponding install directory and add parameters as needed.
 
 The Pyrrha node creates the backbone of the P2P network.
@@ -27,4 +27,4 @@ Online resources
 ----------------
 
 The Bitcoin Unlimited website: https://www.bitcoinunlimited.info/
-The Pyrrha website : https://nexa.org
+The Pyrrha website : https://pyrrha.org

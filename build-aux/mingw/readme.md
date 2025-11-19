@@ -20,13 +20,13 @@ Quick Summary
    install paths.
 6. Execute `/build-aux/mingw/config-mingw.bat` to install the initial development
    environment.
-7. Optional: Install ZMQ for mingw64 if desired and update make-nexa.sh
+7. Optional: Install ZMQ for mingw64 if desired and update make-pyrrha.sh
 
 
 #### (Re)Build Pyrrha
 
 1. If necessary, modify configuration of `/build-aux/mingw/SET_ENV_VARS.bat`
-2. Execute `/build-aux/mingw/rebuild-nexa.bat` to build nexa from source.
+2. Execute `/build-aux/mingw/rebuild-pyrrha.bat` to build pyrrha from source.
 3. Output of a successful build will be placed in `/build-output/`
 
 
@@ -60,7 +60,7 @@ you need to customize to your local system settings.
 	
 3. Clone the Bitcoin Unlimited repository with the following command:
 
-	`git clone https://gitlab.com/nexa/nexa.git .`
+	`git clone https://gitlab.com/pyrrha/pyrrha.git .`
 	
 4. See section 5.2 below for setting the git path in the configuration file.
 
@@ -128,11 +128,11 @@ NOTE: The `SET_ENV_VARS.bat` file uses MS-DOS style comments.  Any line that
    configuration in section 4 above.  **This path is required to be correctly set
    for the scripts to work.**
 5. Set the `DEPS_ROOT` path.  This is the path where all dependencies needed to
-   build nexa will be downloaded and built.  Within this path, an x86 and/or
+   build pyrrha will be downloaded and built.  Within this path, an x86 and/or
    an x64 sub-directory will be created depending on if you are building 32-bit,
    64-bit, or both clients.  **This path is required to be correctly set for the
    scripts to work.**
-6. NOTE: The `NEXA_GIT_ROOT` variable should only be modified if you have the
+6. NOTE: The `PYRRHA_GIT_ROOT` variable should only be modified if you have the
    build scripts located outside of the git repository download for some reason.
    This variable should point to the root path of the source.
 7. `BUILD_32_BIT` is commented out by default.  If you wish to build 32-bit
@@ -211,7 +211,7 @@ bindings. Most likely you will choose something like: "mingw-w64-clang-x86_64_ze
 To install this enter: "pacman -S mingw-w64-clang-x86_64_zeromq".
 
 You now have the package installed however you need to add the path to the lib and include
-folders to the make-nexa.sh script.
+folders to the make-pyrrha.sh script.
 
     Example:
 
@@ -219,5 +219,5 @@ folders to the make-nexa.sh script.
 
 	-L/d/msys64/mingw64/lib \
 
-Now you are ready to run the rebuild-nexa.bat script to build the nexa binaries.
+Now you are ready to run the rebuild-pyrrha.bat script to build the pyrrha binaries.
 

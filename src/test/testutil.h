@@ -6,8 +6,8 @@
 /**
  * Utility functions shared by unit tests
  */
-#ifndef NEXA_TEST_TESTUTIL_H
-#define NEXA_TEST_TESTUTIL_H
+#ifndef PYRRHA_TEST_TESTUTIL_H
+#define PYRRHA_TEST_TESTUTIL_H
 
 #include "fs.h"
 #include "key.h"
@@ -74,4 +74,4 @@ CTransaction tx1x2(const CTransaction &prevtx,
     const CKey &key,
     bool p2pkh = true);
 
-#endif // NEXA_TEST_TESTUTIL_H
+#endif // PYRRHA_TEST_TESTUTIL_H

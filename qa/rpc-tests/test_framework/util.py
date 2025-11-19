@@ -114,13 +114,13 @@ def ser_uint256(u):
     return rs
 
 def uint256ToRpcHex(b):
-    """RPC (nexad) hex is reversed"""
+    """RPC (pyrrhad) hex is reversed"""
     if type(b) is int:
         b = ser_uint256(b)
     return b[::-1].hex()
 
 def rpcHexToUint256(h):
-    """RPC (nexad) hex is reversed"""
+    """RPC (pyrrhad) hex is reversed"""
     b = bytes.fromhex(h)
     return deser_uint256(b[::-1])
 
@@ -148,7 +148,7 @@ class UtilOptions:
     no_ipv6_rpc_listen = False
     electrumexec = None
 
-NEXAD_PROC_WAIT_TIMEOUT = 60
+PYRRHAD_PROC_WAIT_TIMEOUT = 60
 
 #Set Mocktime default to OFF.
 #MOCKTIME is only needed for scripts that use the
@@ -160,7 +160,7 @@ MOCKTIME = 0
 
 
 class NoConfigValue:
-    """ Use to remove the specific configure parameter and value when writing to nexa.conf"""
+    """ Use to remove the specific configure parameter and value when writing to pyrrha.conf"""
     def __init__(self):
         pass
 
@@ -347,7 +347,7 @@ def sync_blocks(rpc_connections, *, wait=1, verbose=1, timeout=60):
                         connectedTo.append(peerIdx)
                 graph[nodeIdx] = connectedTo
             if not is_connected(graph):
-                raise Exception('sync_blocks: nexad nodes cannot sync because they are not all connected.  Node connection graph: %s' % str(graph))
+                raise Exception('sync_blocks: pyrrhad nodes cannot sync because they are not all connected.  Node connection graph: %s' % str(graph))
     print("sync_blocks timeout, printing debug info: ")
     for rpc in rpc_connections:
         print("NODE: ")
@@ -450,15 +450,15 @@ def initialize_datadir(dirname, n, bitcoinConfDict=None, wallet=None, bins=None)
 
     if bitcoinConfDict: defaults.update(bitcoinConfDict)
 
-    file = "nexa.conf"
+    file = "pyrrha.conf"
     if bins:
         if BCD_HUB_PATH in bins[n]:
             defaults = filterUnsupportedParams(defaults)
-            file = NEXA_CONF
+            file = PYRRHA_CONF
     else:
         if hub_is_running(n):
             defaults = filterUnsupportedParams(defaults)
-            file = NEXA_CONF
+            file = PYRRHA_CONF
 
     config_file_path = os.path.join(datadir, file)
 
@@ -492,15 +492,15 @@ def rpc_url(i, rpchost=None):
 
 def wait_for_bitcoind_start(process, url, i, timeout=120):
     '''
-    Wait for nexad to start. This means that RPC is accessible and fully initialized.
-    Raise an exception if nexad exits during initialization.
+    Wait for pyrrhad to start. This means that RPC is accessible and fully initialized.
+    Raise an exception if pyrrhad exits during initialization.
     '''
     rpc = None
     endTime = time.time() + timeout
     worked = False
     while time.time() < endTime:
         if process.poll() is not None:
-            raise Exception('nexad exited with status %i during initialization' % process.returncode)
+            raise Exception('pyrrhad exited with status %i during initialization' % process.returncode)
         try:
             rpc = get_rpc_proxy(url, i)
             blocks = rpc.getblockcount()
@@ -514,7 +514,7 @@ def wait_for_bitcoind_start(process, url, i, timeout=120):
                 raise # unkown JSON RPC exception
         time.sleep(0.25)
     if not worked:
-        raise TimeoutException("nexad (pid %d) did not fully come up" % process.pid)
+        raise TimeoutException("pyrrhad (pid %d) did not fully come up" % process.pid)
     return rpc
 
 def initialize_chain(test_dir,bitcoinConfDict=None,wallets=None, bins=None):
@@ -537,8 +537,8 @@ def initialize_chain(test_dir,bitcoinConfDict=None,wallets=None, bins=None):
             if os.path.isdir(os.path.join("building_cache","node"+str(i))):
                 shutil.rmtree(os.path.join("building_cache","node"+str(i)))
 
-        # Create cache directories, run nexads:
-        logging.info("  starting 4 nexad")
+        # Create cache directories, run pyrrhads:
+        logging.info("  starting 4 pyrrhad")
         for i in range(4):
             for retry in range(4):
                 try:
@@ -546,25 +546,25 @@ def initialize_chain(test_dir,bitcoinConfDict=None,wallets=None, bins=None):
                     if bins:
                         args = [ bins[i], "-keypool=1", "-datadir="+datadir ]
                     else:
-                        args = [ os.getenv("NEXAD", "nexad"), "-keypool=1", "-datadir="+datadir ]
+                        args = [ os.getenv("PYRRHAD", "pyrrhad"), "-keypool=1", "-datadir="+datadir ]
                     if i > 0:
                         args.append("-connect=127.0.0.1:"+str(p2p_port(0)))
                     bitcoind_processes[i] = subprocess.Popen(args)
-                    logging.info("initialize_chain: nexad started, waiting for RPC to come up")
+                    logging.info("initialize_chain: pyrrhad started, waiting for RPC to come up")
                     wait_for_bitcoind_start(bitcoind_processes[i], rpc_url(i), i)
                     logging.info("initialize_chain: RPC succesfully started")
                     break
                 except Exception as exc:
-                    logging.error("Error bringing up nexad #%d (initialize_chain, directory %s), this might be retried. Problem is:", i, test_dir)
+                    logging.error("Error bringing up pyrrhad #%d (initialize_chain, directory %s), this might be retried. Problem is:", i, test_dir)
                     do_and_ignore_failure(lambda x: bitcoind_processes[i].kill())
                     traceback.print_exc(file=sys.stdout)
                     remap_ports(i)
             else:
-                logging.error("Couldn't start nexad (%s) even with retries on different ports (initialize_chain)." % args)
-                raise Exception("Couldn't start nexad (%s) even with retries on different ports (initialize_chain)." % args)
+                logging.error("Couldn't start pyrrhad (%s) even with retries on different ports (initialize_chain)." % args)
+                raise Exception("Couldn't start pyrrhad (%s) even with retries on different ports (initialize_chain)." % args)
 
         rpcs = []
-        logging.info("  connecting to nexads")
+        logging.info("  connecting to pyrrhads")
         for i in range(4):
             try:
                 rpcs.append(get_rpc_proxy(rpc_url(i), i))
@@ -611,7 +611,7 @@ def initialize_chain(test_dir,bitcoinConfDict=None,wallets=None, bins=None):
         from_dir = os.path.join("cache", "node"+str(i))
         to_dir = os.path.join(test_dir,  "node"+str(i))
         shutil.copytree(from_dir, to_dir)
-        initialize_datadir(test_dir, i,bitcoinConfDict,wallets[i] if wallets else None) # Overwrite port/rpcport in nexa.conf
+        initialize_datadir(test_dir, i,bitcoinConfDict,wallets[i] if wallets else None) # Overwrite port/rpcport in pyrrha.conf
 
 def initialize_chain_clean(test_dir, num_nodes, bitcoinConfDict=None, wallets=None):
     """
@@ -644,11 +644,11 @@ def _rpchost_to_args(rpchost):
 
 def start_node(i, dirname, extra_args=None, rpchost=None, timewait=None, binary=None):
     """
-    Start a nexad and return RPC connection to it
+    Start a pyrrhad and return RPC connection to it
     """
     datadir = os.path.join(dirname, "node"+str(i))
     if binary is None:
-        binary = os.getenv("NEXAD", "nexad")
+        binary = os.getenv("PYRRHAD", "pyrrhad")
     # RPC tests still depend on free transactions
     args = [ binary, "-datadir="+datadir, "-rest", "-mocktime="+str(get_mocktime()) ] # // BU removed, "-keypool=1","-blockprioritysize=50000" ]
     if extra_args is not None: args.extend(extra_args)
@@ -656,20 +656,20 @@ def start_node(i, dirname, extra_args=None, rpchost=None, timewait=None, binary=
         try:
             logging.debug("executing: %s" % str(args))
             bitcoind_processes[i] = subprocess.Popen(args)
-            logging.debug("start_node: nexad started, waiting for RPC to come up")
+            logging.debug("start_node: pyrrhad started, waiting for RPC to come up")
             url = rpc_url(i, rpchost)
             wait_for_bitcoind_start(bitcoind_processes[i], url, i)
             # log all the info you need for debugging access
             logging.info("Started %s %d as pid %d at %s dir %s  " % (binary, i, bitcoind_processes[i].pid, "127.0.0.1:"+str(p2p_port(i)), datadir))
             break
         except Exception as exc:
-            # this may not be an error because every once in a while nexad uses a port that's already in use.
-            logging.error("Error bringing up nexad #%d (start_node, directory %s), this might be retried. Problem is: %s", i, dirname, str(exc))
+            # this may not be an error because every once in a while pyrrhad uses a port that's already in use.
+            logging.error("Error bringing up pyrrhad #%d (start_node, directory %s), this might be retried. Problem is: %s", i, dirname, str(exc))
             do_and_ignore_failure(lambda x: bitcoind_processes[i].kill())
             # commented out because looks like an error: traceback.print_exc(file=sys.stdout)
             remap_ports(i)
     else:
-        raise Exception("Couldn't start nexad even with retries on different ports (start_node).")
+        raise Exception("Couldn't start pyrrhad even with retries on different ports (start_node).")
 
     proxy = get_rpc_proxy(url, i, timeout=timewait)
     if COVERAGE_DIR:
@@ -679,11 +679,11 @@ def start_node(i, dirname, extra_args=None, rpchost=None, timewait=None, binary=
 
 def start_node_and_raise_on_init_error(i, dirname, expected_msg, extra_args=None, binary=None, stdout_l=None, stderr_l=None):
     """
-    Start a nexad and raise AssertionError if there's no init error
+    Start a pyrrhad and raise AssertionError if there's no init error
     """
     datadir = os.path.join(dirname, "node"+str(i))
     if binary is None:
-        binary = os.getenv("NEXAD", "nexad")
+        binary = os.getenv("PYRRHAD", "pyrrhad")
     # RPC tests still depend on free transactions
     args = [ binary, "-datadir="+datadir, "-rest", "-mocktime="+str(get_mocktime()) ]
     if extra_args is not None: args.extend(extra_args)
@@ -709,14 +709,14 @@ def start_node_and_raise_on_init_error(i, dirname, expected_msg, extra_args=None
 
 def start_nodes(num_nodes, dirname, extra_args=None, rpchost=None, binary=None,timewait=None):
     """
-    Start multiple nexads, return RPC connections to them
+    Start multiple pyrrhads, return RPC connections to them
     """
     if extra_args is None: extra_args = [ None for _ in range(num_nodes) ]
     if binary is None: binary = [ None for _ in range(num_nodes) ]
 
     def start(i):
         if binary[i] is None:
-            bin = os.getenv("NEXAD", "nexad")
+            bin = os.getenv("PYRRHAD", "pyrrhad")
         else:
             bin = binary[i]
         datadir = os.path.join(dirname, "node"+str(i))
@@ -746,11 +746,11 @@ def start_nodes(num_nodes, dirname, extra_args=None, rpchost=None, binary=None,t
                 url = rpc_url(i, rpchost)
                 rpcs[i] = wait_for_bitcoind_start(bitcoind_processes[i], url, i)
                 # log all the info you need for debugging access
-                logging.info("nexad %d startup complete" % i)
+                logging.info("pyrrhad %d startup complete" % i)
             break
         except Exception as exc:
-                # this may not be an error because every once in a while nexad uses a port that's already in use.
-                logging.error("Error bringing up nexad #%d, this might be retried. Problem is: %s", workingOn, str(exc))
+                # this may not be an error because every once in a while pyrrhad uses a port that's already in use.
+                logging.error("Error bringing up pyrrhad #%d, this might be retried. Problem is: %s", workingOn, str(exc))
                 do_and_ignore_failure(lambda x: bitcoind_processes[workingOn].kill())
                 # commented out because looks like an error: traceback.print_exc(file=sys.stdout)
                 remap_ports(workingOn)
@@ -775,7 +775,7 @@ def stop_node(node, i):
         node.stop()
     except http.client.CannotSendRequest as e:
         print("WARN: Unable to stop node: " + repr(e))
-    bitcoind_processes[i].wait(timeout=NEXAD_PROC_WAIT_TIMEOUT)
+    bitcoind_processes[i].wait(timeout=PYRRHAD_PROC_WAIT_TIMEOUT)
     del bitcoind_processes[i]
 
 def stop_nodes(nodes):
@@ -795,10 +795,10 @@ def set_node_times(nodes, t):
 def wait_bitcoinds():
     # Wait for all bitcoinds to cleanly exit
     for bitcoind in bitcoind_processes.values():
-        bitcoind.wait(timeout=NEXAD_PROC_WAIT_TIMEOUT)
+        bitcoind.wait(timeout=PYRRHAD_PROC_WAIT_TIMEOUT)
     bitcoind_processes.clear()
 
-def wait_bitcoind_exit(i, timeout=NEXAD_PROC_WAIT_TIMEOUT):
+def wait_bitcoind_exit(i, timeout=PYRRHAD_PROC_WAIT_TIMEOUT):
     # Wait for all bitcoinds to cleanly exit
     bitcoind_processes[i].wait(timeout=timeout)
 
@@ -1279,18 +1279,18 @@ def get_bip135_status(node, key):
 # bip135 end
 
 def findBitcoind(trySrcDir=None):
-    """Find the nexad executable via env var or search in typical out-of-source locations (debug or release)"""
-    env = os.getenv("NEXAD", None)
+    """Find the pyrrhad executable via env var or search in typical out-of-source locations (debug or release)"""
+    env = os.getenv("PYRRHAD", None)
     if env is None:
         if trySrcDir:
-            objpath = trySrcDir + "/nexad"
+            objpath = trySrcDir + "/pyrrhad"
             if os.path.exists(objpath):
                 return trySrcDir
         here = os.path.dirname(os.path.abspath(__file__))
-        objpath = os.path.abspath(here + "/../../../src/nexad")
+        objpath = os.path.abspath(here + "/../../../src/pyrrhad")
         if not os.path.exists(objpath):
-            dbg = os.path.abspath(here + "/../../../debug/src/nexad")
-            rel = os.path.abspath(here + "/../../../release/src/nexad")
+            dbg = os.path.abspath(here + "/../../../debug/src/pyrrhad")
+            rel = os.path.abspath(here + "/../../../release/src/pyrrhad")
             if os.path.exists(dbg):
                 logging.info("Running from the debug directory (%s)" % dbg)
                 objpath = os.path.dirname(dbg)

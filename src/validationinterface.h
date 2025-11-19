@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_VALIDATIONINTERFACE_H
-#define NEXA_VALIDATIONINTERFACE_H
+#ifndef PYRRHA_VALIDATIONINTERFACE_H
+#define PYRRHA_VALIDATIONINTERFACE_H
 
 #include "primitives/transaction.h"
 
@@ -87,4 +87,4 @@ struct CMainSignals
 
 CMainSignals &GetMainSignals();
 
-#endif // NEXA_VALIDATIONINTERFACE_H
+#endif // PYRRHA_VALIDATIONINTERFACE_H

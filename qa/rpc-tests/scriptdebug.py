@@ -263,7 +263,7 @@ class ScriptDebugTest (BitcoinTestFramework):
 
 
     def run_test(self):
-        # TODO all the examples need updating for Nexa.  However, the active effort in making a debugger has moved to Kotlin so
+        # TODO all the examples need updating for Pyrrha.  However, the active effort in making a debugger has moved to Kotlin so
         # wait until this is needed again.
         pass
         #self.runScriptMachineTests()
@@ -274,14 +274,14 @@ class ScriptDebugTest (BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    env = os.getenv("NEXAD", None)
+    env = os.getenv("PYRRHAD", None)
     if env is None:
         env = os.path.dirname(os.path.abspath(__file__))
-        env = env + os.sep + ".." + os.sep + ".." + os.sep + "src" + os.sep + "nexad"
+        env = env + os.sep + ".." + os.sep + ".." + os.sep + "src" + os.sep + "pyrrhad"
         env = os.path.abspath(env)
     path = os.path.dirname(env)
     try:
-        cashlib.init(path + os.sep + ".libs" + os.sep + "libnexa.so")
+        cashlib.init(path + os.sep + ".libs" + os.sep + "libpyrrha.so")
         MyTest().main()
     except OSError as e:
         print("Issue loading shared library.  This is expected during cross compilation since the native python will not load the .so: %s" % str(e))
@@ -301,5 +301,5 @@ def Test():
         flags.append("--tmppfx=/ramdisk/test")
     binpath = findBitcoind()
     flags.append("--srcdir=%s" % binpath)
-    cashlib.init(binpath + os.sep + ".libs" + os.sep + "libnexa.so")
+    cashlib.init(binpath + os.sep + ".libs" + os.sep + "libpyrrha.so")
     t.main(flags, bitcoinConf, None)

@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "arith_uint256.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "uint256.h"
 #include "version.h"
 #include <boost/test/unit_test.hpp>

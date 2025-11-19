@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_FORKS_H
-#define NEXA_FORKS_H
+#ifndef PYRRHA_FORKS_H
+#define PYRRHA_FORKS_H
 
 #include "amount.h"
 #include "arith_uint256.h"

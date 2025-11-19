@@ -102,7 +102,7 @@ bool ElectrumServer::Start(const std::string &path, const std::vector<std::strin
                 // The electrum server exit was not initiated by us, so it
                 // must have stopped due to some error.
 
-                LOGA("Electrum: Nexad is configured to exit when "
+                LOGA("Electrum: Pyrrhad is configured to exit when "
                      "electrum exits on error. Initiating shutdown.");
                 StartShutdown();
             }

@@ -56,7 +56,7 @@ ScriptError EvalPushTxState(const VchType &specifier, const ScriptImportedState 
     case PushTxStateSpecifier::GROUP_NTH_OUTPUT:
     {
         // Grab the "nth" index as a 2 byte value:
-        // encode this in nexascript: PUSH X, PUSH 2, BIN2NUM
+        // encode this in pyrrhascript: PUSH X, PUSH 2, BIN2NUM
         if (specEnd - specIter < 2)
         {
             return SCRIPT_ERR_INVALID_STATE_SPECIFIER;

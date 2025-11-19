@@ -309,7 +309,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../nexagui.cpp" line="+286"/>
+        <location filename="../pyrrhagui.cpp" line="+286"/>
         <source>Quit application</source>
         <translation>Κλείσιμο εφαρμογής</translation>
     </message>
@@ -1923,7 +1923,7 @@
         </translation>
     </message>
     <message>
-        <location filename="../nexaunits.cpp" line="+187"/>
+        <location filename="../pyrrhaunits.cpp" line="+187"/>
         <source>Amount</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4028,7 +4028,7 @@
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../nexagui.cpp" line="+117"/>
+        <location filename="../pyrrhagui.cpp" line="+117"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4212,7 +4212,7 @@
 <context>
     <name>pyrrha</name>
     <message>
-        <location filename="../nexastrings.cpp" line="+173"/>
+        <location filename="../pyrrhastrings.cpp" line="+173"/>
         <source>Loading wallet...</source>
         <translation>Φόρτωση πορτοφολιού...</translation>
     </message>

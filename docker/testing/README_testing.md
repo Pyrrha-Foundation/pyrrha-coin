@@ -6,30 +6,30 @@ container in a bash shell to change to a new branch and then recompile the code
 or edit the commented section of the dockerfile to have the image build with a specific branch
 
 ## Recommended image names
-- img-nexa-ubu20-linux64
-- img-nexa-ubu20-windows64
+- img-pyrrha-ubu20-linux64
+- img-pyrrha-ubu20-windows64
 
 ## Recommended container names
-- nexa-linux64
-- nexa-windows64
+- pyrrha-linux64
+- pyrrha-windows64
 
 ## To build
 `docker build --no-cache -t <image name> -f <docker file name> .`
 
 example:
 
-`docker build --no-cache -t img-nexa-ubu18-linux64 -f Dockerfile.ubuntu20-linux64 .`
+`docker build --no-cache -t img-pyrrha-ubu18-linux64 -f Dockerfile.ubuntu20-linux64 .`
 
 ## To start an image in a new container in a bash shell
 `docker run -it -d --name <container name> <imagename> bash`
 
 example:
 
-`docker run -it -d --name nexa-linux64 img-nexa-ubu20-linux64 bash`
+`docker run -it -d --name pyrrha-linux64 img-pyrrha-ubu20-linux64 bash`
 
 ## To start an image in a new container in a bash shell with a mounted directory and opened port
 ```
-docker run -p <port mapping> -v /path/to/a/local/directory:/root/.nexa --name <container name> <image name> bash
+docker run -p <port mapping> -v /path/to/a/local/directory:/root/.pyrrha --name <container name> <image name> bash
 ```
 
 port mapping maps an internal port to an external one by internal:external

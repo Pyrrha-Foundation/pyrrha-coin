@@ -39,7 +39,7 @@ PUSH Hash160(Script(PUSH pubkey))
 [Optional: TBD additional data (do not rely on the size to identify this address form)]
 
 **Example**
-nexa:nqtsq5g5w6syq5aa5z5ghkj3w7ux59wrk204txrn64e2gs92
+pyrrha:nqtsq5g5w6syq5aa5z5ghkj3w7ux59wrk204txrn64e2gs92
 
 ### Grouped, Unspecified Token Amount, Pay-to-public-key-template (GP2PKT) Form  
   
@@ -50,7 +50,7 @@ PUSH Hash160(Script(PUSH pubkey))
 [Optional: TBD additional data (do not rely on the size to identify this address form)]
 
 **Example**
-nexa:nqazqy3uqsp4j0zyyufqzy65qc2u9vvm2jthyqgzqvzq2ps8pqys5zcvqgqqq5g5w6syq5aa5z5ghkj3w7ux59wrk204txrn92xzqzsu
+pyrrha:nqazqy3uqsp4j0zyyufqzy65qc2u9vvm2jthyqgzqvzq2ps8pqys5zcvqgqqq5g5w6syq5aa5z5ghkj3w7ux59wrk204txrn92xzqzsu
 
 ### Ungrouped Pay-To-Contract-Args-Template (P2CAT) Form  
   
@@ -61,7 +61,7 @@ PUSH Hash160/256(Script(PUSH your args ...))
 [Optional: TBD additional data]...
 
 **Example**
-nexa:nq4sq9rk5pq980dq4z9a55thhp4ptsajna2esuc5zg7qgq6e83zzwyspzd2qv9wzkxd4f9mjwp6hsdfn
+pyrrha:nq4sq9rk5pq980dq4z9a55thhp4ptsajna2esuc5zg7qgq6e83zzwyspzd2qv9wzkxd4f9mjwp6hsdfn
 
 ### Grouped, Pay-To-Contract-Args-Template (GP2CAT) Form   
  
@@ -73,7 +73,7 @@ PUSH Hash160/256(Script(PUSH your args ...))
 [Optional: TBD additional data]...
 
 **Example**
-nexa:np9sq9rk5pq980dq4z9a55thhp4ptsajna2esuc5zg7qgq6e83zzwyspzd2qv9wzkxd4f9mjzg7qgq6e83zzwyspzd2qv9wzkxd4f9mjqypqxpq9qcrsszg2pvxq3p2q9kaa
+pyrrha:np9sq9rk5pq980dq4z9a55thhp4ptsajna2esuc5zg7qgq6e83zzwyspzd2qv9wzkxd4f9mjzg7qgq6e83zzwyspzd2qv9wzkxd4f9mjqypqxpq9qcrsszg2pvxq3p2q9kaa
 
 ### Ungrouped Pay-To-Contract-Template (P2CT) Form  (no args)
   
@@ -83,4 +83,4 @@ OP_0 # No args
 [Optional: PUSH visible args]...
 [Optional: TBD additional data]...
 
-nexa:nqtsq9rk5pq980dq4z9a55thhp4ptsajna2esucqqj42vk56
+pyrrha:nqtsq9rk5pq980dq4z9a55thhp4ptsajna2esucqqj42vk56

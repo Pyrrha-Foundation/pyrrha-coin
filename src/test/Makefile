@@ -1,6 +1,6 @@
 all:
-	$(MAKE) -C .. nexa_test
+	$(MAKE) -C .. pyrrha_test
 clean:
-	$(MAKE) -C .. nexa_test_clean
+	$(MAKE) -C .. pyrrha_test_clean
 check:
-	$(MAKE) -C .. nexa_test_check
+	$(MAKE) -C .. pyrrha_test_check

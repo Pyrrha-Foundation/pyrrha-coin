@@ -6,7 +6,7 @@
 #include "clientversion.h"
 #include "consensus/validation.h"
 #include "primitives/block.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "utiltime.h"
 #include "validation/validation.h"
 

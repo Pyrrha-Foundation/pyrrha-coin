@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_NETBASE_H
-#define NEXA_NETBASE_H
+#ifndef PYRRHA_NETBASE_H
+#define PYRRHA_NETBASE_H
 
 #include "netaddress.h" // For CService, serialize.h, etc.
 
@@ -103,4 +103,4 @@ bool SetSocketNonBlocking(SOCKET &hSocket, bool fNonBlocking);
  */
 struct timeval MillisToTimeval(int64_t nTimeout);
 
-#endif // NEXA_NETBASE_H
+#endif // PYRRHA_NETBASE_H

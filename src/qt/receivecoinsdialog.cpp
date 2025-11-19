@@ -10,7 +10,7 @@
 #include "addresstablemodel.h"
 #include "config.h"
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "optionsmodel.h"
 #include "platformstyle.h"
 #include "receivefreezedialog.h"

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_DBWRAPPER_H
-#define NEXA_DBWRAPPER_H
+#ifndef PYRRHA_DBWRAPPER_H
+#define PYRRHA_DBWRAPPER_H
 
 #include "clientversion.h"
 #include "fs.h"
@@ -389,4 +389,4 @@ public:
     std::vector<unsigned char> getobfuscate_key() const { return this->obfuscate_key; }
 };
 
-#endif // NEXA_DBWRAPPER_H
+#endif // PYRRHA_DBWRAPPER_H

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_ADDRESSTABLEMODEL_H
-#define NEXA_QT_ADDRESSTABLEMODEL_H
+#ifndef PYRRHA_QT_ADDRESSTABLEMODEL_H
+#define PYRRHA_QT_ADDRESSTABLEMODEL_H
 
 #include "script/script.h" // Freeze CScriptNum
 
@@ -99,4 +99,4 @@ public Q_SLOTS:
     friend class AddressTablePriv;
 };
 
-#endif // NEXA_QT_ADDRESSTABLEMODEL_H
+#endif // PYRRHA_QT_ADDRESSTABLEMODEL_H

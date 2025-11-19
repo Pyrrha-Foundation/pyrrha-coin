@@ -81,7 +81,7 @@ class SigHashMatchTest(BitcoinTestFramework):
 
         for hashcode in [ SIGHASH_ALL, bytes(), bytes([SIGHASH_THIS_IN | SIGHASH_ALL_OUT]), bytes([SIGHASH_FIRSTN_IN | SIGHASH_FIRSTN_OUT, 1,1]), bytes([SIGHASH_FIRSTN_IN | SIGHASH_FIRSTN_OUT, 0,1])]:
             scriptcode = CScript([OP_FROMALTSTACK, OP_CHECKSIGVERIFY])
-            sighash = txn.SignatureHashNexa(0, bytes(scriptcode), hashcode, debug=False)
+            sighash = txn.SignatureHashPyrrha(0, bytes(scriptcode), hashcode, debug=False)
             txn_mansig = unhexlify(self.nodes[0].signdata(addr, "hash", hexlify(sighash).decode("ascii")))
             hcBytes = hashcode if type(hashcode) == bytes else bytes([hashcode])
             fullsig = txn_mansig + hcBytes 
@@ -93,7 +93,7 @@ class SigHashMatchTest(BitcoinTestFramework):
         # finally try issuing the tx
         scriptcode = CScript([OP_FROMALTSTACK, OP_CHECKSIGVERIFY])
         hashcode = SIGHASH_ALL
-        sighash = txn.SignatureHashNexa(0, bytes(scriptcode), hashcode, debug=False)
+        sighash = txn.SignatureHashPyrrha(0, bytes(scriptcode), hashcode, debug=False)
         txn_mansig = unhexlify(self.nodes[0].signdata(addr, "hash", hexlify(sighash).decode("ascii")))
         fullsig = txn_mansig+bytes([hashcode])
         templateArgs = CScript([pub])

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_COINCONTROL_H
-#define NEXA_COINCONTROL_H
+#ifndef PYRRHA_COINCONTROL_H
+#define PYRRHA_COINCONTROL_H
 
 #include "primitives/transaction.h"
 #include "script/standard.h"
@@ -53,4 +53,4 @@ private:
     std::set<COutPoint> setSelected;
 };
 
-#endif // NEXA_COINCONTROL_H
+#endif // PYRRHA_COINCONTROL_H

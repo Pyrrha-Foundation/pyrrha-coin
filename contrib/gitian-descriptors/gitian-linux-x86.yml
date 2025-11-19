@@ -1,5 +1,5 @@
 ---
-name: "nexa-linux-x86"
+name: "pyrrha-linux-x86"
 enable_cache: true
 suites:
 - "focal"
@@ -28,8 +28,8 @@ packages:
 
 reference_datetime: "2020-08-20 00:00:00"
 remotes:
-- "url": "https://gitlab.com/nexa/nexa.git"
-  "dir": "nexa"
+- "url": "https://gitlab.com/pyrrha/pyrrha.git"
+  "dir": "pyrrha"
 files: []
 script: |
   set -e -o pipefail
@@ -85,7 +85,7 @@ script: |
   create_per-host_faketime_wrappers "2000-01-01 12:00:00"
   export PATH=${WRAP_DIR}:${PATH}
 
-  cd nexa
+  cd pyrrha
   BASEPREFIX=`pwd`/depends
   # Build dependencies for each host
   for i in $HOSTS; do
@@ -106,13 +106,13 @@ script: |
   ./autogen.sh
   CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --prefix=/
   make dist
-  SOURCEDIST=`echo nexa-*.tar.gz`
+  SOURCEDIST=`echo pyrrha-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find nexa* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find pyrrha* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   popd
 
   ORIGPATH="$PATH"
@@ -141,10 +141,10 @@ script: |
         cp src/rostrum ${INSTALLPATH}/bin/rostrum
     fi
     # BU save the executables with debug symbols
-    cp -f src/nexad ${OUTDIR}/nexad-${i}.debug
-    if [ -f src/qt/nexa-qt ]
+    cp -f src/pyrrhad ${OUTDIR}/pyrrhad-${i}.debug
+    if [ -f src/qt/pyrrha-qt ]
     then
-      cp -f src/qt/nexa-qt ${OUTDIR}/nexa-qt-${i}.debug
+      cp -f src/qt/pyrrha-qt ${OUTDIR}/pyrrha-qt-${i}.debug
     fi
 
     make install-strip DESTDIR=${INSTALLPATH}

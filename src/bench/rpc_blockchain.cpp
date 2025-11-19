@@ -5,7 +5,7 @@
 #include <bench/bench.h>
 #include <bench/data.h>
 #include <chainparams.h>
-#include <test/test_nexa.h>
+#include <test/test_pyrrha.h>
 
 #include <rpc/blockchain.h>
 #include <streams.h>

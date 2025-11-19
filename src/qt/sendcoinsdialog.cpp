@@ -10,7 +10,7 @@
 #include "clientmodel.h"
 #include "coincontroldialog.h"
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "optionsmodel.h"
 #include "platformstyle.h"
 #include "sendcoinsentry.h"
@@ -848,7 +848,7 @@ void SendCoinsDialog::coinControlChangeEdited(const QString &text)
         else if (!IsValidDestination(dest))
         {
             // Invalid address
-            ui->labelCoinControlChangeLabel->setText(tr("Warning: Invalid Nexa address"));
+            ui->labelCoinControlChangeLabel->setText(tr("Warning: Invalid Pyrrha address"));
         }
         else
         {

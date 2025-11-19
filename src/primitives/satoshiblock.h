@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_PRIMITIVES_SATOSHI_BLOCK_H
-#define NEXA_PRIMITIVES_SATOSHI_BLOCK_H
+#ifndef PYRRHA_PRIMITIVES_SATOSHI_BLOCK_H
+#define PYRRHA_PRIMITIVES_SATOSHI_BLOCK_H
 
 #include "primitives/transaction.h"
 #include "protocol.h"
@@ -172,4 +172,4 @@ public:
     uint64_t GetBlockSize() const;
 };
 
-#endif // NEXA_PRIMITIVES_SATOSHI_BLOCK_H
+#endif // PYRRHA_PRIMITIVES_SATOSHI_BLOCK_H

@@ -12,8 +12,8 @@
  * - E-mail usually won't line-break if there's no punctuation to break at.
  * - Double-clicking selects the whole string as one word if it's all alphanumeric.
  */
-#ifndef NEXA_BASE58_H
-#define NEXA_BASE58_H
+#ifndef PYRRHA_BASE58_H
+#define PYRRHA_BASE58_H
 
 #include "chainparams.h"
 #include "key.h"
@@ -153,4 +153,4 @@ std::string EncodeLegacyAddr(const CTxDestination &dest, const CChainParams &);
 /// Decode an old-style address
 CTxDestination DecodeLegacyAddr(const std::string &str, const CChainParams &);
 
-#endif // NEXA_BASE58_H
+#endif // PYRRHA_BASE58_H

@@ -2,8 +2,8 @@
 // Copyright (c) 2015-2022 The Bitcoin Unlimited developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef NEXA_PREVECTOR_H
-#define NEXA_PREVECTOR_H
+#ifndef PYRRHA_PREVECTOR_H
+#define PYRRHA_PREVECTOR_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -639,4 +639,4 @@ public:
     const value_type *data() const { return item_ptr(0); }
 };
 
-#endif // NEXA_PREVECTOR_H
+#endif // PYRRHA_PREVECTOR_H

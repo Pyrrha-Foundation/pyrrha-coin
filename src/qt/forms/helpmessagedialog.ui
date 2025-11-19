@@ -52,7 +52,7 @@
         </size>
        </property>
        <property name="pixmap">
-        <pixmap resource="../nexa.qrc">:/icons/nexa</pixmap>
+        <pixmap resource="../pyrrha.qrc">:/icons/pyrrha</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -150,7 +150,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../nexa.qrc"/>
+  <include location="../pyrrha.qrc"/>
  </resources>
  <connections>
   <connection>

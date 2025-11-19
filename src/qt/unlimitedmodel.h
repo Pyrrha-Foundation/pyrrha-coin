@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_UNLIMITEDMODEL_H
-#define NEXA_QT_UNLIMITEDMODEL_H
+#ifndef PYRRHA_QT_UNLIMITEDMODEL_H
+#define PYRRHA_QT_UNLIMITEDMODEL_H
 
 #include "amount.h"
 #include "unlimited.h"
@@ -67,4 +67,4 @@ private:
 Q_SIGNALS:
 };
 
-#endif // NEXA_QT_OPTIONSMODEL_H
+#endif // PYRRHA_QT_OPTIONSMODEL_H

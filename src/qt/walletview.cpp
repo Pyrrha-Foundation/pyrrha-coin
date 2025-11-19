@@ -9,7 +9,7 @@
 #include "askpassphrasedialog.h"
 #include "clientmodel.h"
 #include "guiutil.h"
-#include "nexagui.h"
+#include "pyrrhagui.h"
 #include "optionsmodel.h"
 #include "overviewpage.h"
 #include "platformstyle.h"

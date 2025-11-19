@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_VERSIONBITS
-#define NEXA_VERSIONBITS
+#ifndef PYRRHA_VERSIONBITS
+#define PYRRHA_VERSIONBITS
 
 #include "chain.h"
 #include <map>
@@ -110,4 +110,4 @@ void ClearBip135Votes();
 bool AssignBip135Votes(const std::string &features, int vote);
 
 
-#endif // NEXA_VERSIONBITS_H
+#endif // PYRRHA_VERSIONBITS_H

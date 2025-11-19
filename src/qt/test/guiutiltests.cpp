@@ -18,7 +18,7 @@ public:
     void SetCashAddrEncoding(bool b) override { useCashAddr = b; }
     bool UseCashAddrEncoding() const override { return useCashAddr; }
     const CChainParams &GetChainParams() const override {
-        return Params(CBaseChainParams::NEXA);
+        return Params(CBaseChainParams::PYRRHA);
     }
 
 private:
@@ -28,7 +28,7 @@ private:
 } // anon ns
 
 void GUIUtilTests::dummyAddressTest() {
-    CChainParams &params = Params(CBaseChainParams::NEXA);
+    CChainParams &params = Params(CBaseChainParams::PYRRHA);
     UtilCfgDummy cfg;
     std::string dummyaddr;
 
@@ -49,7 +49,7 @@ void GUIUtilTests::toCurrentEncodingTest() {
     // garbage in, garbage out
     QVERIFY(ToCurrentEncoding("garbage", config) == "garbage");
 
-    QString cashaddr_pubkey = "nexa:qqjk5f068wpfdhmqh5rnrrqkhryl6lacq5tl8m6qg7";
+    QString cashaddr_pubkey = "pyrrha:qqjk5f068wpfdhmqh5rnrrqkhryl6lacq5tl8m6qg7";
     QString base58_pubkey = "B7run8V4hf1NJ46UUB2WkHXC8aW6NVz1iR";
 
     config.SetCashAddrEncoding(true);

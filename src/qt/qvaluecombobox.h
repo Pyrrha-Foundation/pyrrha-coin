@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_QVALUECOMBOBOX_H
-#define NEXA_QT_QVALUECOMBOBOX_H
+#ifndef PYRRHA_QT_QVALUECOMBOBOX_H
+#define PYRRHA_QT_QVALUECOMBOBOX_H
 
 #include <QComboBox>
 #include <QVariant>
@@ -35,4 +35,4 @@ private Q_SLOTS:
     void handleSelectionChanged(int idx);
 };
 
-#endif // NEXA_QT_QVALUECOMBOBOX_H
+#endif // PYRRHA_QT_QVALUECOMBOBOX_H

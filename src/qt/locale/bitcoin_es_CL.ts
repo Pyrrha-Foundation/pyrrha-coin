@@ -309,7 +309,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../nexagui.cpp" line="+318"/>
+        <location filename="../pyrrhagui.cpp" line="+318"/>
         <source>Sign &amp;message...</source>
         <translation>Firmar &amp;Mensaje...</translation>
     </message>
@@ -1830,7 +1830,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../nexaunits.cpp" line="+187"/>
+        <location filename="../pyrrhaunits.cpp" line="+187"/>
         <source>Amount</source>
         <translation>Cantidad</translation>
     </message>
@@ -4032,7 +4032,7 @@
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../nexagui.cpp" line="+117"/>
+        <location filename="../pyrrhagui.cpp" line="+117"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4216,7 +4216,7 @@
 <context>
     <name>pyrrha</name>
     <message>
-        <location filename="../nexastrings.cpp" line="+157"/>
+        <location filename="../pyrrhastrings.cpp" line="+157"/>
         <source>Error: Disk space is low!</source>
         <translation>Atención: Poco espacio en el disco duro</translation>
     </message>

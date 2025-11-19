@@ -2204,7 +2204,7 @@ bool TransactionSignatureChecker::CheckSig(const vector<uint8_t> &vchSigIn,
     size_t nHashed = 0;
     if (txTo == nullptr || nIn >= txTo->vin.size())
         return false;
-    if (!SignatureHashNexa(scriptCode, *txTo, nIn, sigHashType, sighash, &nHashed))
+    if (!SignatureHashPyrrha(scriptCode, *txTo, nIn, sigHashType, sighash, &nHashed))
         return false;
 
     nBytesHashed += nHashed;
@@ -2520,8 +2520,8 @@ bool VerifyScript(const CScript &scriptSig,
     }
     else
     {
-        // P2SH disabled on nexa mainnet.  Left on in regtest, testnet to maintain tests.
-        if (Params().NetworkIDString() == "nexa")
+        // P2SH disabled on pyrrha mainnet.  Left on in regtest, testnet to maintain tests.
+        if (Params().NetworkIDString() == "pyrrha")
             flags &= ~SCRIPT_VERIFY_P2SH;
         // Verify a "legacy"-mode script
         return VerifySatoScript(scriptSig, scriptPubKey, flags, maxSatoScriptOps, sis, serror, tracker);

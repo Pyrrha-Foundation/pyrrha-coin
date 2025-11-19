@@ -357,6 +357,6 @@ def Test():
         flags.append("--tmpdir=/ramdisk/test/t")
     binpath = findBitcoind()
     flags.append("--srcdir=%s" % binpath)
-    cashlib.init(binpath + os.sep + ".libs" + os.sep + "libnexa.so")
+    cashlib.init(binpath + os.sep + ".libs" + os.sep + "libpyrrha.so")
 
     t.main(flags, bitcoinConf, None)

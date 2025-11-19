@@ -309,7 +309,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../nexagui.cpp" line="+318"/>
+        <location filename="../pyrrhagui.cpp" line="+318"/>
         <source>Sign &amp;message...</source>
         <translation>Semnează &amp;mesaj...</translation>
     </message>
@@ -1837,7 +1837,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../nexaunits.cpp" line="+187"/>
+        <location filename="../pyrrhaunits.cpp" line="+187"/>
         <source>Amount</source>
         <translation>Cantitate</translation>
     </message>
@@ -4047,7 +4047,7 @@
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../nexagui.cpp" line="+117"/>
+        <location filename="../pyrrhagui.cpp" line="+117"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation>Unitatea în care sînt arătate sumele. Faceţi clic pentru a selecta o altă unitate.</translation>
     </message>
@@ -4231,7 +4231,7 @@
 <context>
     <name>pyrrha</name>
     <message>
-        <location filename="../nexastrings.cpp" line="+28"/>
+        <location filename="../pyrrhastrings.cpp" line="+28"/>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation>Distribuit sub licenţa de programe MIT/X11, vezi fişierul însoţitor COPYING sau &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
     </message>

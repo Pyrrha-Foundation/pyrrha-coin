@@ -163,7 +163,7 @@ typedef enum
 // Must match the equivalent object in calling language code (e.g. ChainSelector)
 typedef enum
 {
-    AddrBlockchainNexa = 1,
+    AddrBlockchainPyrrha = 1,
     AddrBlockchainTestnet = 2,
     AddrBlockchainRegtest = 3,
     AddrBlockchainBCH = 4,
@@ -299,8 +299,8 @@ static BchTestnet4Params bchTestnet4Params;
 
 CChainParams *GetChainParams(ChainSelector chainSelector)
 {
-    if (chainSelector == AddrBlockchainNexa)
-        return &Params(CBaseChainParams::NEXA);
+    if (chainSelector == AddrBlockchainPyrrha)
+        return &Params(CBaseChainParams::PYRRHA);
     else if (chainSelector == AddrBlockchainTestnet)
         return &Params(CBaseChainParams::TESTNET);
     else if (chainSelector == AddrBlockchainRegtest)
@@ -607,7 +607,7 @@ SLAPI int SignTxSchnorr(unsigned char *txData,
 
     size_t nHashedOut = 0;
     uint256 sighash;
-    if (!SignatureHashNexa(priorScript, tx, inputIdx, sigHashType, sighash, &nHashedOut))
+    if (!SignatureHashPyrrha(priorScript, tx, inputIdx, sigHashType, sighash, &nHashedOut))
     {
         return 0;
     }
@@ -1498,7 +1498,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_Wal
     {
         // decode this address as if it was a string
         auto s = std::string(addr.data, addr.data + addr.size);
-        destination = DecodeDestination(s, Params(CBaseChainParams::NEXA));
+        destination = DecodeDestination(s, Params(CBaseChainParams::PYRRHA));
         if (!IsValidDestination(destination))
         {
             destination = DecodeDestination(s, Params(CBaseChainParams::TESTNET));
@@ -2093,7 +2093,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_Has
     return bArray;
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_NexaBlockHeader_blockHash(JNIEnv *env,
+extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_PyrrhaBlockHeader_blockHash(JNIEnv *env,
     jobject ths,
     jbyteArray arg)
 {
@@ -2115,7 +2115,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_Nex
     return bArray;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_bitcoinunlimited_libbitcoincash_NexaBlockHeader_verifyBlockHeader(
+extern "C" JNIEXPORT jboolean JNICALL Java_bitcoinunlimited_libbitcoincash_PyrrhaBlockHeader_verifyBlockHeader(
     JNIEnv *env,
     jobject ths,
     jbyte chainSelector,
@@ -2143,7 +2143,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_bitcoinunlimited_libbitcoincash_NexaB
 }
 
 
-extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_NexaTransaction_txid(JNIEnv *env,
+extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_PyrrhaTransaction_txid(JNIEnv *env,
     jobject ths,
     jbyteArray arg)
 {
@@ -2161,7 +2161,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_Nex
     return bArray;
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_NexaTransaction_txidem(JNIEnv *env,
+extern "C" JNIEXPORT jbyteArray JNICALL Java_bitcoinunlimited_libbitcoincash_PyrrhaTransaction_txidem(JNIEnv *env,
     jobject ths,
     jbyteArray arg)
 {
@@ -2195,7 +2195,7 @@ public:
 };
 
 
-// Since partial Merkle blocks are just trees of hashes, this structure is the same for Nexa and BCH
+// Since partial Merkle blocks are just trees of hashes, this structure is the same for Pyrrha and BCH
 jobjectArray JNICALL
 MerkleBlock_Extract(JNIEnv *env, jobject ths, jint numTxes, jbyteArray merkleProofPath, jobjectArray hashArray)
 {
@@ -2252,7 +2252,7 @@ MerkleBlock_Extract(JNIEnv *env, jobject ths, jint numTxes, jbyteArray merklePro
     return ret;
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_bitcoinunlimited_libbitcoincash_NexaMerkleBlock_Extract(JNIEnv *env,
+extern "C" JNIEXPORT jobjectArray JNICALL Java_bitcoinunlimited_libbitcoincash_PyrrhaMerkleBlock_Extract(JNIEnv *env,
     jobject ths,
     jint numTxes,
     jbyteArray merkleProofPath,
@@ -2284,8 +2284,8 @@ extern "C" JNIEXPORT jstring JNICALL Java_bitcoinunlimited_libbitcoincash_Initia
     }
     switch ((ChainSelector)chainSelector)
     {
-    case AddrBlockchainNexa:
-        SelectParams("nexa");
+    case AddrBlockchainPyrrha:
+        SelectParams("pyrrha");
         break;
     case AddrBlockchainTestnet:
         SelectParams("test");
@@ -2296,7 +2296,7 @@ extern "C" JNIEXPORT jstring JNICALL Java_bitcoinunlimited_libbitcoincash_Initia
     case AddrBlockchainBCH:
         SelectParams("main");
         break;
-        // These set the default params to the NEXA equivalent, because these testnets are not def-ed across the
+        // These set the default params to the PYRRHA equivalent, because these testnets are not def-ed across the
         // codebase.  Basically, DONT initialize to these!
     case AddrBlockchainBchTestnet:
         SelectParams("test");

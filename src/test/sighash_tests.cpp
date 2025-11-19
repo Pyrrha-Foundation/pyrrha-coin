@@ -13,7 +13,7 @@
 #include "script/sighashtype.h"
 #include "serialize.h"
 #include "streams.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "tweak.h"
 #include "util.h"
 #include "utilstrencodings.h"

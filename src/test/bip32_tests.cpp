@@ -7,7 +7,7 @@
 
 #include "base58.h"
 #include "key.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "uint256.h"
 #include "util.h"
 #include "utilstrencodings.h"

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_WALLET_CRYPTER_H
-#define NEXA_WALLET_CRYPTER_H
+#ifndef PYRRHA_WALLET_CRYPTER_H
+#define PYRRHA_WALLET_CRYPTER_H
 
 #include "keystore.h"
 #include "serialize.h"
@@ -213,4 +213,4 @@ public:
     boost::signals2::signal<void(CCryptoKeyStore *wallet)> NotifyStatusChanged;
 };
 
-#endif // NEXA_WALLET_CRYPTER_H
+#endif // PYRRHA_WALLET_CRYPTER_H

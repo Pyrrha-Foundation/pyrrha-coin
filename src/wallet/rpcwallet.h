@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_WALLET_RPCWALLET_H
-#define NEXA_WALLET_RPCWALLET_H
+#ifndef PYRRHA_WALLET_RPCWALLET_H
+#define PYRRHA_WALLET_RPCWALLET_H
 
 class CRPCTable;
 
@@ -13,4 +13,4 @@ void RegisterWalletRPCCommands(CRPCTable &tableRPC);
 /** Sign a message using a wallets private key */
 bool SignMessage(const UniValue &params, UniValue &sig, std::string &error);
 
-#endif // NEXA_WALLET_RPCWALLET_H
+#endif // PYRRHA_WALLET_RPCWALLET_H

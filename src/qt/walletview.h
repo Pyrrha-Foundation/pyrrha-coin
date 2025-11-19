@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_WALLETVIEW_H
-#define NEXA_QT_WALLETVIEW_H
+#ifndef PYRRHA_QT_WALLETVIEW_H
+#define PYRRHA_QT_WALLETVIEW_H
 
 #include "amount.h"
 
@@ -47,7 +47,7 @@ public:
     */
     void setClientModel(ClientModel *clientModel);
     /** Set the wallet model.
-        The wallet model represents a nexa wallet, and offers access to the list of transactions, address book and
+        The wallet model represents a pyrrha wallet, and offers access to the list of transactions, address book and
        sending
         functionality.
     */
@@ -136,4 +136,4 @@ Q_SIGNALS:
     void outOfSyncWarningClicked();
 };
 
-#endif // NEXA_QT_WALLETVIEW_H
+#endif // PYRRHA_QT_WALLETVIEW_H

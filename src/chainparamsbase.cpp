@@ -15,7 +15,7 @@ const std::string CBaseChainParams::LEGACY_UNIT_TESTS = "main";
 const std::string CBaseChainParams::TESTNET = "test";
 const std::string CBaseChainParams::SCALENET = "scale";
 const std::string CBaseChainParams::REGTEST = "regtest";
-const std::string CBaseChainParams::NEXA = "nexa";
+const std::string CBaseChainParams::PYRRHA = "pyrrha";
 
 /**
  * Main network
@@ -72,14 +72,14 @@ public:
 static CBaseRegTestParams regTestParams;
 
 /**
- * Nexa
+ * Pyrrha
  */
-class CBaseNexaParams : public CBaseChainParams
+class CBasePyrrhaParams : public CBaseChainParams
 {
 public:
-    CBaseNexaParams() { nRPCPort = 7227; }
+    CBasePyrrhaParams() { nRPCPort = 7227; }
 };
-static CBaseNexaParams nexaParams;
+static CBasePyrrhaParams pyrrhaParams;
 
 static CBaseChainParams *pCurrentBaseParams = 0;
 
@@ -99,8 +99,8 @@ CBaseChainParams &BaseParams(const std::string &chain)
         return scaleNetParams;
     else if (chain == CBaseChainParams::REGTEST)
         return regTestParams;
-    else if (chain == CBaseChainParams::NEXA)
-        return nexaParams;
+    else if (chain == CBaseChainParams::PYRRHA)
+        return pyrrhaParams;
     else
         throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
 }
@@ -115,8 +115,8 @@ std::string ChainNameFromCommandLine()
     num_selected += fTestNet;
     bool fScaleNet = GetBoolArg("-scalenet", false);
     num_selected += fScaleNet;
-    bool fNexa = GetBoolArg("-nexa", false);
-    num_selected += fNexa;
+    bool fPyrrha = GetBoolArg("-pyrrha", false);
+    num_selected += fPyrrha;
 
     if (num_selected > 1)
         throw std::runtime_error("Invalid combination of -regtest, -testnet, -scalenet");
@@ -126,11 +126,11 @@ std::string ChainNameFromCommandLine()
         return CBaseChainParams::TESTNET;
     if (fScaleNet)
         return CBaseChainParams::SCALENET;
-    if (fNexa)
-        return CBaseChainParams::NEXA;
+    if (fPyrrha)
+        return CBaseChainParams::PYRRHA;
 
-    // default on this branch is nexa
-    return CBaseChainParams::NEXA;
+    // default on this branch is pyrrha
+    return CBaseChainParams::PYRRHA;
 }
 
 bool AreBaseParamsConfigured() { return pCurrentBaseParams != nullptr; }

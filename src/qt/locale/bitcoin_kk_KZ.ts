@@ -309,7 +309,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../nexagui.cpp" line="+261"/>
+        <location filename="../pyrrhagui.cpp" line="+261"/>
         <source>&amp;Transactions</source>
         <translation>&amp;Транзакциялар</translation>
     </message>
@@ -1828,7 +1828,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../nexaunits.cpp" line="+187"/>
+        <location filename="../pyrrhaunits.cpp" line="+187"/>
         <source>Amount</source>
         <translation>Саны</translation>
     </message>
@@ -4028,7 +4028,7 @@
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../nexagui.cpp" line="+396"/>
+        <location filename="../pyrrhagui.cpp" line="+396"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4212,7 +4212,7 @@
 <context>
     <name>pyrrha</name>
     <message>
-        <location filename="../nexastrings.cpp" line="+12"/>
+        <location filename="../pyrrhastrings.cpp" line="+12"/>
         <source>Pyrrha</source>
         <translation type="unfinished">Биткоин</translation>
     </message>

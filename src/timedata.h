@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_TIMEDATA_H
-#define NEXA_TIMEDATA_H
+#ifndef PYRRHA_TIMEDATA_H
+#define PYRRHA_TIMEDATA_H
 
 #include <algorithm>
 #include <assert.h>
@@ -69,4 +69,4 @@ int64_t GetTimeOffset();
 int64_t GetAdjustedTime();
 void AddTimeData(const CNetAddr &ip, int64_t nTime);
 
-#endif // NEXA_TIMEDATA_H
+#endif // PYRRHA_TIMEDATA_H

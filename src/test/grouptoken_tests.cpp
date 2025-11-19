@@ -7,7 +7,7 @@
 #include "main.h"
 #include "miner.h"
 #include "script/sighashtype.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "test/testutil.h"
 #include "txadmission.h"
 #include "utilstrencodings.h"
@@ -1538,9 +1538,9 @@ BOOST_FIXTURE_TEST_CASE(grouptoken_blockchain, TestChain100Setup)
 BOOST_AUTO_TEST_CASE(grouptoken_descriptions)
 {
     // Test that all labels can be encoded in OP_RETURN and retrieved successfully.
-    std::string name = "NexaToken";
+    std::string name = "PyrrhaToken";
     std::string ticker = "NEXT";
-    std::string url = "http://nexa.org";
+    std::string url = "http://pyrrha.org";
     std::string urlHex = "a0b0123489c8";
 
     std::vector<std::vector<unsigned char> > desc;

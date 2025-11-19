@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_FS_H
-#define NEXA_FS_H
+#ifndef PYRRHA_FS_H
+#define PYRRHA_FS_H
 
 #include <stdio.h>
 #include <string>

@@ -15,7 +15,7 @@ sudo usermod -a -G docker $USER
 exec su -l $USER  #make effective the usermod command
 mkdir -p ~/src
 cd ~/src
-git clone https://gitlab.com/nexa/nexa.git
+git clone https://gitlab.com/pyrrha/pyrrha.git
 git clone https://github.com/devrandom/gitian-builder.git
 cd gitian-builder
 bin/make-base-vm --suite focal --arch amd64 --docker
@@ -29,7 +29,7 @@ These are the commands to actually produce the linux x86_64 bit executables :
 ```bash
 cd ~/src/gitian-builder
 export USE_DOCKER=1
-bin/gbuild -j 4 -m 10000 --url nexa=https://gitlab.com/nexa/nexa.git --commit nexa=dev ../nexa/contrib/gitian-descriptors/gitian-linux-x86.yml
+bin/gbuild -j 4 -m 10000 --url pyrrha=https://gitlab.com/pyrrha/pyrrha.git --commit pyrrha=dev ../pyrrha/contrib/gitian-descriptors/gitian-linux-x86.yml
 ```
 
 Your binaries will be ready to be used in `build/out/` folder.
@@ -42,5 +42,5 @@ Then issue the following command to have the binaries for osx produced and store
 ```bash
 cd ~/src/gitian-builder
 export USE_DOCKER=1
-bin/gbuild -j 4 -m 10000 --url nexa=https://gitlab.com/nexa/nexa.git --commit nexa=dev ../nexa/contrib/gitian-descriptors/gitian-osx.yml
+bin/gbuild -j 4 -m 10000 --url pyrrha=https://gitlab.com/pyrrha/pyrrha.git --commit pyrrha=dev ../pyrrha/contrib/gitian-descriptors/gitian-osx.yml
 ```

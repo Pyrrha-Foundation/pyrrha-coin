@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SERIALIZE_H
-#define NEXA_SERIALIZE_H
+#ifndef PYRRHA_SERIALIZE_H
+#define PYRRHA_SERIALIZE_H
 
 #include "compat/endian.h"
 
@@ -1185,4 +1185,4 @@ size_t GetSerializeSize(const S &s, const T &t)
     return (CSizeComputer(s.GetType(), s.GetVersion()) << t).size();
 }
 
-#endif // NEXA_SERIALIZE_H
+#endif // PYRRHA_SERIALIZE_H

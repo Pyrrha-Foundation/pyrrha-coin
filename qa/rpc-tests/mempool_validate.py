@@ -322,6 +322,6 @@ def Test():
     flags.append("--srcdir=%s" % binpath)
 
     # load the cashlib.so from our build directory
-    cashlib.init(binpath + os.sep + ".libs" + os.sep + "libnexa.so")
+    cashlib.init(binpath + os.sep + ".libs" + os.sep + "libpyrrha.so")
     # start the test
     t.main(flags, bitcoinConf, None)

@@ -5,8 +5,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_KEY_H
-#define NEXA_KEY_H
+#ifndef PYRRHA_KEY_H
+#define PYRRHA_KEY_H
 
 #include "pubkey.h"
 #include "serialize.h"
@@ -232,4 +232,4 @@ int Hd44DeriveChildKey(unsigned char *secretSeed,
     std::string *keypath);
 
 
-#endif // NEXA_KEY_H
+#endif // PYRRHA_KEY_H

@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_WALLET_WALLET_H
-#define NEXA_WALLET_WALLET_H
+#ifndef PYRRHA_WALLET_WALLET_H
+#define PYRRHA_WALLET_WALLET_H
 
 #include "amount.h"
 #include "clientversion.h"
@@ -412,7 +412,7 @@ public:
     CAmount GetAvailableWatchOnlyCredit(const bool &fUseCache = true) const;
     CAmount GetChange() const;
 
-    // Get only Nexa transaction amounts
+    // Get only Pyrrha transaction amounts
     void GetAmounts(std::list<COutputEntry> &listReceived,
         std::list<COutputEntry> &listSent,
         CAmount &nFee,
@@ -1226,4 +1226,4 @@ public:
 // This will drop all connections and spend a LONG time to complete
 extern void StartWalletRescanThread();
 
-#endif // NEXA_WALLET_WALLET_H
+#endif // PYRRHA_WALLET_WALLET_H

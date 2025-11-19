@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_PLATFORMSTYLE_H
-#define NEXA_QT_PLATFORMSTYLE_H
+#ifndef PYRRHA_QT_PLATFORMSTYLE_H
+#define PYRRHA_QT_PLATFORMSTYLE_H
 
 #include <QIcon>
 #include <QPixmap>
@@ -49,4 +49,4 @@ private:
     /* ... more to come later */
 };
 
-#endif // NEXA_QT_PLATFORMSTYLE_H
+#endif // PYRRHA_QT_PLATFORMSTYLE_H

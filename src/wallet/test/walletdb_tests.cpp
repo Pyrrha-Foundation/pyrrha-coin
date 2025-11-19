@@ -3,7 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "fs.h"
 
 #include "wallet/wallet.h"
@@ -14,7 +14,7 @@
 namespace {
 struct WalletDBTestingSetup : public TestingSetup
 {
-    WalletDBTestingSetup(const std::string &chainName = CBaseChainParams::NEXA)
+    WalletDBTestingSetup(const std::string &chainName = CBaseChainParams::PYRRHA)
     {
         bitdb.MakeMock();
     }

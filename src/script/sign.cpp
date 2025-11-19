@@ -57,7 +57,7 @@ bool TransactionSignatureCreator::CreateSig(std::vector<uint8_t> &vchSig,
     }
 
     uint256 hash;
-    if (!SignatureHashNexa(scriptCode, *txTo, nIn, sigHashType, hash))
+    if (!SignatureHashPyrrha(scriptCode, *txTo, nIn, sigHashType, hash))
         return false;
     if (!key.SignSchnorr(hash, vchSig))
         return false;

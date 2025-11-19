@@ -13,7 +13,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 add_definitions(-Wno-tautological-constant-compare -DBOOST_SYSTEM_NO_DEPRECATED)
 
 add_library( # Sets the name of the library.
-             nexandroid
+             pyrrhandroid
 
              # Sets the library as a shared library.
              SHARED
@@ -130,10 +130,10 @@ include_directories( .
 # build script, prebuilt third-party libraries, or system libraries.
 
 # if you need boost libraries again someday
-# set_target_properties(nexandroid PROPERTIES LINK_FLAGS -L/fast/bitcoin/boostAndroid/build/out/${ANDROID_ABI}/lib)
+# set_target_properties(pyrrhandroid PROPERTIES LINK_FLAGS -L/fast/bitcoin/boostAndroid/build/out/${ANDROID_ABI}/lib)
 
 target_link_libraries( # Specifies the target library.
-                       nexandroid
+                       pyrrhandroid
                        # Links the target library to these libraries
                        android  # base android library
                        log  # android log library

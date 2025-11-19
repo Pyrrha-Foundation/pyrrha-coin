@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test txpool persistence.
 
-By default, nexad will dump txpool on shutdown and
+By default, pyrrhad will dump txpool on shutdown and
 then reload it on startup. This can be overridden with
 the -cache.persistTxPool=0 command line option.
 
@@ -104,7 +104,7 @@ class MempoolPersistTest(BitcoinTestFramework):
         self.nodes = start_nodes(2, self.options.tmpdir)
         waitFor(10, lambda: len(self.nodes[1].getrawtxpool()) == 5)
 
-        logging.info("Prevent nexad from writing txpool.dat to disk. Verify that `savetxpool` fails")
+        logging.info("Prevent pyrrhad from writing txpool.dat to disk. Verify that `savetxpool` fails")
         # try to dump txpool content on a directory rather than a file
         # which is an implementation detail that could change and break this test
         txpooldotnew1 = txpooldat1 + '.new'
@@ -185,7 +185,7 @@ class MempoolPersistTest(BitcoinTestFramework):
         waitFor(DELAY_TIME, lambda: self.nodes[1].gettxpoolinfo()["size"] == 0, lambda: print (getNodeInfo(self.nodes[1])))
         waitFor(DELAY_TIME, lambda: self.nodes[1].gettxpoolinfo()["size"] == 0, lambda: print (getNodeInfo(self.nodes[1])))
 
-        logging.info("Prevent nexad from writing orphanpool.dat to disk. Verify that `saveorphanpool` fails")
+        logging.info("Prevent pyrrhad from writing orphanpool.dat to disk. Verify that `saveorphanpool` fails")
         # try to dump orphanpool content on a directory rather than a file
         # which is an implementation detail that could change and break this test
         orphanpooldotnew1 = orphanpooldat1 + '.new'
@@ -251,7 +251,7 @@ class MempoolPersistTest(BitcoinTestFramework):
         self.nodes = start_nodes(2, self.options.tmpdir)
         waitFor(30, lambda: self.nodes[1].capd("info")["count"] == 5)
 
-        logging.info("Prevent nexad from writing msgpool.dat to disk. Verify that `savemsgpool` fails")
+        logging.info("Prevent pyrrhad from writing msgpool.dat to disk. Verify that `savemsgpool` fails")
         # try to dump txpool content on a directory rather than a file
         # which is an implementation detail that could change and break this test
         msgpooldotnew1 = msgpooldat1 + '.new'

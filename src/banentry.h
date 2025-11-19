@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_BANENTRY_H
-#define NEXA_BANENTRY_H
+#ifndef PYRRHA_BANENTRY_H
+#define PYRRHA_BANENTRY_H
 
 // NOTE: netaddress.h includes serialize.h which is required for serialization macros
 #include "netaddress.h" // for CSubNet
@@ -54,4 +54,4 @@ public:
 
 typedef std::map<CSubNet, CBanEntry> banmap_t;
 
-#endif // NEXA_BANENTRY_H
+#endif // PYRRHA_BANENTRY_H

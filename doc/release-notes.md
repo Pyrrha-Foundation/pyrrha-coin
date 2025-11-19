@@ -3,16 +3,16 @@ Release Notes for Pyrrha 1.3.0.2
 
 Pyrrha version 1.3.0.2 is now available from:
 
-  <https://gitlab.com/nexa/nexa/-/releases>
+  <https://gitlab.com/pyrrha/pyrrha/-/releases>
 
 Please report bugs using the issue tracker at github:
 
-  <https://gitlab.com/nexa/nexa/-/issues>
+  <https://gitlab.com/pyrrha/pyrrha/-/issues>
 
 This is minor release of Pyrrha, for more information about Pyrrha see:
 
-- https://nexa.org
-- https://spec.nexa.org
+- https://pyrrha.org
+- https://spec.pyrrha.org
 
 Main changes in 1.3.0.2
 -----------------------

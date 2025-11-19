@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SIG_HASH_TYPE_H
-#define NEXA_SIG_HASH_TYPE_H
+#ifndef PYRRHA_SIG_HASH_TYPE_H
+#define PYRRHA_SIG_HASH_TYPE_H
 
 #include "script/interpreter.h"
 #include "serialize.h"
@@ -188,7 +188,7 @@ public:
         ::Serialize(s, sigHashBytes);
     }
 
-    friend bool SignatureHashNexaComponents(const CTransaction &txTo,
+    friend bool SignatureHashPyrrhaComponents(const CTransaction &txTo,
         unsigned int nIn,
         const SigHashType &sigHashType,
         uint256 &hashPrevouts,
@@ -219,7 +219,7 @@ uint256 SignatureHash(const CScript &scriptCode,
     const CAmount &amount,
     size_t *nHashedOut = nullptr);
 
-bool SignatureHashNexa(const CScript &scriptCode,
+bool SignatureHashPyrrha(const CScript &scriptCode,
     const CTransaction &txTo,
     unsigned int nIn,
     const SigHashType &sigHashType,
@@ -229,7 +229,7 @@ bool SignatureHashNexa(const CScript &scriptCode,
 /** Given the components of the sighash, calculate it
     (used by double spend proofs and normal signature calculation)
  */
-bool SignatureHashNexa(const CScript &scriptCode,
+bool SignatureHashPyrrha(const CScript &scriptCode,
     uint8_t txVersion,
     uint32_t txLockTime,
     const SigHashType &sigHashType,
@@ -260,4 +260,4 @@ void RemoveSigHashType(std::vector<unsigned char> &vchSig);
 
 extern const SigHashType defaultSigHashType;
 
-#endif // NEXA_SCRIPT_HASH_TYPE_H
+#endif // PYRRHA_SCRIPT_HASH_TYPE_H

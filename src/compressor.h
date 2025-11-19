@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_COMPRESSOR_H
-#define NEXA_COMPRESSOR_H
+#ifndef PYRRHA_COMPRESSOR_H
+#define PYRRHA_COMPRESSOR_H
 
 #include "primitives/transaction.h"
 #include "script/script.h"
@@ -135,4 +135,4 @@ public:
     }
 };
 
-#endif // NEXA_COMPRESSOR_H
+#endif // PYRRHA_COMPRESSOR_H

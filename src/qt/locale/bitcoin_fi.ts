@@ -309,7 +309,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../nexagui.cpp" line="+318"/>
+        <location filename="../pyrrhagui.cpp" line="+318"/>
         <source>Sign &amp;message...</source>
         <translation>&amp;Allekirjoita viesti...</translation>
     </message>
@@ -1833,7 +1833,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../nexaunits.cpp" line="+187"/>
+        <location filename="../pyrrhaunits.cpp" line="+187"/>
         <source>Amount</source>
         <translation>Määrä</translation>
     </message>
@@ -4033,7 +4033,7 @@
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../nexagui.cpp" line="+117"/>
+        <location filename="../pyrrhagui.cpp" line="+117"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation>Yksikkö jossa määrät näytetään. Klikkaa valitaksesi toisen yksikön.</translation>
     </message>
@@ -4217,7 +4217,7 @@
 <context>
     <name>pyrrha</name>
     <message>
-        <location filename="../nexastrings.cpp" line="+156"/>
+        <location filename="../pyrrhastrings.cpp" line="+156"/>
         <source>Error: A fatal internal error occurred, see debug.log for details</source>
         <translation>Virhe: Kriittinen sisäinen virhe kohdattiin, katso debug.log lisätietoja varten</translation>
     </message>

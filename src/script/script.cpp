@@ -311,7 +311,7 @@ const char *GetOpName(opcodetype opcode)
         return "OP_OUTPUTBYTECODE";
         break;
 
-    // NEXA opcodes
+    // PYRRHA opcodes
     case OP_PLACE:
         return "OP_PLACE";
     case OP_PUSH_TX_STATE:

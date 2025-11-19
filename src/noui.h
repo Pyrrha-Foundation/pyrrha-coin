@@ -3,9 +3,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_NOUI_H
-#define NEXA_NOUI_H
+#ifndef PYRRHA_NOUI_H
+#define PYRRHA_NOUI_H
 
 extern void noui_connect();
 
-#endif // NEXA_NOUI_H
+#endif // PYRRHA_NOUI_H

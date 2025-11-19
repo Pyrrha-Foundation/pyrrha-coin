@@ -6,7 +6,7 @@
 #include "recentrequeststablemodel.h"
 
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "optionsmodel.h"
 
 #include "clientversion.h"

@@ -84,7 +84,7 @@ libqrencode (optional) can be installed with:
 sudo apt-get install libqrencode-dev
 ```
 
-Once these are installed, they will be found by configure and a nexa-qt executable will be
+Once these are installed, they will be found by configure and a pyrrha-qt executable will be
 built by default.
 
 ## Dependencies
@@ -116,8 +116,8 @@ For the versions used, see [dependencies.md](dependencies.md)
 Start out by fetching the code
 
 ```bash
-git clone https://gitlab.com/nexa/nexa.git nexa
-cd nexa/
+git clone https://gitlab.com/pyrrha/pyrrha.git pyrrha
+cd pyrrha/
 ```
 ## To build without wallet
 
@@ -137,7 +137,7 @@ make
 make install # optional
 ```
 
-You will find the `nexad` binary in the `src/` folder.
+You will find the `pyrrhad` binary in the `src/` folder.
 
 ## To build with wallet
 
@@ -154,7 +154,7 @@ make
 make install # optional
 ```
 
-You will find the `nexad` binary in the `src/` folder. This will build `nexa-qt` as well (in `src/qt`), if the dependencies are met.
+You will find the `pyrrhad` binary in the `src/` folder. This will build `pyrrha-qt` as well (in `src/qt`), if the dependencies are met.
 
 
 # Notes
@@ -169,7 +169,7 @@ A list of additional configure flags can be displayed with:
 
 ## Absolute path
 
-Always use absolute paths to configure and compile nexa and the dependencies,
+Always use absolute paths to configure and compile pyrrha and the dependencies,
 for example, when specifying the path of the dependency:
 
 ```bash
@@ -187,7 +187,7 @@ compilation will take much longer due to swap thrashing.
 
 ## Strip debug symbols
 
-The release is built with GCC and then `strip nexad` to strip the debug
+The release is built with GCC and then `strip pyrrhad` to strip the debug
 symbols, which reduces the executable size by about 90%.
 
 
@@ -221,7 +221,7 @@ Hardening enables the following features:
     To test that you have built PIE executable, install `scanelf`, part of `pax-utils`, and use:
 
 ```bash
-scanelf -e ./nexad
+scanelf -e ./pyrrhad
 ```
 
     The output should contain:
@@ -231,13 +231,13 @@ scanelf -e ./nexad
 
 * Non-executable Stack
     If the stack is executable then trivial stack based buffer overflow exploits are possible if
-    vulnerable buffers are found. By default, nexa should be built with a non-executable stack
+    vulnerable buffers are found. By default, pyrrha should be built with a non-executable stack
     but if one of the libraries it uses asks for an executable stack or someone makes a mistake
     and uses a compiler extension which requires an executable stack, it will silently build an
     executable without the non-executable stack protection.
 
     To verify that the stack is non-executable after compiling use:
-    `scanelf -e ./nexad`
+    `scanelf -e ./pyrrhad`
 
     the output should contain:
 	STK/REL/PTL
@@ -255,8 +255,8 @@ needed to fetch the source code of all the depends packages, the latter is neede
 the Qt library from source.
 
 ```bash
-git clone https://gitlab.com/nexa/nexa.git nexa
-cd nexa/depends
+git clone https://gitlab.com/pyrrha/pyrrha.git pyrrha
+cd pyrrha/depends
 make HOST=x86_64-pc-linux-gnu NO_QT=1 -j4
 cd ..
 ./autogen.sh

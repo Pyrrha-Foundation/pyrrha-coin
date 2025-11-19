@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_TXDEBUGGER_H
-#define NEXA_TXDEBUGGER_H
+#ifndef PYRRHA_TXDEBUGGER_H
+#define PYRRHA_TXDEBUGGER_H
 
 #include <map>
 #include <stdint.h>

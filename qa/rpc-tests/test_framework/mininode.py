@@ -274,7 +274,7 @@ class NodeConn(asyncore.dispatcher):
     }, bumessagemap)
 
     MAGIC_BYTES = {
-        "nexa": b"\x72\x27\x12\x21",   # mainnet
+        "pyrrha": b"\x72\x27\x12\x21",   # mainnet
         "testnet3": b"\x72\x27\x12\x22",  # testnet3
         "regtest": b"\xea\xe5\xef\xea"    # regtest
         }

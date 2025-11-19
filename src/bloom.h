@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_BLOOM_H
-#define NEXA_BLOOM_H
+#ifndef PYRRHA_BLOOM_H
+#define PYRRHA_BLOOM_H
 
 #include "consensus/consensus.h"
 #include "serialize.h"
@@ -201,4 +201,4 @@ private:
     int nHashFuncs;
 };
 
-#endif // NEXA_BLOOM_H
+#endif // PYRRHA_BLOOM_H

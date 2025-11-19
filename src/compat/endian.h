@@ -3,11 +3,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_COMPAT_ENDIAN_H
-#define NEXA_COMPAT_ENDIAN_H
+#ifndef PYRRHA_COMPAT_ENDIAN_H
+#define PYRRHA_COMPAT_ENDIAN_H
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include <stdint.h>
@@ -122,4 +122,4 @@ inline uint64_t le64toh(uint64_t little_endian_64bits) { return little_endian_64
 
 #endif // WORDS_BIGENDIAN
 
-#endif // NEXA_COMPAT_ENDIAN_H
+#endif // PYRRHA_COMPAT_ENDIAN_H

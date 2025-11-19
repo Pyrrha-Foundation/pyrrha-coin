@@ -3,7 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "util.h"
 
 #include <string>
@@ -16,12 +16,12 @@ BOOST_FIXTURE_TEST_SUITE(getarg_tests, BasicTestingSetup)
 
 enum Kind
 {
-    NEXAD = 0,
+    PYRRHAD = 0,
     CONFIGFILE = 1,
-    NEXA_CLI = 2
+    PYRRHA_CLI = 2
 };
 
-static void ResetArgs(const std::string &strArg, Kind kind = NEXAD)
+static void ResetArgs(const std::string &strArg, Kind kind = PYRRHAD)
 {
     std::vector<std::string> vecArg;
     if (strArg.size())
@@ -37,10 +37,10 @@ static void ResetArgs(const std::string &strArg, Kind kind = NEXAD)
 
     if (kind == CONFIGFILE)
         ParseParameters(vecChar.size(), &vecChar[0], AllowedArgs::ConfigFile(&tweaks));
-    else if (kind == NEXAD)
-        ParseParameters(vecChar.size(), &vecChar[0], AllowedArgs::Nexad(&tweaks));
+    else if (kind == PYRRHAD)
+        ParseParameters(vecChar.size(), &vecChar[0], AllowedArgs::Pyrrhad(&tweaks));
     else
-        ParseParameters(vecChar.size(), &vecChar[0], AllowedArgs::NexaCli());
+        ParseParameters(vecChar.size(), &vecChar[0], AllowedArgs::PyrrhaCli());
 }
 
 BOOST_AUTO_TEST_CASE(boolarg)
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(tweakArgs)
     BOOST_CHECK_THROW(ResetArgs("-some.tweak=something", CONFIGFILE), std::runtime_error);
 
     // Test bitcoin-cli accepts unknown tweaks
-    ResetArgs("-some.tweak=something", NEXA_CLI);
+    ResetArgs("-some.tweak=something", PYRRHA_CLI);
     BOOST_CHECK_EQUAL(GetArg("-some.tweak", "default"), "something");
 }
 

@@ -3,11 +3,12 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 
-#ifndef NEXA_EXTVERSIONKEYS_H
-#define NEXA_EXTVERSIONKEYS_H
+#ifndef PYRRHA_EXTVERSIONKEYS_H
+#define PYRRHA_EXTVERSIONKEYS_H
 
 #include <unordered_map>
 #include <unordered_set>
+#include <cstdint>
 
 #define ADD_UL(key, ul) key##ul
 

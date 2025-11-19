@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_THREAD_DEADLOCK_H
-#define NEXA_THREAD_DEADLOCK_H
+#ifndef PYRRHA_THREAD_DEADLOCK_H
+#define PYRRHA_THREAD_DEADLOCK_H
 
 #include "lockorder.h"
 

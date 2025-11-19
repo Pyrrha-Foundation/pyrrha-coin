@@ -42,7 +42,7 @@ bool IsStandard(const CScript &scriptPubKey, txnouttype &whichType)
     if (!Solver(scriptPubKey, whichType, vSolutions))
         return false;
 
-    // P2SH is disabled on Nexa, so mark this type of output nonstandard
+    // P2SH is disabled on Pyrrha, so mark this type of output nonstandard
     if (whichType == TX_SCRIPTHASH)
         return false;
 

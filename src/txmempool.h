@@ -5,8 +5,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_TXMEMPOOL_H
-#define NEXA_TXMEMPOOL_H
+#ifndef PYRRHA_TXMEMPOOL_H
+#define PYRRHA_TXMEMPOOL_H
 
 #include <list>
 #include <set>
@@ -878,4 +878,4 @@ struct TxCoinAgePriorityCompare
     }
 };
 
-#endif // NEXA_TXMEMPOOL_H
+#endif // PYRRHA_TXMEMPOOL_H

@@ -4,7 +4,7 @@
 
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "allowed_args.h"
@@ -106,8 +106,8 @@ public:
                   "sleep and poll every <duration> seconds until difficulty drops below this threshold. Value must be "
                   "a float or integer"))
             .addArg("address=<string>", ::AllowedArgs::requiredStr,
-                _("The address to send the newly generated nexa to. If omitted, will default to an address in the "
-                  "nexa daemon's wallet."))
+                _("The address to send the newly generated pyrrha to. If omitted, will default to an address in the "
+                  "pyrrha daemon's wallet."))
             .addArg("name=<string>", ::AllowedArgs::requiredStr,
                 _("Name for this mining machine for statistics tracking in the full node"))
             .addArg("deterministic[=boolean]", ::AllowedArgs::optionalBool,
@@ -363,7 +363,7 @@ static UniValue CpuMineBlock(unsigned int searchDuration, bool &found, const Ran
         // When mining mainnet, you would normally want to advance the time to keep the block time as close to the
         // real time as possible.  However, this CPU miner is only useful on testnet and in testnet the block difficulty
         // resets to 1 after 20 minutes.  This will cause the block's difficulty to mismatch the expected difficulty
-        // and the block will be rejected.  So do not advance time (let it be advanced by nexad every time we
+        // and the block will be rejected.  So do not advance time (let it be advanced by pyrrhad every time we
         // request a new block).
         // header.nTime = (header.nTime < GetTime()) ? GetTime() : header.nTime;
         int tries = ChunkAmt;
@@ -790,7 +790,7 @@ int CpuMiner(int threadNum)
         {
             mineresult.setNull();
         }
-        // The result is sent to nexad above when the loop gets to it.
+        // The result is sent to pyrrhad above when the loop gets to it.
         // See:   RPCSubmitSolution(mineresult,nblocks);
         // This is so RPC Exceptions are handled in one place.
     }
@@ -812,7 +812,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        std::string appname("nexa-miner");
+        std::string appname("pyrrha-miner");
         std::string usage = "\n" + _("Usage:") + "\n" + "  " + appname + " [options] " + "\n";
         ret = AppInitRPC(usage,  PyrrhaMinerArgs(), argc, argv);
         if (ret != CONTINUE_EXECUTION)

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_EXTVERSIONMESSAGE_H
-#define NEXA_EXTVERSIONMESSAGE_H
+#ifndef PYRRHA_EXTVERSIONMESSAGE_H
+#define PYRRHA_EXTVERSIONMESSAGE_H
 
 
 #include "protocol.h"
@@ -56,7 +56,7 @@ public:
 
 
 /*!
-  Nexa extended version message implementation.
+  Pyrrha extended version message implementation.
 
   The keys are declared in the extversion_keys.h header file which
   should obviously be kept in sync between different implementations.

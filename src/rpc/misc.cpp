@@ -302,7 +302,7 @@ CScript _createmultisig_redeemScript(const UniValue &params)
     {
         const std::string &ks = keys[i].get_str();
 #ifdef ENABLE_WALLET
-        // Case 1: Nexa address and we have full public key:
+        // Case 1: Pyrrha address and we have full public key:
         CTxDestination dest = DecodeDestination(ks);
         if (pwalletMain && IsValidDestination(dest))
         {

@@ -32,7 +32,7 @@ Pyrrha is a next-generation Proof-of-Work blockchain designed around a single mi
 
 > **Make mining fair again — no ASICs, no farms, no industrial dominance.**
 
-Based on a modernized UTXO architecture originally derived from the Nexa codebase, Pyrrha delivers:
+Based on a modernized UTXO architecture originally derived from the Pyrrha codebase, Pyrrha delivers:
 
 - ⚡ **Fast layer-1 throughput** with dynamic block sizes  
 - 🧱 **Advanced script primitives** for scalable tokens & financial logic  
@@ -79,7 +79,7 @@ Pyrrha focuses on long-term sustainability and fair mining:
 ## 🛣️ Pyrrha Roadmap
 
 ### **📍 Phase 1 — Rebrand & Network Identity (CURRENT)**  
-- Rename all Nexa identifiers → **Pyrrha**  
+- Rename all Pyrrha identifiers → **Pyrrha**  
 - Update ports, config names, datadir  
 - Assign new network magic bytes  
 - Clean seeds & checkpoints  
@@ -175,6 +175,6 @@ See:
 Pyrrha is released under the **MIT License**.  
 See ➜ **[COPYING](COPYING)**
 
-This product includes software from the OpenSSL Project and historical portions of the Bitcoin Unlimited / Nexa codebases.
+This product includes software from the OpenSSL Project and historical portions of the Bitcoin Unlimited / Pyrrha codebases.
 
 ---

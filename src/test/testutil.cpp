@@ -14,7 +14,7 @@
 #include "primitives/transaction.h"
 #include "script/sighashtype.h"
 #include "script/standard.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 fs::path GetTempPath() { return fs::temp_directory_path(); }
 CMutableTransaction CreateRandomTx()

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_EDITADDRESSDIALOG_H
-#define NEXA_QT_EDITADDRESSDIALOG_H
+#ifndef PYRRHA_QT_EDITADDRESSDIALOG_H
+#define PYRRHA_QT_EDITADDRESSDIALOG_H
 
 #include <QDialog>
 
@@ -57,4 +57,4 @@ private:
     QString address;
 };
 
-#endif // NEXA_QT_EDITADDRESSDIALOG_H
+#endif // PYRRHA_QT_EDITADDRESSDIALOG_H

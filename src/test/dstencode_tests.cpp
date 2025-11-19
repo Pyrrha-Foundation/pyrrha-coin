@@ -7,7 +7,7 @@
 #include "chainparams.h"
 #include "config.h"
 #include "dstencode.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(findAprefix)
     const CTxDestination dstScript = CScriptID(uint160(hash));
     const CTxDestination dstTemplate = ScriptTemplateDestination(P2pktOutput(hash));
 
-    CChainParamsPub params = *((CChainParamsPub*) &Params(CBaseChainParams::NEXA));
+    CChainParamsPub params = *((CChainParamsPub*) &Params(CBaseChainParams::PYRRHA));
     DstCfgDummy cfg;
 
     for (int i=0;i<255;i++)
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_addresses) {
                                   1,2,3,4,5,6,
                                   7,8,9,10,11,12};
 
-        const CChainParams &params = Params(CBaseChainParams::NEXA);
+        const CChainParams &params = Params(CBaseChainParams::PYRRHA);
         DstCfgDummy cfg;
         
     {

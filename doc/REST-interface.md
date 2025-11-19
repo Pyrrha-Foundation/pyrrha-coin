@@ -1,9 +1,9 @@
 # Unauthenticated REST Interface
 
-The REST API can be enabled with the `-rest` option on the command line, or `rest=1` in the nexa.conf configuration file.  REST access occurs via the same port as JSON-RPC requests.  For example, to access the chain information on Pyrrha mainnet, use:
+The REST API can be enabled with the `-rest` option on the command line, or `rest=1` in the pyrrha.conf configuration file.  REST access occurs via the same port as JSON-RPC requests.  For example, to access the chain information on Pyrrha mainnet, use:
 `curl http://localhost:7227/rest/chaininfo.json`
 
-Note that the REST API uses the same access rules as RPC.  To enable external access to these interfaces, you must use the `rpcallowip` option.  For example, add `rpcallowip=192.168.0.0/16` to nexa.conf to allow the REST API to be accessed from 192.168.* private networks.
+Note that the REST API uses the same access rules as RPC.  To enable external access to these interfaces, you must use the `rpcallowip` option.  For example, add `rpcallowip=192.168.0.0/16` to pyrrha.conf to allow the REST API to be accessed from 192.168.* private networks.
 
 ## Supported API
 
@@ -34,7 +34,7 @@ Given a block hash: returns <COUNT> amount of blockheaders in upward direction.
 
 Returns various state info regarding block chain processing.
 Only supports JSON as output format.
-* chain : (string) current network name as defined in BIP70 (nexa, test, regtest)
+* chain : (string) current network name as defined in BIP70 (pyrrha, test, regtest)
 * blocks : (numeric) the current number of blocks processed in the server
 * headers : (numeric) the current number of headers we have validated
 * bestblockhash : (string) the hash of the currently best block
@@ -73,7 +73,7 @@ $> curl localhost:7227/rest/getutxos/checktxpool/c786590b62b926129c4c09d61e25e48
         "scriptHash": "pay2pubkeytemplate",
         "argsHash": "3850434EED2037E3313EC48199ADAB5FEA4FC984",
         "addresses": [
-          "nexa:nqtsq5g58pgyxnhdyqm7xvf7cjqentdttl4yljvyg3y6kzld"
+          "pyrrha:nqtsq5g58pgyxnhdyqm7xvf7cjqentdttl4yljvyg3y6kzld"
         ]
       }
     }

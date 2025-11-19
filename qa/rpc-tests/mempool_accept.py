@@ -21,7 +21,7 @@ import test_framework.cashlib as cashlib
 from test_framework.nodemessages import *
 from test_framework.script import *
 
-Cli = "nexa-cli"  # Will be amended with the path during initialization
+Cli = "pyrrha-cli"  # Will be amended with the path during initialization
 
 class PayDest:
     """A payment destination.  All the info you need to send a payment here and make a subsequent payment
@@ -178,7 +178,7 @@ class MyTest (BitcoinTestFramework):
     def setup_chain(self, bitcoinConfDict=None, wallets=None):
         cashlib.loadCashLibOrExit(self.options.srcdir)
         path = findBitcoind(self.options.srcdir)
-        Cli = os.getenv("NEXACLI", path + os.sep + "nexa-cli")
+        Cli = os.getenv("PYRRHACLI", path + os.sep + "pyrrha-cli")
         logging.info("Initializing test directory " + self.options.tmpdir)
         initialize_chain(self.options.tmpdir, bitcoinConfDict, wallets)
 

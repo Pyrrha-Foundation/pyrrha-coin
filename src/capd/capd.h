@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_CAPD_H
-#define NEXA_CAPD_H
+#ifndef PYRRHA_CAPD_H
+#define PYRRHA_CAPD_H
 
 // Counterparty and protocol discovery
 #include <array>
@@ -762,4 +762,4 @@ extern uint64_t msgpoolMaxSize;
 extern CapdMsgPool msgpool;
 extern CapdProtocol capdProtocol;
 
-#endif // NEXA_CAPD_H
+#endif // PYRRHA_CAPD_H

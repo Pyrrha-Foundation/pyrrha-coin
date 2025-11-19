@@ -5,7 +5,7 @@
 
 #include "hashwrapper.h"
 #include "random.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "utilstrencodings.h"
 
 #include <vector>

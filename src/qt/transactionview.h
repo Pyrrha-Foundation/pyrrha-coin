@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_TRANSACTIONVIEW_H
-#define NEXA_QT_TRANSACTIONVIEW_H
+#ifndef PYRRHA_QT_TRANSACTIONVIEW_H
+#define PYRRHA_QT_TRANSACTIONVIEW_H
 
 #include "guiutil.h"
 
@@ -115,4 +115,4 @@ public Q_SLOTS:
     void focusTransaction(const QModelIndex &);
 };
 
-#endif // NEXA_QT_TRANSACTIONVIEW_H
+#endif // PYRRHA_QT_TRANSACTIONVIEW_H

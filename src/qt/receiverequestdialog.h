@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_RECEIVEREQUESTDIALOG_H
-#define NEXA_QT_RECEIVEREQUESTDIALOG_H
+#ifndef PYRRHA_QT_RECEIVEREQUESTDIALOG_H
+#define PYRRHA_QT_RECEIVEREQUESTDIALOG_H
 
 #include "walletmodel.h"
 
@@ -76,4 +76,4 @@ private:
 // exported for unittesting
 QString ToCurrentEncoding(const QString &addr, const Config &);
 
-#endif // NEXA_QT_RECEIVEREQUESTDIALOG_H
+#endif // PYRRHA_QT_RECEIVEREQUESTDIALOG_H

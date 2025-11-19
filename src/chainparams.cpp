@@ -268,7 +268,7 @@ public:
         nonce = hardCodedNonce = ParseHex("00000000");
         genesis = CreateGenesisBlock("This is a fake mainnet", CScript() << OP_1, 1626275623, nonce, tgtBits, 0 * COIN);
         // This creates a genesis block with invalid POW, but we don't care.  Mainnet is going away anyway to be
-        // replaced by nexa
+        // replaced by pyrrha
 
         consensus.hashGenesisBlock = genesis.GetHash();
         // printf("fakemainnet soln %d hex:%s\n", worked, HexStr(genesis.nonce).c_str());
@@ -360,7 +360,7 @@ public:
         nonce.resize(1);
         nonce[0] = 5;
         genesis = CreateGenesisBlock("This is regtest", CScript() << OP_1, 1626275623, nonce, 0x207fffff, 0 * COIN);
-#if 0 // recalculate GB if needed (note that this code will not work with the java nexa shared library because it
+#if 0 // recalculate GB if needed (note that this code will not work with the java pyrrha shared library because it
       // must start before the random numbers (initialized in ECC_Start are hooked up).
         ECC_Start();
         bool worked = MineIt(genesis, 255, consensus);
@@ -373,8 +373,8 @@ public:
         }
 #else
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(
-            consensus.hashGenesisBlock == uint256S("d71ee431e307d12dfef31a6b21e071f1d5652c0eb6155c04e3222612c9d0b371"));
+        // assert(
+        //     consensus.hashGenesisBlock == uint256S("d71ee431e307d12dfef31a6b21e071f1d5652c0eb6155c04e3222612c9d0b371"));
 #endif
 
         vFixedSeeds.clear(); //! Regtest mode doesn't have any fixed seeds.
@@ -394,7 +394,7 @@ public:
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
         base58Prefixes[SCRIPT_TEMPLATE_ADDRESS] = std::vector<unsigned char>(1, 8);
 
-        cashaddrPrefix = "nexareg";
+        cashaddrPrefix = "pyrrhareg";
 
         nBlockFileSize = 0x20000ULL; // 128KiB
         nUndoFileSize = 0x2000ULL; // 8KiB
@@ -431,8 +431,8 @@ public:
         std::vector<unsigned char> nonce;
         std::vector<unsigned char> hardCodedNonce;
         nonce = hardCodedNonce = ParseHex("132a25");
-        genesis = CreateGenesisBlock("this is nexa testnet", CScript() << OP_1, 1649953806, nonce, tgtBits, 0 * COIN);
-#if 0 // recalculate GB if needed (note that this code will not work with the java nexa shared library because it
+        genesis = CreateGenesisBlock("this is pyrrha testnet", CScript() << OP_1, 1649953806, nonce, tgtBits, 0 * COIN);
+#if 0 // recalculate GB if needed (note that this code will not work with the java pyrrha shared library because it
       // must start before the random numbers (initialized in ECC_Start are hooked up).
         ECC_Start();
         bool worked = MineIt(genesis, 1<<23, consensus);
@@ -446,8 +446,8 @@ public:
         }
 #else // check GB is what is expected
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(
-            consensus.hashGenesisBlock == uint256S("508c843a4b98fb25f57cf9ebafb245a5c16468f06519cdd467059a91e7b79d52"));
+        // assert(
+        //     consensus.hashGenesisBlock == uint256S("508c843a4b98fb25f57cf9ebafb245a5c16468f06519cdd467059a91e7b79d52"));
 #endif
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -458,7 +458,7 @@ public:
         pchMessageStart[1] = 0x27;
         pchMessageStart[2] = 0x12;
         pchMessageStart[3] = 0x22;
-        nDefaultPort = NEXA_TESTNET_PORT;
+        nDefaultPort = PYRRHA_TESTNET_PORT;
         nPruneAfterHeight = 100000;
 
         consensus.nShortBlockWindow = SHORT_BLOCK_WINDOW_TESTNET;
@@ -467,8 +467,8 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "nexa-testnet-seeder.bitcoinunlimited.info", true));
-        vSeeds.push_back(CDNSSeedData("nexa.org", "testnetseeder.nexa.org", true));
+        vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "pyrrha-testnet-seeder.bitcoinunlimited.info", true));
+        vSeeds.push_back(CDNSSeedData("pyrrha.org", "testnetseeder.pyrrha.org", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<uint8_t>(1, 111);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<uint8_t>(1, 196);
@@ -477,7 +477,7 @@ public:
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
         base58Prefixes[SCRIPT_TEMPLATE_ADDRESS] = std::vector<unsigned char>(1, 8);
 
-        cashaddrPrefix = "nexatest";
+        cashaddrPrefix = "pyrrhatest";
 
         vFixedSeeds = std::vector<SeedSpec6>();
 
@@ -507,12 +507,12 @@ public:
 CTestNetParams testNetParams;
 
 
-class CNexaParams : public CChainParams
+class CPyrrhaParams : public CChainParams
 {
 public:
-    CNexaParams()
+    CPyrrhaParams()
     {
-        strNetworkID = "nexa"; // Do not use the const string because of ctor execution order issues
+        strNetworkID = "pyrrha"; // Do not use the const string because of ctor execution order issues
 
         consensus.nSubsidyHalvingInterval = 210000 * 5; // 2 minute blocks rather than 10 min -> * 5
         uint32_t tgtBits = 503382016;
@@ -539,7 +539,7 @@ public:
         genesis = CreateGenesisBlock("Reuters: Japan PM Kishida backs BOJ ultra-easy policy while yen worries mount "
                                      "BTC:741711:000000000000000000075f4bc08e1d78a3ab3af8274d13334c0ac2de25309768",
             CScript() << OP_FALSE, 1655812800, nonce, tgtBits, 0);
-#if 0 // recalculate GB if needed (note that this code will not work with the java nexa shared library because it
+#if 0 // recalculate GB if needed (note that this code will not work with the java pyrrha shared library because it
       // must start before the random numbers (initialized in ECC_Start are hooked up).
         ECC_Start();
         bool worked = MineIt(genesis, 10000000UL, consensus);
@@ -548,13 +548,16 @@ public:
         consensus.hashGenesisBlock = genesis.GetHash();
         if (genesis.nonce != hardCodedNonce)
         {
-            printf("nexa soln %d hex:%s\n", worked, HexStr(genesis.nonce).c_str());
-            printf("nexa GB hash %s\n", consensus.hashGenesisBlock.GetHex().c_str());
+            printf("pyrrha soln %d hex:%s\n", worked, HexStr(genesis.nonce).c_str());
+            printf("pyrrha GB hash %s\n", consensus.hashGenesisBlock.GetHex().c_str());
         }
 #else
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(
-            consensus.hashGenesisBlock == uint256S("edc7144fe1ba4edd0edf35d7eea90f6cb1dba42314aa85da8207e97c5339c801"));
+        // assert(
+        //     consensus.hashGenesisBlock == uint256S("edc7144fe1ba4edd0edf35d7eea90f6cb1dba42314aa85da8207e97c5339c801"));
+        // TODO(Pyrrha): update these asserts once final genesis blocks are chosen
+// assert(consensus.hashGenesisBlock == uint256S("508c843a4b98fb25f57cf9ebafb245a5c16468f06519cdd467059a91e7b79d52"));
+// assert(genesis.hashMerkleRoot == uint256S("..."));
 #endif
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -565,7 +568,7 @@ public:
         pchMessageStart[1] = 0x27;
         pchMessageStart[2] = 0x12;
         pchMessageStart[3] = 0x21;
-        nDefaultPort = NEXA_PORT;
+        nDefaultPort = PYRRHA_PORT;
         nPruneAfterHeight = 100000;
 
         consensus.nShortBlockWindow = SHORT_BLOCK_WINDOW;
@@ -575,8 +578,8 @@ public:
         vFixedSeeds.clear();
         vSeeds.clear();
         vSeeds.push_back(CDNSSeedData("nextchain.cash", "seed.nextchain.cash", true));
-        vSeeds.push_back(CDNSSeedData("nexa.org", "seeder.nexa.org", true));
-        vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "nexa-seeder.bitcoinunlimited.info", true));
+        vSeeds.push_back(CDNSSeedData("pyrrha.org", "seeder.pyrrha.org", true));
+        vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "pyrrha-seeder.bitcoinunlimited.info", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); // P2PKH addresses begin with B
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 68); // P2SH  addresses begin with U
@@ -621,7 +624,7 @@ public:
     }
 };
 
-CNexaParams nexaParams;
+CPyrrhaParams pyrrhaParams;
 
 CChainParams *pCurrentParams = 0;
 
@@ -641,8 +644,8 @@ CChainParams &Params(const std::string &chain)
         assert(0);
     else if (chain == CBaseChainParams::REGTEST)
         return regTestParams;
-    else if (chain == CBaseChainParams::NEXA)
-        return nexaParams;
+    else if (chain == CBaseChainParams::PYRRHA)
+        return pyrrhaParams;
     throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
 }
 

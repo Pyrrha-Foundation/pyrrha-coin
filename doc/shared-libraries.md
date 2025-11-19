@@ -1,6 +1,6 @@
 # Shared Libraries
 
-## libnexa
+## libpyrrha
 
 The purpose of this library is to make complex cryptocurrency functionality available to other applications (especially light wallets), e.g. to language bindings.  Hashing, address conversion, transaction signing, and script evalution is supported.
 

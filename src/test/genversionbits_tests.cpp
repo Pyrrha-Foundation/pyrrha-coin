@@ -8,7 +8,7 @@
 #include "chain.h"
 #include "random.h"
 #include "versionbits.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "chainparams.h"
 #include "chainparamsbase.h"
 #include "main.h"
@@ -30,7 +30,7 @@ int32_t GenVBTestTime(int nHeight) { return 1415926536 + 600 * nHeight; }
 
 #define TEST_BIT 8
 
-#define SELECTED_CHAIN CBaseChainParams::NEXA
+#define SELECTED_CHAIN CBaseChainParams::PYRRHA
 
 
 // a checker which enforced some minlockedblocks

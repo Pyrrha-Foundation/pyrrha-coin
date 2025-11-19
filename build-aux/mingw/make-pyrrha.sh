@@ -4,7 +4,7 @@
 MSYS_BIN=$(echo "/$MSYS_BIN" | sed -e 's/\\/\//g' -e 's/://' -e 's/\"//g')
 PATH_DEPS=$(echo "/$PATH_DEPS" | sed -e 's/\\/\//g' -e 's/://' -e 's/\"//g')
 TOOLCHAIN_BIN=$(echo "/$TOOLCHAIN_BIN" | sed -e 's/\\/\//g' -e 's/://' -e 's/\"//g')
-NEXA_GIT_ROOT=$(echo "/$NEXA_GIT_ROOT" | sed -e 's/\\/\//g' -e 's/://' -e 's/\"//g')
+PYRRHA_GIT_ROOT=$(echo "/$PYRRHA_GIT_ROOT" | sed -e 's/\\/\//g' -e 's/://' -e 's/\"//g')
 BUILD_TYPE=$(basename $PATH_DEPS)
 
 # Set PATH using POSIX style paths
@@ -87,7 +87,7 @@ then
 fi
 
 # Build Pyrrha
-cd "$NEXA_GIT_ROOT"
+cd "$PYRRHA_GIT_ROOT"
 
 #define and export BOOST_ROOT prior to any calls that require
 #executing ./configure (this may include `make clean`) depending on current system state
@@ -185,9 +185,9 @@ make $MAKE_CORES
 # Strip symbol tables
 if [ -n "$STRIP" ]; then
 	echo 'Stripping exeutables'
-	strip src/nexa-tx.exe
-	strip src/nexa-cli.exe
-	strip src/nexa-miner.exe
-	strip src/nexad.exe
-	strip src/qt/nexa-qt.exe
+	strip src/pyrrha-tx.exe
+	strip src/pyrrha-cli.exe
+	strip src/pyrrha-miner.exe
+	strip src/pyrrhad.exe
+	strip src/qt/pyrrha-qt.exe
 fi

@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
     try
     {
-        std::string appname("bench_nexa");
+        std::string appname("bench_pyrrha");
         std::string usage = "\n" + std::string("Usage:") + "\n" + "  " + appname + " [options] " + "\n";
         int ret = AppInitRPC(usage, AllowedArgs::PyrrhaBench(), argc, argv);
         if (ret != CONTINUE_EXECUTION)

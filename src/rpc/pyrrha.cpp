@@ -33,7 +33,7 @@ static const CRPCCommand commands[] =
 };
 /* clang-format on */
 
-void RegisterNexaRPCCommands(CRPCTable &table)
+void RegisterPyrrhaRPCCommands(CRPCTable &table)
 {
     for (auto cmd : commands)
         table.appendCommand(cmd);

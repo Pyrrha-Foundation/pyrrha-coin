@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_RPC_BLOCKCHAIN_H
-#define NEXA_RPC_BLOCKCHAIN_H
+#ifndef PYRRHA_RPC_BLOCKCHAIN_H
+#define PYRRHA_RPC_BLOCKCHAIN_H
 
 #include "chain.h"
 

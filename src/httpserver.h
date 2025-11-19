@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_HTTPSERVER_H
-#define NEXA_HTTPSERVER_H
+#ifndef PYRRHA_HTTPSERVER_H
+#define PYRRHA_HTTPSERVER_H
 
 #include <functional>
 #include <stdint.h>
@@ -147,4 +147,4 @@ private:
     struct event *ev;
 };
 
-#endif // NEXA_HTTPSERVER_H
+#endif // PYRRHA_HTTPSERVER_H

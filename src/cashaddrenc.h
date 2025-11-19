@@ -2,8 +2,8 @@
 // Copyright (c) 2017-2022 The Bitcoin Unlimited developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef NEXA_CASHADDRENC_H
-#define NEXA_CASHADDRENC_H
+#ifndef PYRRHA_CASHADDRENC_H
+#define PYRRHA_CASHADDRENC_H
 
 #include "script/standard.h"
 

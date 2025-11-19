@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_NODESTATE_H
-#define NEXA_NODESTATE_H
+#ifndef PYRRHA_NODESTATE_H
+#define PYRRHA_NODESTATE_H
 
 #include "net.h" // For NodeId
 #include "requestManager.h"
@@ -121,4 +121,4 @@ struct CNodeStateStats
 };
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats, bool fAllStats = true);
 
-#endif // NEXA_NODESTATE_H
+#endif // PYRRHA_NODESTATE_H

@@ -37,35 +37,35 @@ endif
 EXTRA_LIBRARIES =
 
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
-NEXA_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
+PYRRHA_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
 
-NEXA_INCLUDES += -I$(srcdir)/secp256k1/include
-NEXA_INCLUDES += -I$(srcdir)/univalue/include
-NEXA_INCLUDES += -I$(srcdir)/rsm/include
+PYRRHA_INCLUDES += -I$(srcdir)/secp256k1/include
+PYRRHA_INCLUDES += -I$(srcdir)/univalue/include
+PYRRHA_INCLUDES += -I$(srcdir)/rsm/include
 
-LIBNEXA_SERVER=libnexa_server.a
-LIBNEXA_COMMON=libnexa_common.a
-LIBNEXA_CLI=libnexa_cli.a
-LIBNEXA_UTIL=libnexa_util.a
-LIBNEXA_FALCON=falcon512/libnexa_falcon512.a
-LIBNEXA_CRYPTO=crypto/libnexa_crypto.a
-LIBNEXA_CRYPTO_SSE41=crypto/libnexa_crypto_sse41.a
-LIBNEXA_CRYPTO_AVX2=crypto/libnexa_crypto_avx2.a
-LIBNEXAQT=qt/libnexaqt.a
+LIBPYRRHA_SERVER=libpyrrha_server.a
+LIBPYRRHA_COMMON=libpyrrha_common.a
+LIBPYRRHA_CLI=libpyrrha_cli.a
+LIBPYRRHA_UTIL=libpyrrha_util.a
+LIBPYRRHA_FALCON=falcon512/libpyrrha_falcon512.a
+LIBPYRRHA_CRYPTO=crypto/libpyrrha_crypto.a
+LIBPYRRHA_CRYPTO_SSE41=crypto/libpyrrha_crypto_sse41.a
+LIBPYRRHA_CRYPTO_AVX2=crypto/libpyrrha_crypto_avx2.a
+LIBPYRRHAQT=qt/libpyrrhaqt.a
 LIBRSM=rsm/librsm.la
 LIBSECP256K1=secp256k1/libsecp256k1.la
 LIBUNIVALUE=univalue/libunivalue.la
 
 if ENABLE_ZMQ
-LIBNEXA_ZMQ=libnexa_zmq.a
+LIBPYRRHA_ZMQ=libpyrrha_zmq.a
 endif
 
-if BUILD_NEXA_LIBS
-LIBBITCOINCASH=libnexa.la
+if BUILD_PYRRHA_LIBS
+LIBBITCOINCASH=libpyrrha.la
 endif
 
 if ENABLE_WALLET
-LIBNEXA_WALLET=libnexa_wallet.a
+LIBPYRRHA_WALLET=libpyrrha_wallet.a
 endif
 
 $(LIBRSM): $(wildcard rsm/lib/*) $(wildcard rsm/include/*)
@@ -80,16 +80,16 @@ $(LIBUNIVALUE): $(wildcard univalue/lib/*) $(wildcard univalue/include/*)
 # Make is not made aware of per-object dependencies to avoid limiting building parallelization
 # But to build the less dependent modules first, we manually select their order here:
 EXTRA_LIBRARIES += \
-  $(LIBNEXA_CRYPTO) \
-  $(LIBNEXA_CRYPTO_SSE41) \
-  $(LIBNEXA_CRYPTO_AVX2) \
-  $(LIBNEXA_FALCON) \
-  $(LIBNEXA_UTIL) \
-  $(LIBNEXA_COMMON) \
-  $(LIBNEXA_SERVER) \
-  $(LIBNEXA_CLI) \
-  $(LIBNEXA_WALLET) \
-  $(LIBNEXA_ZMQ)
+  $(LIBPYRRHA_CRYPTO) \
+  $(LIBPYRRHA_CRYPTO_SSE41) \
+  $(LIBPYRRHA_CRYPTO_AVX2) \
+  $(LIBPYRRHA_FALCON) \
+  $(LIBPYRRHA_UTIL) \
+  $(LIBPYRRHA_COMMON) \
+  $(LIBPYRRHA_SERVER) \
+  $(LIBPYRRHA_CLI) \
+  $(LIBPYRRHA_WALLET) \
+  $(LIBPYRRHA_ZMQ)
 
 lib_LTLIBRARIES = $(LIBBITCOINCASH)
 
@@ -99,11 +99,11 @@ TESTS =
 BENCHMARKS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += nexad
+  bin_PROGRAMS += pyrrhad
 endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += nexa-cli nexa-tx nexa-miner
+  bin_PROGRAMS += pyrrha-cli pyrrha-tx pyrrha-miner
 endif
 
 .PHONY: FORCE check-symbols check-security check-formatting
@@ -270,12 +270,12 @@ obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh $(abs_top_builddir)/src/obj/build.h \
 	  $(abs_top_srcdir)
-libnexa_util_a-clientversion.$(OBJEXT): obj/build.h
+libpyrrha_util_a-clientversion.$(OBJEXT): obj/build.h
 
-# server: shared between nexad and nexa-qt
-libnexa_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
-libnexa_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libnexa_server_a_SOURCES = \
+# server: shared between pyrrhad and pyrrha-qt
+libpyrrha_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libpyrrha_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_server_a_SOURCES = \
   globals.cpp \
   addrman.cpp \
   bandb.cpp \
@@ -334,7 +334,7 @@ libnexa_server_a_SOURCES = \
   rpc/mining.cpp \
   rpc/misc.cpp \
   rpc/net.cpp \
-  rpc/nexa.cpp \
+  rpc/pyrrha.cpp \
   rpc/rawtransaction.cpp \
   rpc/server.cpp \
   respend/respendlogger.cpp \
@@ -366,9 +366,9 @@ libnexa_server_a_SOURCES = \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
-libnexa_zmq_a_CPPFLAGS = $(NEXA_INCLUDES) $(ZMQ_CFLAGS)
-libnexa_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libnexa_zmq_a_SOURCES = \
+libpyrrha_zmq_a_CPPFLAGS = $(PYRRHA_INCLUDES) $(ZMQ_CFLAGS)
+libpyrrha_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_zmq_a_SOURCES = \
   zmq/zmqabstractnotifier.cpp \
   zmq/zmqnotificationinterface.cpp \
   zmq/zmqpublishnotifier.cpp \
@@ -376,11 +376,11 @@ libnexa_zmq_a_SOURCES = \
 endif
 
 
-# wallet: shared between nexad and nexa-qt, but only linked
+# wallet: shared between pyrrhad and pyrrha-qt, but only linked
 # when wallet enabled
-libnexa_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
-libnexa_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libnexa_wallet_a_SOURCES = \
+libpyrrha_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES)
+libpyrrha_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_wallet_a_SOURCES = \
   wallet/coinselection.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
@@ -392,10 +392,10 @@ libnexa_wallet_a_SOURCES = \
   $(BITCOIN_CORE_H)
 
 if !TARGET_WINDOWS
-libnexa_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
-libnexa_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_a_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES)
+libpyrrha_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-libnexa_a_SOURCES = \
+libpyrrha_a_SOURCES = \
   cashlib/cashlib.cpp \
   base58.cpp \
   base58.h \
@@ -480,9 +480,9 @@ endif
 
 
 # crypto primitives library
-crypto_libnexa_crypto_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_CONFIG_INCLUDES)
-crypto_libnexa_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libnexa_crypto_a_SOURCES = \
+crypto_libpyrrha_crypto_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_CONFIG_INCLUDES)
+crypto_libpyrrha_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libpyrrha_crypto_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
   crypto/chacha20.h \
@@ -502,29 +502,29 @@ crypto_libnexa_crypto_a_SOURCES = \
   crypto/sha512.h
 
 if USE_ASM
-crypto_libnexa_crypto_a_SOURCES += crypto/sha256_sse4.cpp
+crypto_libpyrrha_crypto_a_SOURCES += crypto/sha256_sse4.cpp
 endif
 
-crypto_libnexa_crypto_sse41_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libnexa_crypto_sse41_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libpyrrha_crypto_sse41_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libpyrrha_crypto_sse41_a_CPPFLAGS = $(AM_CPPFLAGS)
 if ENABLE_SSE41
-crypto_libnexa_crypto_sse41_a_CXXFLAGS += $(SSE41_CXXFLAGS)
-crypto_libnexa_crypto_sse41_a_CPPFLAGS += -DENABLE_SSE41
+crypto_libpyrrha_crypto_sse41_a_CXXFLAGS += $(SSE41_CXXFLAGS)
+crypto_libpyrrha_crypto_sse41_a_CPPFLAGS += -DENABLE_SSE41
 endif
-crypto_libnexa_crypto_sse41_a_SOURCES = crypto/sha256_sse41.cpp
+crypto_libpyrrha_crypto_sse41_a_SOURCES = crypto/sha256_sse41.cpp
 
-crypto_libnexa_crypto_avx2_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libnexa_crypto_avx2_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libpyrrha_crypto_avx2_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libpyrrha_crypto_avx2_a_CPPFLAGS = $(AM_CPPFLAGS)
 if ENABLE_AVX2
-crypto_libnexa_crypto_avx2_a_CXXFLAGS += $(AVX2_CXXFLAGS)
-crypto_libnexa_crypto_avx2_a_CPPFLAGS += -DENABLE_AVX2
+crypto_libpyrrha_crypto_avx2_a_CXXFLAGS += $(AVX2_CXXFLAGS)
+crypto_libpyrrha_crypto_avx2_a_CPPFLAGS += -DENABLE_AVX2
 endif
-crypto_libnexa_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
+crypto_libpyrrha_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
 
 # falcon512 primitives library
-falcon512_libnexa_falcon512_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_CONFIG_INCLUDES)
-falcon512_libnexa_falcon512_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-falcon512_libnexa_falcon512_a_SOURCES = \
+falcon512_libpyrrha_falcon512_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_CONFIG_INCLUDES)
+falcon512_libpyrrha_falcon512_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+falcon512_libpyrrha_falcon512_a_SOURCES = \
   falcon512/codec.c \
   falcon512/config.h \
   falcon512/common.c \
@@ -540,10 +540,10 @@ falcon512_libnexa_falcon512_a_SOURCES = \
   falcon512/sign.c \
   falcon512/vrfy.c
 
-# common: shared between nexad, and nexa-qt and non-server tools
-libnexa_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
-libnexa_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libnexa_common_a_SOURCES = \
+# common: shared between pyrrhad, and pyrrha-qt and non-server tools
+libpyrrha_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES)
+libpyrrha_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_common_a_SOURCES = \
   amount.cpp \
   amount.h \
   arith_uint256.cpp \
@@ -619,9 +619,9 @@ libnexa_common_a_SOURCES = \
 # util: shared between all executables.
 # This library *must* be included to make sure that the glibc
 # backward-compatibility objects and their sanity checks are linked.
-libnexa_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
-libnexa_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libnexa_util_a_SOURCES = \
+libpyrrha_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES)
+libpyrrha_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_util_a_SOURCES = \
   support/pagelocker.cpp \
   allowed_args.cpp \
   chainparamsbase.cpp \
@@ -647,41 +647,41 @@ libnexa_util_a_SOURCES = \
   $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
-libnexa_util_a_SOURCES += compat/glibc_compat.cpp
+libpyrrha_util_a_SOURCES += compat/glibc_compat.cpp
 AM_LDFLAGS += $(COMPAT_LDFLAGS)
 endif
 
-# cli: shared between nexa-cli and nexa-qt
-libnexa_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) $(EVENT_CFLAGS)
-libnexa_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libnexa_cli_a_SOURCES = \
+# cli: shared between pyrrha-cli and pyrrha-qt
+libpyrrha_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES) $(EVENT_CFLAGS)
+libpyrrha_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_cli_a_SOURCES = \
   rpc/client.cpp \
   $(BITCOIN_CORE_H)
 
-nodist_libnexa_util_a_SOURCES = $(srcdir)/obj/build.h
+nodist_libpyrrha_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# nexad binary #
-nexad_SOURCES = pyrrhad.cpp
-nexad_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
-nexad_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-nexad_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# pyrrhad binary #
+pyrrhad_SOURCES = pyrrhad.cpp
+pyrrhad_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES)
+pyrrhad_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+pyrrhad_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexad_SOURCES += pyrrhad-res.rc
+pyrrhad_SOURCES += pyrrhad-res.rc
 endif
 
-nexad_LDADD = \
-  $(LIBNEXA_SERVER) \
-  $(LIBNEXA_COMMON) \
+pyrrhad_LDADD = \
+  $(LIBPYRRHA_SERVER) \
+  $(LIBPYRRHA_COMMON) \
   $(LIBUNIVALUE) \
-  $(LIBNEXA_UTIL) \
-  $(LIBNEXA_WALLET) \
-  $(LIBNEXA_ZMQ) \
-  $(LIBNEXA_CRYPTO) \
-  $(LIBNEXA_CRYPTO_SSE41) \
-  $(LIBNEXA_CRYPTO_AVX2) \
-  $(LIBNEXA_FALCON) \
+  $(LIBPYRRHA_UTIL) \
+  $(LIBPYRRHA_WALLET) \
+  $(LIBPYRRHA_ZMQ) \
+  $(LIBPYRRHA_CRYPTO) \
+  $(LIBPYRRHA_CRYPTO_SSE41) \
+  $(LIBPYRRHA_CRYPTO_AVX2) \
+  $(LIBPYRRHA_FALCON) \
   $(LIBLEVELDB) \
   $(LIBLEVELDB_SSE42) \
   $(LIBMEMENV) \
@@ -689,57 +689,57 @@ nexad_LDADD = \
   $(LIBSECP256K1)
 
 
-nexad_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+pyrrhad_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
-# nexa-cli binary #
-nexa_cli_SOURCES = pyrrha-cli.cpp
-nexa_cli_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) $(EVENT_CFLAGS)
-nexa_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-nexa_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# pyrrha-cli binary #
+pyrrha_cli_SOURCES = pyrrha-cli.cpp
+pyrrha_cli_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES) $(EVENT_CFLAGS)
+pyrrha_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+pyrrha_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexa_cli_SOURCES += pyrrha-cli-res.rc
+pyrrha_cli_SOURCES += pyrrha-cli-res.rc
 endif
 
-nexa_cli_LDADD = \
-  $(LIBNEXA_CLI) \
+pyrrha_cli_LDADD = \
+  $(LIBPYRRHA_CLI) \
   $(LIBUNIVALUE) \
-  $(LIBNEXA_UTIL) \
-  $(LIBNEXA_CRYPTO) \
-  $(LIBNEXA_CRYPTO_SSE41) \
-  $(LIBNEXA_CRYPTO_AVX2) \
-  $(LIBNEXA_FALCON) \
+  $(LIBPYRRHA_UTIL) \
+  $(LIBPYRRHA_CRYPTO) \
+  $(LIBPYRRHA_CRYPTO_SSE41) \
+  $(LIBPYRRHA_CRYPTO_AVX2) \
+  $(LIBPYRRHA_FALCON) \
   $(LIBRSM)
 
-nexa_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+pyrrha_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
-# nexa tx binary #
-nexa_tx_SOURCES = pyrrha-tx.cpp
-nexa_tx_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES)
-nexa_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-nexa_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# pyrrha tx binary #
+pyrrha_tx_SOURCES = pyrrha-tx.cpp
+pyrrha_tx_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES)
+pyrrha_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+pyrrha_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexa_tx_SOURCES += pyrrha-tx-res.rc
+pyrrha_tx_SOURCES += pyrrha-tx-res.rc
 endif
 
-nexa_tx_LDADD = \
+pyrrha_tx_LDADD = \
   $(LIBUNIVALUE) \
-  $(LIBNEXA_COMMON) \
-  $(LIBNEXA_UTIL) \
-  $(LIBNEXA_CRYPTO) \
-  $(LIBNEXA_CRYPTO_SSE41) \
-  $(LIBNEXA_CRYPTO_AVX2) \
-  $(LIBNEXA_FALCON) \
+  $(LIBPYRRHA_COMMON) \
+  $(LIBPYRRHA_UTIL) \
+  $(LIBPYRRHA_CRYPTO) \
+  $(LIBPYRRHA_CRYPTO_SSE41) \
+  $(LIBPYRRHA_CRYPTO_AVX2) \
+  $(LIBPYRRHA_FALCON) \
   $(LIBSECP256K1) \
   $(LIBRSM)
 
-nexa_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+pyrrha_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
-# nexa-miner binary #
-nexa_miner_SOURCES = pyrrha-miner.cpp \
+# pyrrha-miner binary #
+pyrrha_miner_SOURCES = pyrrha-miner.cpp \
   pow.cpp \
   daa.cpp \
   arith_uint256.cpp \
@@ -750,41 +750,41 @@ nexa_miner_SOURCES = pyrrha-miner.cpp \
   uint256.h
 
 
-nexa_miner_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) $(EVENT_CFLAGS)
-nexa_miner_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-nexa_miner_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+pyrrha_miner_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES) $(EVENT_CFLAGS)
+pyrrha_miner_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+pyrrha_miner_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-nexa_miner_SOURCES += pyrrha-miner-res.rc
+pyrrha_miner_SOURCES += pyrrha-miner-res.rc
 endif
 
-nexa_miner_LDADD = \
-  $(LIBNEXA_CLI) \
+pyrrha_miner_LDADD = \
+  $(LIBPYRRHA_CLI) \
   $(LIBUNIVALUE) \
-  $(LIBNEXA_COMMON) \
-  $(LIBNEXA_UTIL) \
-  $(LIBNEXA_CRYPTO) \
-  $(LIBNEXA_CRYPTO_SSE41) \
-  $(LIBNEXA_CRYPTO_AVX2) \
-  $(LIBNEXA_FALCON) \
+  $(LIBPYRRHA_COMMON) \
+  $(LIBPYRRHA_UTIL) \
+  $(LIBPYRRHA_CRYPTO) \
+  $(LIBPYRRHA_CRYPTO_SSE41) \
+  $(LIBPYRRHA_CRYPTO_AVX2) \
+  $(LIBPYRRHA_FALCON) \
   $(LIBRSM) \
   $(LIBSECP256K1)
 
-nexa_miner_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+pyrrha_miner_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
-# nexa library #
-if BUILD_NEXA_LIBS
-libnexa_la_SOURCES = $(libnexa_a_SOURCES) $(crypto_libnexa_crypto_a_SOURCES) $(falcon512_libnexa_falcon512_a_SOURCES)
+# pyrrha library #
+if BUILD_PYRRHA_LIBS
+libpyrrha_la_SOURCES = $(libpyrrha_a_SOURCES) $(crypto_libpyrrha_crypto_a_SOURCES) $(falcon512_libpyrrha_falcon512_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
-libnexa_la_SOURCES += compat/glibc_compat.cpp
+libpyrrha_la_SOURCES += compat/glibc_compat.cpp
 endif
 
-libnexa_la_LDFLAGS = $(AM_LDFLAGS) $(CRYPTO_LIBS) $(BOOST_LIBS) -no-undefined $(RELDFLAGS) $(PTHREAD_FLAGS)
-libnexa_la_LIBADD = $(LIBSECP256K1)
-libnexa_la_CPPFLAGS = $(AM_CPPFLAGS) $(NEXA_INCLUDES) -I$(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include $(JNI_CXXFLAGS) -DBUILD_BITCOIN_INTERNAL
-libnexa_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libpyrrha_la_LDFLAGS = $(AM_LDFLAGS) $(CRYPTO_LIBS) $(BOOST_LIBS) -no-undefined $(RELDFLAGS) $(PTHREAD_FLAGS)
+libpyrrha_la_LIBADD = $(LIBSECP256K1)
+libpyrrha_la_CPPFLAGS = $(AM_CPPFLAGS) $(PYRRHA_INCLUDES) -I$(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include $(JNI_CXXFLAGS) -DBUILD_BITCOIN_INTERNAL
+libpyrrha_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 endif
 #
 

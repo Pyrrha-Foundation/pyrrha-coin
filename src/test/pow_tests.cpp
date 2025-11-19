@@ -7,7 +7,7 @@
 #include "chainparams.h"
 #include "pow.h"
 #include "random.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "util.h"
 
 #include <boost/test/unit_test.hpp>

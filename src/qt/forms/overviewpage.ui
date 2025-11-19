@@ -76,7 +76,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../nexa.qrc">
+               <iconset resource="../pyrrha.qrc">
                 <normaloff>:/icons/warning</normaloff>
                 <disabledoff>:/icons/warning</disabledoff>:/icons/warning</iconset>
               </property>
@@ -462,7 +462,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../nexa.qrc">
+               <iconset resource="../pyrrha.qrc">
                 <normaloff>:/icons/warning</normaloff>
                 <disabledoff>:/icons/warning</disabledoff>:/icons/warning</iconset>
               </property>

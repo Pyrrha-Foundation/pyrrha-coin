@@ -185,7 +185,7 @@ class SchnorrMultisigTest(BitcoinTestFramework):
             # Sign the transaction
             sighashtype = SIGHASH_ALL
             hashbyte = bytes([sighashtype & 0xff])
-            sighash = txspend.SignatureHashNexa(0, script, sighashtype)
+            sighash = txspend.SignatureHashPyrrha(0, script, sighashtype)
             if sigtype == 'schnorr':
                 txsig = schnorr.sign(privkeybytes, sighash) + hashbyte
             elif sigtype == 'ecdsa':

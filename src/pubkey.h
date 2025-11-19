@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_PUBKEY_H
-#define NEXA_PUBKEY_H
+#ifndef PYRRHA_PUBKEY_H
+#define PYRRHA_PUBKEY_H
 
 #include "hashwrapper.h"
 #include "serialize.h"
@@ -239,4 +239,4 @@ public:
     ~ECCVerifyHandle();
 };
 
-#endif // NEXA_PUBKEY_H
+#endif // PYRRHA_PUBKEY_H

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_STACK_ITEM_H
-#define NEXA_STACK_ITEM_H
+#ifndef PYRRHA_STACK_ITEM_H
+#define PYRRHA_STACK_ITEM_H
 
 #include "script/bignum.h"
 #include "utilstrencodings.h"

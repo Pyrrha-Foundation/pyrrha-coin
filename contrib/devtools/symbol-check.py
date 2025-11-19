@@ -55,7 +55,7 @@ OTOOL_CMD = os.getenv('OTOOL', '/usr/bin/otool')
 
 # Allowed NEEDED libraries
 ELF_ALLOWED_LIBRARIES = {
-# nexad and nexa-qt
+# pyrrhad and pyrrha-qt
 'libgcc_s.so.1', # GCC base support
 'libc.so.6', # C library
 'libpthread.so.0', # threading
@@ -68,7 +68,7 @@ ELF_ALLOWED_LIBRARIES = {
 'ld-linux-aarch64.so.1', # 64-bit ARM dynamic linker
 'ld-linux-armhf.so.3', # 32-bit ARM dynamic linker
 'ld-linux-riscv64-lp64d.so.1', # 64-bit RISC-V dynamic linker
-# nexa-qt only
+# pyrrha-qt only
 'libxcb.so.1', # part of X11
 'libxkbcommon.so.0', # keyboard keymapping
 'libxkbcommon-x11.so.0', # keyboard keymapping
@@ -97,11 +97,11 @@ pixie.EM_AARCH64:(2,17),
 }
 
 MACHO_ALLOWED_LIBRARIES = {
-# nexad and nexa-qt
+# pyrrhad and pyrrha-qt
 'libc++.1.dylib', # C++ Standard Library
 'libgmp.10.dylib', # bignum library
 'libSystem.B.dylib', # libc, libm, libpthread, libinfo
-# nexa-qt only
+# pyrrha-qt only
 'AppKit', # user interface
 'ApplicationServices', # common application tasks.
 'CFNetwork', # Access network services and handle changes in network configurations (BIP70)
@@ -132,7 +132,7 @@ PE_ALLOWED_LIBRARIES = {
 'SHELL32.dll', # shell API
 'USER32.dll', # user interface
 'WS2_32.dll', # sockets
-# nexa-qt only
+# pyrrha-qt only
 'CRYPT32.dll', #needed fot bip70 payments
 'dwmapi.dll', # desktop window manager
 'GDI32.dll', # graphics device interface

@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "utilitydialog.h"
@@ -15,7 +15,7 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "intro.h"
-#include "nexagui.h"
+#include "pyrrhagui.h"
 #include "paymentrequestplus.h"
 
 #include "clientversion.h"
@@ -71,14 +71,14 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) : QDialog(pare
     {
         setWindowTitle(tr("Command-line options"));
         QString header =
-            tr("Usage:") + "\n" + "  nexa-qt [" + tr("command-line options") + "]                     " + "\n";
+            tr("Usage:") + "\n" + "  pyrrha-qt [" + tr("command-line options") + "]                     " + "\n";
         QTextCursor cursor(ui->helpMessage->document());
         cursor.insertText(version);
         cursor.insertBlock();
         cursor.insertText(header);
         cursor.insertBlock();
 
-        std::string strUsage = AllowedArgs::NexaQt(&tweaks).helpMessage();
+        std::string strUsage = AllowedArgs::PyrrhaQt(&tweaks).helpMessage();
         QString coreOptions = QString::fromStdString(strUsage);
         text = version + "\n" + header + "\n" + coreOptions;
 

@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "chainparams.h"
@@ -15,7 +15,7 @@
 #include "guiutil.h"
 #include "intro.h"
 #include "networkstyle.h"
-#include "nexagui.h"
+#include "pyrrhagui.h"
 #include "optionsmodel.h"
 #include "platformstyle.h"
 #include "splashscreen.h"
@@ -76,7 +76,7 @@ static void InitMessage(const std::string &message) { LOGA("init message: %s\n",
 /*
    Translate string to current locale using Qt.
  */
-static std::string Translate(const char *psz) { return QCoreApplication::translate("nexa", psz).toStdString(); }
+static std::string Translate(const char *psz) { return QCoreApplication::translate("pyrrha", psz).toStdString(); }
 
 static QString GetLangTerritory()
 {
@@ -125,11 +125,11 @@ static void initTranslations(QTranslator &qtTranslatorBase,
     if (qtTranslator.load("qt_" + lang_territory, QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
         QApplication::installTranslator(&qtTranslator);
 
-    // Load e.g. bitcoin_de.qm (shortcut "de" needs to be defined in nexa.qrc)
+    // Load e.g. bitcoin_de.qm (shortcut "de" needs to be defined in pyrrha.qrc)
     if (translatorBase.load(lang, ":/translations/"))
         QApplication::installTranslator(&translatorBase);
 
-    // Load e.g. bitcoin_de_DE.qm (shortcut "de_DE" needs to be defined in nexa.qrc)
+    // Load e.g. bitcoin_de_DE.qm (shortcut "de_DE" needs to be defined in pyrrha.qrc)
     if (translator.load(lang_territory, ":/translations/"))
         QApplication::installTranslator(&translator);
 }
@@ -143,14 +143,14 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext &context, cons
     LOG(category, "GUI: %s\n", msg.toStdString());
 }
 
-/** Class encapsulating Nexa startup and shutdown.
+/** Class encapsulating Pyrrha startup and shutdown.
  * Allows running startup and shutdown in a different thread from the UI thread.
  */
 class Pyrrha : public QObject
 {
     Q_OBJECT
 public:
-    explicit Nexa();
+    explicit Pyrrha();
 
 public Q_SLOTS:
     void initialize(Config *config);
@@ -166,7 +166,7 @@ private:
     void handleRunawayException(const std::exception *e);
 };
 
-/** Main Nexa application object */
+/** Main Pyrrha application object */
 class PyrrhaApplication : public QApplication
 {
     Q_OBJECT
@@ -228,9 +228,9 @@ private:
     void startThread();
 };
 
-#include "nexa.moc"
+#include "pyrrha.moc"
 
-Pyrrha::Nexa() : QObject() {}
+Pyrrha::Pyrrha() : QObject() {}
 void Pyrrha::handleRunawayException(const std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
@@ -356,7 +356,7 @@ void PyrrhaApplication::startThread()
     if (coreThread)
         return;
     coreThread = new QThread(this);
-    Nexa *executor = new Nexa();
+    Pyrrha *executor = new Pyrrha();
     executor->moveToThread(coreThread);
 
     /*  communication to and from thread */
@@ -452,7 +452,7 @@ void PyrrhaApplication::initializeResult(int retval)
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
-        // nexa: URIs or payment requests:
+        // pyrrha: URIs or payment requests:
         connect(paymentServer, SIGNAL(receivedPaymentRequest(SendCoinsRecipient)), window,
             SLOT(handlePaymentRequest(SendCoinsRecipient)));
         connect(window, SIGNAL(receivedURI(QString)), paymentServer, SLOT(handleURIOrFile(QString)));
@@ -476,7 +476,7 @@ void PyrrhaApplication::shutdownResult(int retval)
 void PyrrhaApplication::handleRunawayException(const QString &message)
 {
     QMessageBox::critical(0, "Runaway exception",
-        BitcoinGUI::tr("A fatal error occurred. Nexa can no longer continue safely and will quit.") + QString("\n\n") +
+        BitcoinGUI::tr("A fatal error occurred. Pyrrha can no longer continue safely and will quit.") + QString("\n\n") +
             message);
     ::exit(EXIT_FAILURE);
 }
@@ -617,7 +617,7 @@ bool TryMigrateQtAppSettings(const QString &oldOrg, const QString &oldApp, const
     return true;
 }
 
-#ifndef NEXA_QT_TEST
+#ifndef PYRRHA_QT_TEST
 int main(int argc, char *argv[])
 {
     SetupEnvironment();
@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Config *>();
 
     /// 2. Parse command-line options. Command-line options take precedence:
-    AllowedArgs::NexaQt allowedArgs(&tweaks);
+    AllowedArgs::PyrrhaQt allowedArgs(&tweaks);
     try
     {
         ParseParameters(argc, argv, allowedArgs);
@@ -669,8 +669,8 @@ int main(int argc, char *argv[])
     bool fMigrated = false;
     // No migrations right now
 
-    // If we just migrated and this is a Nexa node, have the user reconfirm the data directory.
-    // This is necessary in case the user wants to run side-by-side BTC chain and Nexa chain nodes
+    // If we just migrated and this is a Pyrrha node, have the user reconfirm the data directory.
+    // This is necessary in case the user wants to run side-by-side BTC chain and Pyrrha chain nodes
     // in which case each instance requires a different data directory.
     if (fMigrated)
         SoftSetBoolArg("-choosedatadir", true);
@@ -680,7 +680,7 @@ int main(int argc, char *argv[])
     // as it is used to locate QSettings
     QApplication::setOrganizationName(QAPP_ORG_NAME);
     QApplication::setOrganizationDomain(QAPP_ORG_DOMAIN);
-    // Use a different app name for Nexa to enable side-by-side installations which won't
+    // Use a different app name for Pyrrha to enable side-by-side installations which won't
     // interfere with each other
     QApplication::setApplicationName(QAPP_APP_NAME);
     GUIUtil::SubstituteFonts(GetLangTerritory());
@@ -705,7 +705,7 @@ int main(int argc, char *argv[])
     if (!Intro::pickDataDirectory())
         return EXIT_FAILURE;
 
-    /// 7. Determine availability of data directory and parse nexa.conf
+    /// 7. Determine availability of data directory and parse pyrrha.conf
     /// - Do not call GetDataDir(true) before this step finishes
     fs::path dataDir;
     std::string msg;
@@ -779,7 +779,7 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
 
     // Start up the payment server early, too, so impatient users that click on
-    // nexa: links repeatedly have their payment requests routed to this
+    // pyrrha: links repeatedly have their payment requests routed to this
     // process:
     app.createPaymentServer();
 #endif
@@ -833,4 +833,4 @@ int main(int argc, char *argv[])
 
     return app.getReturnValue();
 }
-#endif // NEXA_QT_TEST
+#endif // PYRRHA_QT_TEST

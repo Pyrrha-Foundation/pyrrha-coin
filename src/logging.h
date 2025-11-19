@@ -8,8 +8,8 @@
  * Server/client environment: argument handling, config file parsing,
  * logging, thread wrappers, startup time
  */
-#ifndef NEXA_LOGGING_H
-#define NEXA_LOGGING_H
+#ifndef PYRRHA_LOGGING_H
+#define PYRRHA_LOGGING_H
 
 #include "fs.h"
 #include "tinyformat.h"
@@ -227,4 +227,4 @@ inline bool error(uint64_t ctgr, const char *fmt, const Args &...args)
 }
 
 
-#endif // NEXA_LOGGING_H
+#endif // PYRRHA_LOGGING_H

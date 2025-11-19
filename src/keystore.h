@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_KEYSTORE_H
-#define NEXA_KEYSTORE_H
+#ifndef PYRRHA_KEYSTORE_H
+#define PYRRHA_KEYSTORE_H
 
 #include "key.h"
 #include "pubkey.h"
@@ -196,4 +196,4 @@ public:
 typedef std::vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial;
 typedef std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char> > > CryptedKeyMap;
 
-#endif // NEXA_KEYSTORE_H
+#endif // PYRRHA_KEYSTORE_H

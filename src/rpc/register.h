@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_RPC_REGISTER_H
-#define NEXA_RPC_REGISTER_H
+#ifndef PYRRHA_RPC_REGISTER_H
+#define PYRRHA_RPC_REGISTER_H
 
 /** These are in one header file to avoid creating tons of single-function
  * headers for everything under src/rpc/ */
@@ -25,7 +25,7 @@ void RegisterUnlimitedRPCCommands(CRPCTable &tableRPC);
 /** Register Electrum RPC commands */
 void RegisterElectrumRPC(CRPCTable &tableRPC);
 
-void RegisterNexaRPCCommands(CRPCTable &table);
+void RegisterPyrrhaRPCCommands(CRPCTable &table);
 
 /** Register CAPD RPC commands */
 void RegisterCapdRPCCommands(CRPCTable &table);
@@ -39,8 +39,8 @@ static inline void RegisterAllCoreRPCCommands(CRPCTable &tableRPC)
     RegisterRawTransactionRPCCommands(tableRPC);
     RegisterUnlimitedRPCCommands(tableRPC);
     RegisterElectrumRPC(tableRPC);
-    RegisterNexaRPCCommands(tableRPC);
+    RegisterPyrrhaRPCCommands(tableRPC);
     RegisterCapdRPCCommands(tableRPC);
 }
 
-#endif // NEXA_RPC_REGISTER_H
+#endif // PYRRHA_RPC_REGISTER_H

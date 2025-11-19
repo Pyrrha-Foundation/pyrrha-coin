@@ -15,7 +15,7 @@ Transaction identity is split into two roles:
 1. The **"transaction idem"**.  Latin for same, all transactions with the same idem cause the same UTXO state transformation.
 2. The **transaction "id"**.  Similar to Bitcoin's transaction hash, the id is (probabilistically) unique for a transaction.
 
-Using the Idem avoids most malleability attacks.  In practice, users only care about UTXO state transformation (who paid who) rather then the exact bytes in the transaction, so the Idem should be used by default in wallets.  Transactions spend other transactions by Idem, allowing children to be signed before parents and preventing malleability from orphaning chains of unspent transactions.  The nexad RPC operations generally return the Idem, but sometimes both.
+Using the Idem avoids most malleability attacks.  In practice, users only care about UTXO state transformation (who paid who) rather then the exact bytes in the transaction, so the Idem should be used by default in wallets.  Transactions spend other transactions by Idem, allowing children to be signed before parents and preventing malleability from orphaning chains of unspent transactions.  The pyrrhad RPC operations generally return the Idem, but sometimes both.
 
 The Id is used in the networking code, and in the block merkle tree.  Using the Id in the networking code is necessary so an attacker can't "spoof" a valid transaction with an invalid one.  Using the Id in the block merkle tree ensures participant consistency -- the blockchain converges to a specific transaction regardless of variants, and ensures that the chain-of-signatures must be retained by all full node participants.
 

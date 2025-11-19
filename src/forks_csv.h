@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_FORKS_CSV
-#define NEXA_FORKS_CSV
+#ifndef PYRRHA_FORKS_CSV
+#define PYRRHA_FORKS_CSV
 
 #include <fstream>
 

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_ALLOWED_ARGS_H
-#define NEXA_ALLOWED_ARGS_H
+#ifndef PYRRHA_ALLOWED_ARGS_H
+#define PYRRHA_ALLOWED_ARGS_H
 
 #include "tweak.h"
 #include <functional>
@@ -168,4 +168,4 @@ bool requiredAmount(const std::string &str);
 
 } // namespace AllowedArgs
 
-#endif // NEXA_ALLOWED_ARGS_H
+#endif // PYRRHA_ALLOWED_ARGS_H

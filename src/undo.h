@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_UNDO_H
-#define NEXA_UNDO_H
+#ifndef PYRRHA_UNDO_H
+#define PYRRHA_UNDO_H
 
 #include "coins.h"
 #include "compressor.h"
@@ -121,4 +121,4 @@ public:
     }
 };
 
-#endif // NEXA_UNDO_H
+#endif // PYRRHA_UNDO_H

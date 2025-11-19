@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_AMOUNT_H
-#define NEXA_AMOUNT_H
+#ifndef PYRRHA_AMOUNT_H
+#define PYRRHA_AMOUNT_H
 
 #include "serialize.h"
 
@@ -84,4 +84,4 @@ public:
 /** A fee rate smaller than this is considered zero fee (for relaying, mining and transaction creation) */
 extern CFeeRate minRelayTxFee;
 
-#endif //  NEXA_AMOUNT_H
+#endif //  PYRRHA_AMOUNT_H

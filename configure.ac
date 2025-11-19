@@ -18,16 +18,16 @@ define(_CLIENT_VERSION_IS_RELEASE, true)
 define(_COPYRIGHT_YEAR, 2023)
 define(_COPYRIGHT_HOLDERS,[The %s developers])
 define(_COPYRIGHT_HOLDERS_SUBSTITUTION,[Bitcoin Bitcoin XT and Bitcoin Unlimited])
-AC_INIT([Nexa],m4_join([.],_CLIENT_VERSION_MAJOR,_CLIENT_VERSION_MINOR,_CLIENT_VERSION_REVISION,_CLIENT_VERSION_BUILD)m4_if(_CLIENT_VERSION_RC, [0], [], [rc]_CLIENT_VERSION_RC),[https://gitlab.com/nexa/nexa/issues],[nexa])
+AC_INIT([Pyrrha],m4_join([.],_CLIENT_VERSION_MAJOR,_CLIENT_VERSION_MINOR,_CLIENT_VERSION_REVISION,_CLIENT_VERSION_BUILD)m4_if(_CLIENT_VERSION_RC, [0], [], [rc]_CLIENT_VERSION_RC),[https://gitlab.com/pyrrha/pyrrha/issues],[pyrrha])
 AC_CONFIG_SRCDIR([src/main.cpp])
-AC_CONFIG_HEADERS([src/config/nexa-config.h])
+AC_CONFIG_HEADERS([src/config/pyrrha-config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
 
-BITCOIN_DAEMON_NAME=nexad
-BITCOIN_GUI_NAME=nexa-qt
-BITCOIN_CLI_NAME=nexa-cli
-BITCOIN_TX_NAME=nexa-tx
+BITCOIN_DAEMON_NAME=pyrrhad
+BITCOIN_GUI_NAME=pyrrha-qt
+BITCOIN_CLI_NAME=pyrrha-cli
+BITCOIN_TX_NAME=pyrrha-tx
 
 dnl Unless the user specified ARFLAGS, force it to be cr
 AC_ARG_VAR([ARFLAGS], [Flags for the archiver, defaults to <cr> if not set])
@@ -38,9 +38,9 @@ fi
 AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
-AH_TOP([#ifndef NEXA_CONFIG_H])
-AH_TOP([#define NEXA_CONFIG_H])
-AH_BOTTOM([#endif // NEXA_CONFIG_H])
+AH_TOP([#ifndef PYRRHA_CONFIG_H])
+AH_TOP([#define PYRRHA_CONFIG_H])
+AH_BOTTOM([#endif // PYRRHA_CONFIG_H])
 
 dnl faketime breaks configure and is only needed for make. Disable it here.
 unset FAKETIME
@@ -188,7 +188,7 @@ AC_ARG_ENABLE([gprof],
 
 AC_ARG_ENABLE([javacashlib],
   [AS_HELP_STRING([--enable-javacashlib],
-  [enable java bindings for libnexa (default is no)])],
+  [enable java bindings for libpyrrha (default is no)])],
   [use_javacashlib=yes],
   [use_javacashlib=no])
 
@@ -392,8 +392,8 @@ AC_ARG_WITH([utils],
 AC_ARG_WITH([libs],
   [AS_HELP_STRING([--with-libs],
   [build libraries (default=yes)])],
-  [build_nexa_libs=$withval],
-  [build_nexa_libs=yes])
+  [build_pyrrha_libs=$withval],
+  [build_pyrrha_libs=yes])
 
 AC_ARG_WITH([daemon],
   [AS_HELP_STRING([--with-daemon],
@@ -642,7 +642,7 @@ AC_C_BIGENDIAN
 dnl Check for pthread compile/link requirements
 AX_PTHREAD
 
-# The following macro will add the necessary defines to nexa-config.h, but
+# The following macro will add the necessary defines to pyrrha-config.h, but
 # they also need to be passed down to any subprojects. Pull the results out of
 # the cache and add them to CPPFLAGS.
 AC_SYS_LARGEFILE
@@ -1064,8 +1064,8 @@ AM_CONDITIONAL([BUILD_BITCOIN_UTILS], [test x$build_bitcoin_utils = xyes])
 AC_MSG_RESULT($build_bitcoin_utils)
 
 AC_MSG_CHECKING([whether to build libraries])
-AM_CONDITIONAL([BUILD_NEXA_LIBS], [test x$build_nexa_libs = xyes])
-AC_MSG_RESULT($build_nexa_libs)
+AM_CONDITIONAL([BUILD_PYRRHA_LIBS], [test x$build_pyrrha_libs = xyes])
+AC_MSG_RESULT($build_pyrrha_libs)
 
 AC_LANG_POP
 
@@ -1156,7 +1156,7 @@ if test x$bitcoin_enable_qt != xno; then
     AC_MSG_WARN("xgettext is required to update qt translations")
   fi
 
-  AC_MSG_CHECKING([whether to build test_nexa-qt])
+  AC_MSG_CHECKING([whether to build test_pyrrha-qt])
   if test x$use_gui_tests$bitcoin_enable_qt_test = xyesyes; then
     AC_MSG_RESULT([yes])
     BUILD_TEST_QT="yes"
@@ -1167,7 +1167,7 @@ fi
 
 AM_CONDITIONAL([ENABLE_ZMQ], [test "x$use_zmq" = "xyes"])
 
-AC_MSG_CHECKING([whether to build test_nexa])
+AC_MSG_CHECKING([whether to build test_pyrrha])
 if test x$use_tests = xyes; then
   AC_MSG_RESULT([yes])
   BUILD_TEST="yes"
@@ -1195,7 +1195,7 @@ else
   AC_MSG_RESULT([no])
 fi
 
-if test x$build_bitcoin_utils$build_nexa_libs$build_bitcoind$bitcoin_enable_qt$use_tests = xnonononono; then
+if test x$build_bitcoin_utils$build_pyrrha_libs$build_bitcoind$bitcoin_enable_qt$use_tests = xnonononono; then
   AC_MSG_ERROR([No targets! Please specify at least one of: --with-utils --with-libs --with-daemon --with-gui or --enable-tests])
 fi
 

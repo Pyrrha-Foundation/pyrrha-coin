@@ -5,7 +5,7 @@
 
 #include "test/lcg.h"
 #include "script/sighashtype.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include "script/interpreter.h"
 

@@ -7,8 +7,8 @@
 /**
  * Money parsing/formatting utilities.
  */
-#ifndef NEXA_UTILMONEYSTR_H
-#define NEXA_UTILMONEYSTR_H
+#ifndef PYRRHA_UTILMONEYSTR_H
+#define PYRRHA_UTILMONEYSTR_H
 
 #include <stdint.h>
 #include <string>
@@ -19,4 +19,4 @@ std::string FormatMoney(const CAmount &n);
 bool ParseMoney(const std::string &str, CAmount &nRet);
 bool ParseMoney(const char *pszIn, CAmount &nRet);
 
-#endif // NEXA_UTILMONEYSTR_H
+#endif // PYRRHA_UTILMONEYSTR_H

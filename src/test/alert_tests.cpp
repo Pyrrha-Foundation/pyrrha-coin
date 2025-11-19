@@ -8,7 +8,7 @@
 #include "chainparams.h"
 #include "main.h" // For PartitionCheck
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "test/testutil.h"
 
 #include <boost/test/unit_test.hpp>
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(PartitionAlert)
     // Test PartitionCheck
     CCriticalSection csDummy;
     CBlockIndex indexDummy[500];
-    CChainParams &params = Params(CBaseChainParams::NEXA);
+    CChainParams &params = Params(CBaseChainParams::PYRRHA);
     int64_t nPowTargetSpacing = params.GetConsensus().nPowTargetSpacing;
 
     // Generate fake blockchain timestamps relative to

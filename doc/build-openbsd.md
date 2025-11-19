@@ -1,7 +1,7 @@
 # OpenBSD build guide
 (Tested with OpenBSD 6.6)
 
-This guide describes how to build nexad and command-line utilities on OpenBSD.
+This guide describes how to build pyrrhad and command-line utilities on OpenBSD.
 
 As OpenBSD is most common as a server OS, we will not bother with the GUI.
 
@@ -41,7 +41,7 @@ As your normal (non root) user, go through the steps below
 ### Fetch the code
 
 ```bash
-git clone https://gitlab.com/nexa/nexa.git Pyrrha
+git clone https://gitlab.com/pyrrha/pyrrha.git Pyrrha
 cd Pyrrha/
 ```
 
@@ -67,7 +67,7 @@ While in the `Pyrrha` directory
 gmake # You may get an error with one of the tests.
 ```
 
-You will find the `nexad` binary in the `src/` folder.
+You will find the `pyrrhad` binary in the `src/` folder.
 
 
 ### To build with wallet
@@ -83,7 +83,7 @@ BerkeleyDB is only necessary for the wallet functionality. To skip this, pass `-
 To build Berkeley DB 5.3:
 
 ```bash
-# Pick some path to install BDB to, here we create a directory within the nexa directory
+# Pick some path to install BDB to, here we create a directory within the pyrrha directory
 BDB_PREFIX=$(pwd)/db4
 mkdir -p $BDB_PREFIX
 

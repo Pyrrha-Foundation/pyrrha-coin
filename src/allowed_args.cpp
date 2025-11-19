@@ -33,12 +33,12 @@
 #include "wallet/wallet.h"
 #endif
 
-// These globals are needed here so nexa-cli can link
+// These globals are needed here so pyrrha-cli can link
 const std::string CURRENCY_UNIT = "NEX";
 const std::string DEFAULT_TOR_CONTROL = "127.0.0.1:9051";
 const char DEFAULT_RPCCONNECT[] = "127.0.0.1";
 
-// Variables for traffic shaping.  Needed here so nexa-cli can link
+// Variables for traffic shaping.  Needed here so pyrrha-cli can link
 /** Default value for the maximum amount of data that can be received in a burst */
 const int64_t DEFAULT_MAX_RECV_BURST = std::numeric_limits<int64_t>::max();
 /** Default value for the maximum amount of data that can be sent in a burst */
@@ -70,8 +70,8 @@ bool upnpParamOptional = true;
 
 enum HelpMessageMode
 {
-    HMM_NEXAD,
-    HMM_NEXA_QT
+    HMM_PYRRHAD,
+    HMM_PYRRHA_QT
 };
 
 static const int screenWidth = 79;
@@ -148,7 +148,7 @@ void AllowedArgs::checkArg(const std::string &strArg, const std::string &strValu
     if (m_optional.count(strArg) && m_optional.at(strArg))
     {
         // Put a warning to stdout and in debug.log to notify the user that this parameter has no effect
-        // on the current session. TODO: use a warning dialog if running nexa-qt
+        // on the current session. TODO: use a warning dialog if running pyrrha-qt
         std::string str =
             strprintf(_("Option %s is not in effect due to missing feature disabled a compile time."), strArg);
         LOGA(str);
@@ -247,7 +247,7 @@ static void addChainSelectionOptions(AllowedArgs &allowedArgs)
         .addDebugArg("regtest", optionalBool,
             "Enter regression test mode, which uses a special chain in which blocks can be solved instantly. "
             "This is intended for regression testing tools and app development.")
-        .addArg("nexa", optionalBool, _("Use Nexa main chain"));
+        .addArg("pyrrha", optionalBool, _("Use Pyrrha main chain"));
 }
 
 static void addConfigurationLocationOptions(AllowedArgs &allowedArgs)
@@ -280,7 +280,7 @@ static void addGeneralOptions(AllowedArgs &allowedArgs, HelpMessageMode mode)
         .addDebugArg("dumpforks", optionalBool, _("Dump built-in fork deployment data in CSV format and exit"));
 
 #ifndef WIN32
-    if (mode == HMM_NEXAD)
+    if (mode == HMM_PYRRHAD)
         allowedArgs.addArg("daemon", optionalBool, _("Run in the background as a daemon and accept commands"));
 #endif
 
@@ -352,7 +352,7 @@ static void addConnectionOptions(AllowedArgs &allowedArgs)
         .addArg("port=<port>", requiredInt,
             strprintf(_("Listen for connections on <port> (default: %u, "
                         "testnet: %u, regtest: %u)"),
-                NEXA_PORT, NEXA_TESTNET_PORT, DEFAULT_REGTESTNET_PORT))
+                PYRRHA_PORT, PYRRHA_TESTNET_PORT, DEFAULT_REGTESTNET_PORT))
         .addArg("proxy=<ip:port>", requiredStr, _("Connect through SOCKS5 proxy"))
         .addArg("proxyrandomize", optionalBool,
             strprintf(
@@ -441,7 +441,7 @@ static void addWalletOptions(AllowedArgs &allowedArgs)
                 _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"),
             walletParamOptional)
         .addArg("usecashaddr", optionalBool,
-            _("Use Nexa Cash Address for destination encoding (Activates by default Jan 14, 2017)"),
+            _("Use Pyrrha Cash Address for destination encoding (Activates by default Jan 14, 2017)"),
             walletParamOptional);
 }
 #endif
@@ -467,7 +467,7 @@ static void addDebuggingOptions(AllowedArgs &allowedArgs, HelpMessageMode mode)
                                   "libevent, mempool, mempoolrej, miner, net, parallel, partitioncheck, "
                                   "proxy, prune, rand, reindex, req, rpc, selectcoins, thin, tor, wallet, zmq, "
                                   "graphene, respend, weakblocks";
-    if (mode == HMM_NEXA_QT)
+    if (mode == HMM_PYRRHA_QT)
         debugCategories += ", qt";
 
     allowedArgs.addHeader(_("Debugging/Testing options:"))
@@ -595,7 +595,7 @@ static void addRpcServerOptions(AllowedArgs &allowedArgs)
               "specified multiple times"))
         .addArg("rpcport=<port>", requiredInt,
             strprintf(_("Listen for JSON-RPC connections on <port> (default: %u, testnet: %u, regtest: %u)"),
-                BaseParams(CBaseChainParams::NEXA).RPCPort(), BaseParams(CBaseChainParams::TESTNET).RPCPort(),
+                BaseParams(CBaseChainParams::PYRRHA).RPCPort(), BaseParams(CBaseChainParams::TESTNET).RPCPort(),
                 BaseParams(CBaseChainParams::REGTEST).RPCPort()))
         .addArg("rpcallowip=<ip>", requiredStr,
             _("Allow JSON-RPC connections from specified source. Valid for <ip> are a single IP (e.g. 1.2.3.4), a "
@@ -607,7 +607,7 @@ static void addRpcServerOptions(AllowedArgs &allowedArgs)
             strprintf("Set the depth of the work queue to service RPC calls (default: %d)", DEFAULT_HTTP_WORKQUEUE))
         .addDebugArg("rpcservertimeout=<n>", requiredInt,
             strprintf("Timeout during HTTP requests (default: %d)", DEFAULT_HTTP_SERVER_TIMEOUT))
-        // Although a node does not use rpcconnect it must be allowed because NexaCli also uses the same config file
+        // Although a node does not use rpcconnect it must be allowed because PyrrhaCli also uses the same config file
         .addDebugArg("rpcconnect=<ip>", requiredStr,
             strprintf(_("Send commands to node running on <ip> (default: %s)"), DEFAULT_RPCCONNECT));
 }
@@ -634,7 +634,7 @@ static void addElectrumOptions(AllowedArgs &allowedArgs)
         .addDebugArg("electrum.exec", requiredStr, "Path to electrum daemon executable")
         .addDebugArg("electrum.monitoring.port", requiredStr, "Port to bind monitoring service")
         .addDebugArg("electrum.monitoring.host", requiredStr, "Host to bind monitoring service")
-        .addDebugArg("electrum.daemon.host", requiredStr, "Host for nexad rpc");
+        .addDebugArg("electrum.daemon.host", requiredStr, "Host for pyrrhad rpc");
 }
 
 static void addUiOptions(AllowedArgs &allowedArgs)
@@ -714,11 +714,11 @@ static void addAllNodeOptions(AllowedArgs &allowedArgs, HelpMessageMode mode, CT
     addElectrumOptions(allowedArgs);
     if (pTweaks)
         addTweaks(allowedArgs, pTweaks);
-    if (mode == HMM_NEXA_QT)
+    if (mode == HMM_PYRRHA_QT)
         addUiOptions(allowedArgs);
 }
 
-// nexa-cli does not know about tweaks so we have to silently ignore unknown options
+// pyrrha-cli does not know about tweaks so we have to silently ignore unknown options
 PyrrhaCli::PyrrhaCli() : AllowedArgs(true)
 {
     addHelpOptions(*this);
@@ -730,7 +730,7 @@ PyrrhaCli::PyrrhaCli() : AllowedArgs(true)
             strprintf(_("Send commands to node running on <ip> (default: %s)"), DEFAULT_RPCCONNECT))
         .addArg("rpcport=<port>", requiredInt,
             strprintf(_("Connect to JSON-RPC on <port> (default: %u, testnet: %u, regtest: %u)"),
-                BaseParams(CBaseChainParams::NEXA).RPCPort(), BaseParams(CBaseChainParams::TESTNET).RPCPort(),
+                BaseParams(CBaseChainParams::PYRRHA).RPCPort(), BaseParams(CBaseChainParams::TESTNET).RPCPort(),
                 BaseParams(CBaseChainParams::REGTEST).RPCPort()))
         .addArg("rpcwait", optionalBool, _("Wait for RPC server to start"))
         .addArg("rpcuser=<user>", requiredStr, _("Username for JSON-RPC connections"))
@@ -767,8 +767,8 @@ PyrrhaBench::PyrrhaBench() : AllowedArgs(true)
             strprintf("Plot height in pixel (default: %u)", DEFAULT_PLOT_HEIGHT));
 };
 
-Pyrrhad::Pyrrhad(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_NEXAD, pTweaks); }
-PyrrhaQt::PyrrhaQt(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_NEXA_QT, pTweaks); }
+Pyrrhad::Pyrrhad(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_PYRRHAD, pTweaks); }
+PyrrhaQt::PyrrhaQt(CTweakMap *pTweaks) : AllowedArgs(false) { addAllNodeOptions(*this, HMM_PYRRHA_QT, pTweaks); }
 PyrrhaTx::PyrrhaTx() : AllowedArgs(false)
 {
     addHelpOptions(*this);
@@ -778,13 +778,13 @@ PyrrhaTx::PyrrhaTx() : AllowedArgs(false)
         .addArg("create", optionalBool, _("Create new, empty TX."))
         .addArg("json", optionalBool, _("Select JSON output"))
         .addArg("txid", optionalBool, _("Output only the hex-encoded transaction id of the resultant transaction."))
-        .addDebugArg("", optionalBool, "Read hex-encoded Nexa transaction from stdin.");
+        .addDebugArg("", optionalBool, "Read hex-encoded Pyrrha transaction from stdin.");
 }
 
 ConfigFile::ConfigFile(CTweakMap *pTweaks) : AllowedArgs(false)
 {
-    // Merges all allowed args from NexaCli, Nexad, and NexaQt.
-    // Excludes args from NexaTx, because nexa-tx does not read
+    // Merges all allowed args from PyrrhaCli, Pyrrhad, and PyrrhaQt.
+    // Excludes args from PyrrhaTx, because pyrrha-tx does not read
     // from the config file. Does not set a help message, because the
     // program does not output a config file help message anywhere.
 
@@ -792,9 +792,9 @@ ConfigFile::ConfigFile(CTweakMap *pTweaks) : AllowedArgs(false)
     Pyrrhad pyrrhad(pTweaks);
     PyrrhaQt pyrrhaQt;
 
-    m_args.insert(nexaCli.getArgs().begin(), nexaCli.getArgs().end());
-    m_args.insert(nexad.getArgs().begin(), nexad.getArgs().end());
-    m_args.insert(nexaQt.getArgs().begin(), nexaQt.getArgs().end());
+    m_args.insert(pyrrhaCli.getArgs().begin(), pyrrhaCli.getArgs().end());
+    m_args.insert(pyrrhad.getArgs().begin(), pyrrhad.getArgs().end());
+    m_args.insert(pyrrhaQt.getArgs().begin(), pyrrhaQt.getArgs().end());
 }
 
 } // namespace AllowedArgs

@@ -9,8 +9,8 @@
 #error This header can only be compiled as C++.
 #endif
 
-#ifndef NEXA_PROTOCOL_H
-#define NEXA_PROTOCOL_H
+#ifndef PYRRHA_PROTOCOL_H
+#define PYRRHA_PROTOCOL_H
 
 #include "netbase.h"
 #include "serialize.h"
@@ -534,4 +534,4 @@ enum
     MSG_DOUBLESPENDPROOF = 7
 };
 
-#endif // NEXA_PROTOCOL_H
+#endif // PYRRHA_PROTOCOL_H

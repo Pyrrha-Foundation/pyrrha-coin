@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_UINT256_H
-#define NEXA_UINT256_H
+#ifndef PYRRHA_UINT256_H
+#define PYRRHA_UINT256_H
 
 #include "crypto/common.h"
 #include <assert.h>
@@ -126,7 +126,7 @@ public:
     uint160() {}
     uint160(const base_blob<160> &b) : base_blob<160>(b) {}
     explicit uint160(const std::vector<unsigned char> &vch) : base_blob<160>(vch) {}
-    //! Construct from a byte buffer by copying bytes directly.  Note that the caller must ensure that nexa is
+    //! Construct from a byte buffer by copying bytes directly.  Note that the caller must ensure that pyrrha is
     //  the proper size.
     explicit uint160(const uint8_t *vch) : base_blob<160>(vch) {}
 };
@@ -192,4 +192,4 @@ inline uint160 uint160S(const std::string &str)
     return rv;
 }
 
-#endif // NEXA_UINT256_H
+#endif // PYRRHA_UINT256_H

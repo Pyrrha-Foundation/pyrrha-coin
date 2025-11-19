@@ -5,7 +5,7 @@
 
 #include "streams.h"
 #include "support/allocators/zeroafterfree.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <boost/assert.hpp>
 #include <boost/test/unit_test.hpp>

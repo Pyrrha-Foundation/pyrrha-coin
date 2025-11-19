@@ -102,7 +102,7 @@ if "%BUILD_32_BIT%" NEQ "" (
 	REM The way the toolchain is installed, the \mingw32 subdirectory will always be created
 	set "TOOLCHAIN_BIN=%TOOL_CHAIN_ROOT%\mingw32\bin"
 	set "PATH_DEPS=%DEPS_ROOT%\x86"
-	set "BUILD_OUTPUT=%NEXA_GIT_ROOT%\build-output\x86"
+	set "BUILD_OUTPUT=%PYRRHA_GIT_ROOT%\build-output\x86"
 	
 	GOTO BUILD_START
 )
@@ -116,7 +116,7 @@ if "%BUILD_64_BIT%" NEQ "" (
 	REM The way the toolchain is installed, the \mingw64 subdirectory will always be created
 	set "TOOLCHAIN_BIN=%TOOL_CHAIN_ROOT%\mingw64\bin"
 	set "PATH_DEPS=%DEPS_ROOT%\x64"
-	set "BUILD_OUTPUT=%NEXA_GIT_ROOT%\build-output\x64"
+	set "BUILD_OUTPUT=%PYRRHA_GIT_ROOT%\build-output\x64"
 
 	set HAS_BUILT_64_BIT=TRUE
 	
@@ -138,8 +138,8 @@ if not exist "%TOOLCHAIN_BIN%\gcc.exe" (
 REM Set the path variable to contain the toolchain as well as MSYS bin directories
 set "PATH=%TOOLCHAIN_BIN%;%OLD_PATH%"
 
-%MSYS_SH% "%INST_DIR%\make-nexa.sh"
-REM Check to see if make-nexa.sh failed (possibly due to missing dependencies)
+%MSYS_SH% "%INST_DIR%\make-pyrrha.sh"
+REM Check to see if make-pyrrha.sh failed (possibly due to missing dependencies)
 if %errorlevel% neq 0 (
 	REM Assume that whatever caused the error also wrote an output so we
 	REM don't need to write an output here
@@ -147,20 +147,20 @@ if %errorlevel% neq 0 (
 	exit /b %errorlevel%
 )
 
-echo Saving nexa executables to %BUILD_OUTPUT%
+echo Saving pyrrha executables to %BUILD_OUTPUT%
 REM Make sure output directory exists
 mkdir "%BUILD_OUTPUT%\"
 
-REM cd to src to copy nexa-tx.exe, nexa-cli.exe, and nexad.exe
-cd "%NEXA_GIT_ROOT%\src"
-copy nexa-tx.exe "%BUILD_OUTPUT%\nexa-tx.exe"
-copy nexa-cli.exe "%BUILD_OUTPUT%\nexa-cli.exe"
-copy nexad.exe "%BUILD_OUTPUT%\nexad.exe"
-copy nexa-miner.exe "%BUILD_OUTPUT%\nexa-miner.exe"
+REM cd to src to copy pyrrha-tx.exe, pyrrha-cli.exe, and pyrrhad.exe
+cd "%PYRRHA_GIT_ROOT%\src"
+copy pyrrha-tx.exe "%BUILD_OUTPUT%\pyrrha-tx.exe"
+copy pyrrha-cli.exe "%BUILD_OUTPUT%\pyrrha-cli.exe"
+copy pyrrhad.exe "%BUILD_OUTPUT%\pyrrhad.exe"
+copy pyrrha-miner.exe "%BUILD_OUTPUT%\pyrrha-miner.exe"
 
-REM cd to src\qt to copy nexa-qt.exe
+REM cd to src\qt to copy pyrrha-qt.exe
 cd qt
-copy nexa-qt.exe "%BUILD_OUTPUT%\nexa-qt.exe"
+copy pyrrha-qt.exe "%BUILD_OUTPUT%\pyrrha-qt.exe"
 
 REM Go to the 64-bit build section (in case we are building both 32 and 64 bit)
 GOTO BUILD_START_64

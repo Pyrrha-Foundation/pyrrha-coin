@@ -10,7 +10,7 @@
 #include "script/interpreter.h"
 #include "script/script.h"
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <boost/test/unit_test.hpp>
 

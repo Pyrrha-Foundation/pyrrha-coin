@@ -1,4 +1,4 @@
-# TOR SUPPORT IN NEXA
+# TOR SUPPORT IN PYRRHA
 
 It is possible to run Pyrrha as a Tor hidden service, and connect to such services.
 
@@ -6,7 +6,7 @@ The following directions assume you have a Tor proxy running on port 9050. Many 
 configure Tor.
 
 
-## Run nexa behind a Tor proxy
+## Run pyrrha behind a Tor proxy
 
 The first step is running Pyrrha behind a Tor proxy. This will already make all
 outgoing connections be anonymized, but more is possible.
@@ -29,26 +29,26 @@ outgoing connections be anonymized, but more is possible.
 
 In a typical situation, this suffices to run behind a Tor proxy:
 
-	./nexa -proxy=127.0.0.1:9050
+	./pyrrha -proxy=127.0.0.1:9050
 
 
-## Run a nexa hidden server
+## Run a pyrrha hidden server
 
 If you configure your Tor system accordingly, it is possible to make your node also
 reachable from the Tor network. Add these lines to your /etc/tor/torrc (or equivalent
 config file):
 
-	HiddenServiceDir /var/lib/tor/nexa-service/
+	HiddenServiceDir /var/lib/tor/pyrrha-service/
 	HiddenServicePort 8333 127.0.0.1:8333
 	HiddenServicePort 18333 127.0.0.1:18333
 
 The directory can be different of course, but (both) port numbers should be equal to
-your nexad's P2P listen port (8333 by default).
+your pyrrhad's P2P listen port (8333 by default).
 
-	-externalip=X   You can tell nexa about its publicly reachable address using
+	-externalip=X   You can tell pyrrha about its publicly reachable address using
 	                this option, and this can be a .onion address. Given the above
 	                configuration, you can find your onion address in
-	                /var/lib/tor/nexa-service/hostname. Onion addresses are given
+	                /var/lib/tor/pyrrha-service/hostname. Onion addresses are given
 	                preference for your node to advertise itself with, for connections
 	                coming from unroutable addresses (such as 127.0.0.1, where the
 	                Tor proxy typically runs).
@@ -65,25 +65,25 @@ your nexad's P2P listen port (8333 by default).
 
 In a typical situation, where you're only reachable via Tor, this should suffice:
 
-	./nexad -proxy=127.0.0.1:9050 -externalip=57qr3yd1nyntf5k.onion -listen
+	./pyrrhad -proxy=127.0.0.1:9050 -externalip=57qr3yd1nyntf5k.onion -listen
 
 (obviously, replace the Onion address with your own). It should be noted that you still
 listen on all devices and another node could establish a clearnet connection, when knowing
 your address. To mitigate this, additionally bind the address of your Tor proxy:
 
-	./nexad ... -bind=127.0.0.1
+	./pyrrhad ... -bind=127.0.0.1
 
 If you don't care too much about hiding your node, and want to be reachable on IPv4
 as well, use `discover` instead:
 
-	./nexad ... -discover
+	./pyrrhad ... -discover
 
 and open port 8333 on your firewall (or use -upnp).
 
 If you only want to use Tor to reach onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
 
-	./nexa -onion=127.0.0.1:9050 -externalip=57qr3yd1nyntf5k.onion -discover
+	./pyrrha -onion=127.0.0.1:9050 -externalip=57qr3yd1nyntf5k.onion -discover
 
 ## Automatically listen on Tor
 
@@ -103,7 +103,7 @@ information, pass `-debug=tor`.
 
 In more practical way this what you need to do to actually setting tor to operate
 in this new configuration. Firstly you need to be sure that the user under which
-nexad is going to be executed has write permission on tor system directories
+pyrrhad is going to be executed has write permission on tor system directories
 (e.g. /var/run/tor/control.authcookie). On Debian and Ubuntu system add such user
 to the `debian-tor` group should be enough (i.e. `sudo adduser $USER debian-tor`)
 
@@ -121,7 +121,7 @@ Next you have to restart the Tor service:
 
 	sudo service tor restart
 
-Add these lines to your `nexa.conf` file
+Add these lines to your `pyrrha.conf` file
 
 	proxy=127.0.0.1:9050
 	listen=1
@@ -133,7 +133,7 @@ Add these lines to your `nexa.conf` file
 
 Then issue this command to get the url of your onion hidden service
 
-	nexa-cli getnetworkinfo | grep -w addr
+	pyrrha-cli getnetworkinfo | grep -w addr
 
 you should get an output like this one
 
@@ -145,16 +145,16 @@ reachable.
 If you want to leverage the nature of tor and stop a DDoS attack to your
 node, firstly stop your node:
 
-	nexa-cli stop
+	pyrrha-cli stop
 
-Remove your peer file and tor private key from nexa data directory
+Remove your peer file and tor private key from pyrrha data directory
 
-	cd ~/.nexa
+	cd ~/.pyrrha
 	rm onion_private_key
 	rm peers.dat
 
 Removing the `onion_private_key` serves the aim of having a new onion URL for
-your nexa node, in such a way your attacker won't be able to harm you
+your pyrrha node, in such a way your attacker won't be able to harm you
 again in the near term cause the prev URL is not valid any more.
 
 Removing `peer.dat` will let you fetch a bunch of new peers from the seeder
@@ -165,4 +165,4 @@ the onion private key file.
 
 Restart your node:
 
-	nexad -daemon
+	pyrrhad -daemon

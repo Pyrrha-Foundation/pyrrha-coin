@@ -505,8 +505,8 @@ UniValue setaccount(const UniValue &params, bool fHelp)
             "1. \"address\"  (string, required) The address to be associated with an account.\n"
             "2. \"account\"         (string, required) The account to assign the address to.\n"
             "\nExamples:\n" +
-            HelpExampleCli("setaccount", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" \"tabby\"") +
-            HelpExampleRpc("setaccount", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", \"tabby\""));
+            HelpExampleCli("setaccount", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" \"tabby\"") +
+            HelpExampleRpc("setaccount", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", \"tabby\""));
 
     LOCK(pwalletMain->cs_wallet);
 
@@ -552,8 +552,8 @@ UniValue getaccount(const UniValue &params, bool fHelp)
                             "\nResult:\n"
                             "\"accountname\"        (string) the account address\n"
                             "\nExamples:\n" +
-                            HelpExampleCli("getaccount", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\"") +
-                            HelpExampleRpc("getaccount", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\""));
+                            HelpExampleCli("getaccount", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\"") +
+                            HelpExampleRpc("getaccount", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\""));
 
     LOCK(pwalletMain->cs_wallet);
 
@@ -670,13 +670,13 @@ UniValue sendtoaddress(const UniValue &params, bool fHelp)
             "\nResult:\n"
             "\"txidem\"  (string) The txidem.\n"
             "\nExamples:\n" +
-            HelpExampleCli("sendtoaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.81") +
+            HelpExampleCli("sendtoaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.81") +
             HelpExampleCli("sendtoaddress",
-                "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.81 \"donation\" \"seans outpost\"") +
+                "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.81 \"donation\" \"seans outpost\"") +
             HelpExampleCli(
-                "sendtoaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.81 \"\" \"\" true") +
+                "sendtoaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.81 \"\" \"\" true") +
             HelpExampleRpc("sendtoaddress",
-                "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", 10.81, \"donation\", \"seans outpost\""));
+                "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", 10.81, \"donation\", \"seans outpost\""));
 
     CTxDestination dest = DecodeDestination(params[0].get_str());
     if (!IsValidDestination(dest))
@@ -844,12 +844,12 @@ UniValue signmessage(const UniValue &params, bool fHelp)
             "\nExamples:\n"
             "\nUnlock the wallet for 30 seconds\n" +
             HelpExampleCli("walletpassphrase", "\"mypassphrase\" 30") + "\nCreate the signature\n" +
-            HelpExampleCli("signmessage", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" \"my message\"") +
+            HelpExampleCli("signmessage", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" \"my message\"") +
             "\nVerify the signature\n" +
             HelpExampleCli(
-                "verifymessage", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" \"signature\" \"my message\"") +
+                "verifymessage", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" \"signature\" \"my message\"") +
             "\nAs json rpc\n" +
-            HelpExampleRpc("signmessage", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", \"my message\""));
+            HelpExampleRpc("signmessage", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", \"my message\""));
 
 
     UniValue signature;
@@ -890,11 +890,11 @@ UniValue signdata(const UniValue &params, bool fHelp)
             "\nUnlock the wallet for 30 seconds\n" +
             HelpExampleCli("walletpassphrase", "\"mypassphrase\" 30") + "\nCreate the signature\n" +
             HelpExampleCli(
-                "signdata", "\"nexa:qq5lslagrktm5qtxfw4ltpd5krehhrh595fc04hv0k\" \"string\" \"my message\"") +
-            HelpExampleCli("signdata", "\"nexa:qq5lslagrktm5qtxfw4ltpd5krehhrh595fc04hv0k\" \"hex\" \"01020304\"") +
+                "signdata", "\"pyrrha:qq5lslagrktm5qtxfw4ltpd5krehhrh595fc04hv0k\" \"string\" \"my message\"") +
+            HelpExampleCli("signdata", "\"pyrrha:qq5lslagrktm5qtxfw4ltpd5krehhrh595fc04hv0k\" \"hex\" \"01020304\"") +
             "\nAs json rpc\n" +
             HelpExampleRpc(
-                "signdata", "\"nexa:qq5lslagrktm5qtxfw4ltpd5krehhrh595fc04hv0k\", \"string\", \"my message\""));
+                "signdata", "\"pyrrha:qq5lslagrktm5qtxfw4ltpd5krehhrh595fc04hv0k\", \"string\", \"my message\""));
 
     LOCK(pwalletMain->cs_wallet);
 
@@ -934,7 +934,7 @@ UniValue signdata(const UniValue &params, bool fHelp)
         if (strMessage.size() != 2 * sizeof(uint256))
             throw JSONRPCError(RPC_TYPE_ERROR, "Message is not a hex hash");
         hash.SetHex(strMessage);
-        // nexad reads hashes backwards.  By reversing here, we ensure that
+        // pyrrhad reads hashes backwards.  By reversing here, we ensure that
         // signdata(addr, "string", "foo") == signdata(addr, "hash", normalSHA256("foo"))
         hash.reverse();
     }
@@ -980,13 +980,13 @@ UniValue getreceivedbyaddress(const UniValue &params, bool fHelp)
             " received at this address.\n"
             "\nExamples:\n"
             "\nThe amount from transactions with at least 1 confirmation\n" +
-            HelpExampleCli("getreceivedbyaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\"") +
+            HelpExampleCli("getreceivedbyaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\"") +
             "\nThe amount including unconfirmed transactions, zero confirmations\n" +
-            HelpExampleCli("getreceivedbyaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 0") +
+            HelpExampleCli("getreceivedbyaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 0") +
             "\nThe amount with at least 6 confirmation, very safe\n" +
-            HelpExampleCli("getreceivedbyaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 6") +
+            HelpExampleCli("getreceivedbyaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 6") +
             "\nAs a json rpc call\n" +
-            HelpExampleRpc("getreceivedbyaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", 6"));
+            HelpExampleRpc("getreceivedbyaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", 6"));
 
     LOCK(pwalletMain->cs_wallet);
 
@@ -1349,12 +1349,12 @@ UniValue sendfrom(const UniValue &params, bool fHelp)
             "\nExamples:\n"
             "\nSend 0.01 " +
             CURRENCY_UNIT + " from the default account to the address, must have at least 1 confirmation\n" +
-            HelpExampleCli("sendfrom", "\"\" \"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.01") +
+            HelpExampleCli("sendfrom", "\"\" \"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.01") +
             "\nSend 10.01 from the tabby account to the given address, funds must have at least 6 confirmations\n" +
-            HelpExampleCli("sendfrom", "\"tabby\" \"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.01 6 "
+            HelpExampleCli("sendfrom", "\"tabby\" \"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 10.01 6 "
                                        "\"donation\" \"seans outpost\"") +
             "\nAs a json rpc call\n" +
-            HelpExampleRpc("sendfrom", "\"tabby\", \"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", 10.01, 6, "
+            HelpExampleRpc("sendfrom", "\"tabby\", \"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\", 10.01, 6, "
                                        "\"donation\", \"seans outpost\""));
 
     std::string strAccount = AccountFromValue(params[0]);
@@ -1434,25 +1434,25 @@ UniValue sendmany(const UniValue &params, bool fHelp)
             "\nExamples:\n"
             "\nSend two amounts to two different addresses:\n" +
             HelpExampleCli("sendmany", "\"\" "
-                                       "\"{\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,"
-                                       "\\\"nexa:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\"") +
+                                       "\"{\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,"
+                                       "\\\"pyrrha:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\"") +
             "\nSend two amounts to two different addresses setting the confirmation and comment:\n" +
             HelpExampleCli("sendmany",
                 "\"\" "
-                "\"{\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,"
-                "\\\"nexa:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\" 6 \"testing\"") +
+                "\"{\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,"
+                "\\\"pyrrha:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\" 6 \"testing\"") +
             "\nSend two amounts to two different addresses, subtract fee from amount:\n" +
             HelpExampleCli("sendmany", "\"\" "
-                                       "\"{\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,\\\"nexa:"
+                                       "\"{\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,\\\"pyrrha:"
                                        "qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\" "
                                        "1 \"\" "
-                                       "\"[\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\",\\\"nexa:"
+                                       "\"[\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\",\\\"pyrrha:"
                                        "qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\"]\"") +
             "\nAs a json rpc call\n" +
             HelpExampleRpc("sendmany",
                 "\"\", "
-                "\"{\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,"
-                "\\\"nexa:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\", 6, \"testing\""));
+                "\"{\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\":10.01,"
+                "\\\"pyrrha:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\":10.02}\", 6, \"testing\""));
 
     string strAccount = AccountFromValue(params[0]);
     UniValue sendTo = params[1].get_obj();
@@ -1569,11 +1569,11 @@ UniValue addmultisigaddress(const UniValue &params, bool fHelp)
             "\nExamples:\n"
             "\nAdd a multisig address from 2 addresses\n" +
             HelpExampleCli("addmultisigaddress", "2 "
-                                                 "\"[\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\",\\\"nexa:"
+                                                 "\"[\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\",\\\"pyrrha:"
                                                  "qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\"]\"") +
             "\nAs json rpc call\n" +
             HelpExampleRpc("addmultisigaddress", "2, "
-                                                 "\"[\\\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\",\\\"nexa:"
+                                                 "\"[\\\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\\\",\\\"pyrrha:"
                                                  "qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\"]\"");
         throw runtime_error(msg);
     }
@@ -2739,7 +2739,7 @@ UniValue walletlock(const UniValue &params, bool fHelp)
             "\nSet the passphrase for 2 minutes to perform a transaction\n" +
             HelpExampleCli("walletpassphrase", "\"my pass phrase\" 120") +
             "\nPerform a send (requires passphrase set)\n" +
-            HelpExampleCli("sendtoaddress", "\"nexa:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 1.01") +
+            HelpExampleCli("sendtoaddress", "\"pyrrha:qpnfq7r98lkm2h7jksy0h5mqpwvttxlc3q6zkwmcha\" 1.01") +
             "\nClear the passphrase since we are done before 2 minutes is up\n" + HelpExampleCli("walletlock", "") +
             "\nAs json rpc call\n" + HelpExampleRpc("walletlock", ""));
 
@@ -3109,10 +3109,10 @@ UniValue listunspent(const UniValue &params, bool fHelp)
             "\nExamples\n" +
             HelpExampleCli("listunspent", "") +
             HelpExampleCli("listunspent", "6 9999999 "
-                                          "\"[\\\"nexa:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\","
+                                          "\"[\\\"pyrrha:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\","
                                           "\\\"1LtvqCaApEdUGFkpKMM4MstjcaL4dKg8SP\\\"]\"") +
             HelpExampleRpc("listunspent", "6, 9999999 "
-                                          "\"[\\\"nexa:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\","
+                                          "\"[\\\"pyrrha:qqqdf524crwrn659hattd40jn5ykz32xey7z6n5z28\\\","
                                           "\\\"1LtvqCaApEdUGFkpKMM4MstjcaL4dKg8SP\\\"]\""));
 
     RPCTypeCheck(params, {UniValue::VNUM, UniValue::VNUM, UniValue::VARR});

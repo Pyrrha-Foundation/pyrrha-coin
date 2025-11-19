@@ -11,7 +11,7 @@
 #include "dstencode.h"
 #include "guiconstants.h"
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "optionsmodel.h"
 #include "walletmodel.h"
 
@@ -23,7 +23,7 @@
 #include <QPixmap>
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h" /* for USE_QRCODE */
+#include "pyrrha-config.h" /* for USE_QRCODE */
 #endif
 
 #ifdef USE_QRCODE

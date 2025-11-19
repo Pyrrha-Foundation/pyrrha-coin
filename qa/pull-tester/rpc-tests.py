@@ -70,8 +70,8 @@ CORE_ANALYSIS_SCRIPT = SRCDIR + '/contrib/devtools/coreanalysis.gdb'
 #If imported values are not defined then set to zero (or disabled)
 if 'ENABLE_WALLET' not in vars():
     ENABLE_WALLET=0
-if 'ENABLE_NEXAD' not in vars():
-    ENABLE_NEXAD=0
+if 'ENABLE_PYRRHAD' not in vars():
+    ENABLE_PYRRHAD=0
 if 'ENABLE_UTILS' not in vars():
     ENABLE_UTILS=0
 if 'ENABLE_ZMQ' not in vars():
@@ -168,18 +168,18 @@ for o in opts | double_opts:
             sys.exit(1)
 
 #Set env vars
-if "NEXAD" not in os.environ:
-    os.environ["NEXAD"] = BUILDDIR + '/src/nexad' + EXEEXT
-if "NEXACLI" not in os.environ:
-    os.environ["NEXACLI"] = BUILDDIR + '/src/nexa-cli' + EXEEXT
+if "PYRRHAD" not in os.environ:
+    os.environ["PYRRHAD"] = BUILDDIR + '/src/pyrrhad' + EXEEXT
+if "PYRRHACLI" not in os.environ:
+    os.environ["PYRRHACLI"] = BUILDDIR + '/src/pyrrha-cli' + EXEEXT
 
 #Disable Windows tests by default
 if EXEEXT == ".exe" and not option_passed('win'):
     print("Win tests currently disabled.  Use -win option to enable")
     sys.exit(0)
 
-if not (ENABLE_WALLET == 1 and ENABLE_UTILS == 1 and ENABLE_NEXAD == 1):
-    print("No rpc tests to run. Wallet, utils, and nexad must all be enabled")
+if not (ENABLE_WALLET == 1 and ENABLE_UTILS == 1 and ENABLE_PYRRHAD == 1):
+    print("No rpc tests to run. Wallet, utils, and pyrrhad must all be enabled")
     sys.exit(0)
 
 # python3-zmq may not be installed. Handle this gracefully and with some helpful info
@@ -348,7 +348,7 @@ def runtests():
         coverage = RPCCoverage()
         print("Initializing coverage directory at %s\n" % coverage.dir)
 
-    if(ENABLE_WALLET == 1 and ENABLE_UTILS == 1 and ENABLE_NEXAD == 1):
+    if(ENABLE_WALLET == 1 and ENABLE_UTILS == 1 and ENABLE_PYRRHAD == 1):
         rpcTestDir = RPC_TESTS_DIR
         buildDir   = BUILDDIR
         run_extended = option_passed('extended') or run_only_extended
@@ -482,7 +482,7 @@ def runtests():
         sys.exit(not all_passed)
 
     else:
-        print("No rpc tests to run. Wallet, utils, and nexad must all be enabled")
+        print("No rpc tests to run. Wallet, utils, and pyrrhad must all be enabled")
 
 class RPCTestHandler:
     """
@@ -495,7 +495,7 @@ class RPCTestHandler:
         self.test_list = test_list
         self.flags = flags
         self.num_running = 0
-        # In case there is a graveyard of zombie nexads, we can apply a
+        # In case there is a graveyard of zombie pyrrhads, we can apply a
         # pseudorandom offset to hopefully jump over them.
         # 3750 is PORT_RANGE/MAX_NODES defined in util, but awkward to import into rpc-test.py
         self.portseed_offset = int(time.time() * 1000) % 3750
@@ -597,12 +597,12 @@ class RPCTestHandler:
                         for core in cores:
                             print("Trying to analyze core file: " + str(core))
                             fullCoreFile = os.path.join(coreDir, core)
-                            nexadBin = os.environ["NEXAD"]
-                            path, fil = os.path.split(nexadBin)
+                            pyrrhadBin = os.environ["PYRRHAD"]
+                            path, fil = os.path.split(pyrrhadBin)
                             if os.path.isfile(CORE_ANALYSIS_SCRIPT):
-                                popenList = ["gdb", "-core", fullCoreFile, nexadBin, "-x", CORE_ANALYSIS_SCRIPT, "-batch"]
+                                popenList = ["gdb", "-core", fullCoreFile, pyrrhadBin, "-x", CORE_ANALYSIS_SCRIPT, "-batch"]
                             else:
-                                popenList = ["gdb", "-core", fullCoreFile, nexadBin, "-ex", "thread apply all bt", "-ex", "set pagination 0", "-batch"]
+                                popenList = ["gdb", "-core", fullCoreFile, pyrrhadBin, "-ex", "thread apply all bt", "-ex", "set pagination 0", "-batch"]
                             gdb = subprocess.Popen(popenList, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             (out, err) = gdb.communicate(None, 60)
                             fold_start = ("\ntravis_fold:start:%s\nCore dump analysis\n" % core) if inTravis() else ""
@@ -651,7 +651,7 @@ class RPCCoverage(object):
     Coverage calculation works by having each test script subprocess write
     coverage files into a particular directory. These files contain the RPC
     commands invoked during testing, as well as a complete listing of RPC
-    commands per `nexa-cli help` (`rpc_interface.txt`).
+    commands per `pyrrha-cli help` (`rpc_interface.txt`).
 
     After all tests complete, the commands run are combined and diff'd against
     the complete list to calculate uncovered RPC commands.

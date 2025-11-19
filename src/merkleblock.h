@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_MERKLEBLOCK_H
-#define NEXA_MERKLEBLOCK_H
+#ifndef PYRRHA_MERKLEBLOCK_H
+#define PYRRHA_MERKLEBLOCK_H
 
 #include "bloom.h"
 #include "primitives/block.h"
@@ -166,4 +166,4 @@ public:
     }
 };
 
-#endif // NEXA_MERKLEBLOCK_H
+#endif // PYRRHA_MERKLEBLOCK_H

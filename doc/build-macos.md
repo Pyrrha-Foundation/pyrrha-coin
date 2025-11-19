@@ -33,7 +33,7 @@ NOTE: Must build with QT 5.9 or higher. Building with Qt4 is not supported.
 
 1. Clone the Pyrrha source code and cd into `Pyrrha`
     ```bash
-    git clone https://gitlab.com/nexa/nexa.git Pyrrha
+    git clone https://gitlab.com/pyrrha/pyrrha.git Pyrrha
     cd Pyrrha/
     ```
 
@@ -63,17 +63,17 @@ NOTE: Must build with QT 5.9 or higher. Building with Qt4 is not supported.
 
 ## Running
 
-Pyrrha is now available at `./src/nexad`
+Pyrrha is now available at `./src/pyrrhad`
 
 Before running, it's recommended you create an RPC configuration file.
 
 ```bash
-echo -e "rpcuser=nexarpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Pyrrha/nexa.conf"
+echo -e "rpcuser=pyrrharpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Pyrrha/pyrrha.conf"
 
-chmod 600 "/Users/${USER}/Library/Application Support/Pyrrha/nexa.conf"
+chmod 600 "/Users/${USER}/Library/Application Support/Pyrrha/pyrrha.conf"
 ```
 
-The first time you run nexad, it will start downloading the blockchain. This process could take several hours.
+The first time you run pyrrhad, it will start downloading the blockchain. This process could take several hours.
 
 You can monitor the download process by looking at the debug.log file:
 
@@ -84,9 +84,9 @@ tail -f $HOME/Library/Application\ Support/Pyrrha/debug.log
 ## Other commands:
 
 ```bash
-./src/nexad -daemon # Starts the Pyrrha daemon.
-./src/nexa-cli --help # Outputs a list of command-line options.
-./src/nexa-cli help # Outputs a list of RPC commands when the daemon is running.
+./src/pyrrhad -daemon # Starts the Pyrrha daemon.
+./src/pyrrha-cli --help # Outputs a list of command-line options.
+./src/pyrrha-cli help # Outputs a list of RPC commands when the daemon is running.
 ```
 
 ## Using Qt Creator as IDE
@@ -98,7 +98,7 @@ Uncheck everything except Qt Creator during the installation process.
 1. Make sure you installed everything through Homebrew mentioned above
 2. Do a proper `./configure --enable-debug`
 3. In Qt Creator do "New Project" -> Import Project -> Import Existing Project
-4. Enter "nexa-qt" as project name, enter src/qt as location
+4. Enter "pyrrha-qt" as project name, enter src/qt as location
 5. Leave the file selection as it is
 6. Confirm the "summary page"
 7. In the "Projects" tab select "Manage Kits..."

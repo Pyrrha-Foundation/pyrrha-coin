@@ -3,9 +3,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "qt/test/nexaaddressvalidatortests.h"
+#include "qt/test/pyrrhaaddressvalidatortests.h"
 #include "chainparams.h"
-#include "qt/nexaaddressvalidator.h"
+#include "qt/pyrrhaaddressvalidator.h"
 #include <QValidator>
 
 void BitcoinAddressValidatorTests::inputTests() {

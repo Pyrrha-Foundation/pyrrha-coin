@@ -17,7 +17,7 @@ static const struct
     const char *titleAddText;
 } network_styles[] = {{"main", QAPP_APP_NAME, 0, 0, "Pyrrha"},
     {"testnet", QAPP_APP_NAME_TESTNET, 70, 30, QT_TRANSLATE_NOOP("SplashScreen", "[testnet]")},
-    {"nexa", QAPP_APP_NAME, 0, 0, QT_TRANSLATE_NOOP("SplashScreen", "")}, // BU
+    {"pyrrha", QAPP_APP_NAME, 0, 0, QT_TRANSLATE_NOOP("SplashScreen", "")}, // BU
     {"regtest", QAPP_APP_NAME_REGTEST, 160, 30, "[regtest]"}};
 static const unsigned network_styles_count = sizeof(network_styles) / sizeof(*network_styles);
 
@@ -29,7 +29,7 @@ NetworkStyle::NetworkStyle(const QString &_appName,
     : appName(_appName), titleAddText(qApp->translate("SplashScreen", _titleAddText))
 {
     // load pixmap
-    QPixmap pixmap(":/icons/nexa");
+    QPixmap pixmap(":/icons/pyrrha");
 
     if (iconColorHueShift != 0 && iconColorSaturationReduction != 0)
     {

@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SCRIPT_INTERPRETER_H
-#define NEXA_SCRIPT_INTERPRETER_H
+#ifndef PYRRHA_SCRIPT_INTERPRETER_H
+#define PYRRHA_SCRIPT_INTERPRETER_H
 
 #include "consensus/grouptokens.h"
 #include "primitives/transaction.h"
@@ -25,7 +25,7 @@ class uint256;
 /** Signature types */
 enum
 {
-    // Removed in Nexa: SIGTYPE_ECDSA = 0,
+    // Removed in Pyrrha: SIGTYPE_ECDSA = 0,
     SIGTYPE_SCHNORR = 1,
 };
 
@@ -606,4 +606,4 @@ ScriptError EvalPushTxState(const VchType &specifier, const ScriptImportedState 
 extern uint64_t maxSatoScriptOps;
 extern uint64_t maxScriptTemplateOps;
 
-#endif // NEXA_SCRIPT_INTERPRETER_H
+#endif // PYRRHA_SCRIPT_INTERPRETER_H

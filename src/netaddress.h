@@ -3,15 +3,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_NETADDRESS_H
-#define NEXA_NETADDRESS_H
+#ifndef PYRRHA_NETADDRESS_H
+#define PYRRHA_NETADDRESS_H
 
 #include <stdint.h>
 #include <string>
 #include <vector>
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "compat.h" // socklen_t

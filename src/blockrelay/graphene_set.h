@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_GRAPHENE_SET_H
-#define NEXA_GRAPHENE_SET_H
+#ifndef PYRRHA_GRAPHENE_SET_H
+#define PYRRHA_GRAPHENE_SET_H
 
 #include "bloom.h"
 #include "fastfilter.h"
@@ -311,4 +311,4 @@ public:
     }
 };
 
-#endif // NEXA_GRAPHENE_SET_H
+#endif // PYRRHA_GRAPHENE_SET_H

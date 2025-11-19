@@ -14,7 +14,7 @@
 #include "script/sighashtype.h"
 #include "script/sign.h"
 #include "test/scriptflags.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "test/testutil.h"
 #include "unlimited.h"
 #include "util.h"
@@ -555,7 +555,7 @@ public:
             spendTx.vin[0].amount = amount;
         }
         uint256 hash;
-        SignatureHashNexa(script, CTransaction(spendTx), 0, sigHashType, hash, nullptr);
+        SignatureHashPyrrha(script, CTransaction(spendTx), 0, sigHashType, hash, nullptr);
         if (amount != -1) // put it back to the original value
         {
             spendTx.vin[0].amount = origAmount;

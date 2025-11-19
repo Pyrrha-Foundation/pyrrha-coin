@@ -2,12 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_BITNODES_H
-#define NEXA_BITNODES_H
+#ifndef PYRRHA_BITNODES_H
+#define PYRRHA_BITNODES_H
 
 #include <string>
 #include <vector>
 
 bool GetLeaderboardFromBitnodes(std::vector<std::string> &vIPs);
 
-#endif // NEXA_BITNODES_H
+#endif // PYRRHA_BITNODES_H

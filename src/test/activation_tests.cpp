@@ -7,7 +7,7 @@
 #include <config.h>
 #include <validation/forks.h>
 
-#include <test/test_nexa.h>
+#include <test/test_pyrrha.h>
 
 #include <boost/test/unit_test.hpp>
 

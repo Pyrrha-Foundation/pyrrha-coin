@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_RPC_SERVER_H
-#define NEXA_RPC_SERVER_H
+#ifndef PYRRHA_RPC_SERVER_H
+#define PYRRHA_RPC_SERVER_H
 
 #include "amount.h"
 #include "rpc/protocol.h"
@@ -136,7 +136,7 @@ public:
 };
 
 /**
- * Nexa RPC command dispatcher.
+ * Pyrrha RPC command dispatcher.
  */
 class CRPCTable
 {
@@ -199,4 +199,4 @@ void InterruptRPC();
 void StopRPC();
 std::string JSONRPCExecBatch(const UniValue &vReq);
 
-#endif // NEXA_RPC_SERVER_H
+#endif // PYRRHA_RPC_SERVER_H

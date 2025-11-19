@@ -84,7 +84,7 @@ static const std::string docTxToJSON =
     "         \"groupQuantity\": n,       (numeric, optional) If grouped, the amount of tokens\n"
     "         \"groupAuthority\": n,      (numeric, optional) If an authority, the authority flags\n"
     "         \"addresses\" : [           (json array of string)\n"
-    "           \"nexaaddress\"           (string) nexa address\n"
+    "           \"pyrrhaaddress\"           (string) pyrrha address\n"
     "           ,...\n"
     "         ]\n"
     "       }\n"
@@ -833,7 +833,7 @@ UniValue createrawtransaction(const UniValue &params, bool fHelp)
             "     ]\n"
             "2. \"outputs\"             (string, required) a json object with outputs\n"
             "    {\n"
-            "      \"address\": x.xxx   (numeric or string, required) The key is the nexa address, the numeric "
+            "      \"address\": x.xxx   (numeric or string, required) The key is the pyrrha address, the numeric "
             "value (can be string) is the " +
             CURRENCY_UNIT +
             " amount\n"
@@ -934,7 +934,7 @@ UniValue createrawtransaction(const UniValue &params, bool fHelp)
             CTxDestination destination = DecodeDestination(name_);
             if (!IsValidDestination(destination))
             {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Nexa address: ") + name_);
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Pyrrha address: ") + name_);
             }
 
             if (!destinations.insert(destination).second)
@@ -993,7 +993,7 @@ UniValue decodescript(const UniValue &params, bool fHelp)
                             "  \"type\":\"type\", (string) The output type\n"
                             "  \"reqSigs\": n,    (numeric) The required signatures\n"
                             "  \"addresses\": [   (json array of string)\n"
-                            "     \"address\"     (string) nexa address\n"
+                            "     \"address\"     (string) pyrrha address\n"
                             "     ,...\n"
                             "  ],\n"
                             "  \"p2sh\",\"address\" (string) script address\n"

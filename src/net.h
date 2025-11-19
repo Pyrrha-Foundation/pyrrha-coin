@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_NET_H
-#define NEXA_NET_H
+#ifndef PYRRHA_NET_H
+#define PYRRHA_NET_H
 
 #include "banentry.h"
 #include "blockrelay/compactblock.h"
@@ -1106,4 +1106,4 @@ public:
 /** Return a timestamp in the future (in microseconds) for exponentially distributed events. */
 int64_t PoissonNextSend(int64_t nNow, int average_interval_seconds);
 
-#endif // NEXA_NET_H
+#endif // PYRRHA_NET_H

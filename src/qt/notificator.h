@@ -3,11 +3,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_NOTIFICATOR_H
-#define NEXA_QT_NOTIFICATOR_H
+#ifndef PYRRHA_QT_NOTIFICATOR_H
+#define PYRRHA_QT_NOTIFICATOR_H
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include <QIcon>
@@ -82,4 +82,4 @@ private:
 #endif
 };
 
-#endif // NEXA_QT_NOTIFICATOR_H
+#endif // PYRRHA_QT_NOTIFICATOR_H

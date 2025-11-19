@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_POLICY_POLICY_H
-#define NEXA_POLICY_POLICY_H
+#ifndef PYRRHA_POLICY_POLICY_H
+#define PYRRHA_POLICY_POLICY_H
 
 #include "consensus/consensus.h"
 #include "script/interpreter.h"
@@ -79,4 +79,4 @@ bool IsStandardTx(const CTransactionRef tx, std::string &reason);
  */
 bool AreInputsStandard(const CTransactionRef tx, const CCoinsViewCache &mapInputs);
 
-#endif // NEXA_POLICY_POLICY_H
+#endif // PYRRHA_POLICY_POLICY_H

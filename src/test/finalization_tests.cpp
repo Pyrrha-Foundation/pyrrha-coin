@@ -4,7 +4,7 @@
 
 #include "chainparams.h"
 #include "config.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "validation/validation.h"
 
 #include <boost/test/unit_test.hpp>

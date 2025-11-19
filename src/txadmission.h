@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_TXADMISSION_H
-#define NEXA_TXADMISSION_H
+#ifndef PYRRHA_TXADMISSION_H
+#define PYRRHA_TXADMISSION_H
 
 #include "fastfilter.h"
 #include "main.h"

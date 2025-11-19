@@ -370,7 +370,7 @@ uint256 SignatureHashBitcoinCash(const CScript &scriptCode,
     return sighash;
 }
 
-bool SignatureHashNexaComponents(const CTransaction &txTo,
+bool SignatureHashPyrrhaComponents(const CTransaction &txTo,
     unsigned int nIn,
     const SigHashType &sigHashType,
     uint256 &hashPrevouts,
@@ -452,7 +452,7 @@ bool SignatureHashNexaComponents(const CTransaction &txTo,
     return true;
 }
 
-bool SignatureHashNexa(const CScript &scriptCode,
+bool SignatureHashPyrrha(const CScript &scriptCode,
     const CTransaction &txTo,
     unsigned int nIn,
     const SigHashType &sigHashType,
@@ -468,14 +468,14 @@ bool SignatureHashNexa(const CScript &scriptCode,
     result = SIGNATURE_HASH_ERROR;
 
     // Calculate all needed portions of the sighash
-    if (!SignatureHashNexaComponents(txTo, nIn, sigHashType, hashPrevouts, hashSequence, hashInputAmounts, hashOutputs))
+    if (!SignatureHashPyrrhaComponents(txTo, nIn, sigHashType, hashPrevouts, hashSequence, hashInputAmounts, hashOutputs))
         return false;
 
-    return SignatureHashNexa(scriptCode, txTo.nVersion, txTo.nLockTime, sigHashType, hashPrevouts, hashSequence,
+    return SignatureHashPyrrha(scriptCode, txTo.nVersion, txTo.nLockTime, sigHashType, hashPrevouts, hashSequence,
         hashInputAmounts, hashOutputs, result, nHashedOut);
 }
 
-bool SignatureHashNexa(const CScript &scriptCode,
+bool SignatureHashPyrrha(const CScript &scriptCode,
     uint8_t txVersion,
     uint32_t txLockTime,
     const SigHashType &sigHashType,
@@ -527,7 +527,7 @@ uint256 SignatureHash(const CScript &scriptCode,
         return SIGNATURE_HASH_ERROR;
     }
     uint256 result;
-    if (!SignatureHashNexa(scriptCode, txTo, nIn, sigHashType, result, nHashedOut))
+    if (!SignatureHashPyrrha(scriptCode, txTo, nIn, sigHashType, result, nHashedOut))
         return SIGNATURE_HASH_ERROR;
     return result;
 }

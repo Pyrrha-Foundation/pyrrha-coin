@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_CLIENTMODEL_H
-#define NEXA_QT_CLIENTMODEL_H
+#ifndef PYRRHA_QT_CLIENTMODEL_H
+#define PYRRHA_QT_CLIENTMODEL_H
 
 #include "blockrelay/compactblock.h"
 #include "blockrelay/graphene.h"
@@ -143,4 +143,4 @@ public Q_SLOTS:
     void updateBanlist();
 };
 
-#endif // NEXA_QT_CLIENTMODEL_H
+#endif // PYRRHA_QT_CLIENTMODEL_H

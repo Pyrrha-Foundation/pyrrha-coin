@@ -7,8 +7,8 @@
 /**
  * Utilities for converting data from/to strings.
  */
-#ifndef NEXA_UTILSTRENCODINGS_H
-#define NEXA_UTILSTRENCODINGS_H
+#ifndef PYRRHA_UTILSTRENCODINGS_H
+#define PYRRHA_UTILSTRENCODINGS_H
 
 #include <numeric>
 #include <stdint.h>
@@ -184,4 +184,4 @@ bool ConvertBits(O &out, I it, I end)
  */
 std::string concatenateVector(std::vector<std::string> &strings, std::string separator);
 
-#endif // NEXA_UTILSTRENCODINGS_H
+#endif // PYRRHA_UTILSTRENCODINGS_H

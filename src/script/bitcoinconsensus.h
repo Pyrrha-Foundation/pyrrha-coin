@@ -4,11 +4,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SCRIPT_BITCOINCONSENSUS_H
-#define NEXA_SCRIPT_BITCOINCONSENSUS_H
+#ifndef PYRRHA_SCRIPT_BITCOINCONSENSUS_H
+#define PYRRHA_SCRIPT_BITCOINCONSENSUS_H
 
 #if defined(BUILD_BITCOIN_INTERNAL) && defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #if defined(_WIN32)
 #if defined(DLL_EXPORT)
 #if defined(HAVE_FUNC_ATTRIBUTE_DLLEXPORT)
@@ -20,7 +20,7 @@
 #elif defined(HAVE_FUNC_ATTRIBUTE_VISIBILITY)
 #define EXPORT_SYMBOL __attribute__((visibility("default")))
 #endif
-#elif defined(MSC_VER) && !defined(STATIC_LIBNEXACONSENSUS)
+#elif defined(MSC_VER) && !defined(STATIC_LIBPYRRHACONSENSUS)
 #define EXPORT_SYMBOL __declspec(dllimport)
 #endif
 
@@ -72,4 +72,4 @@ extern "C"
 
 #undef EXPORT_SYMBOL
 
-#endif // NEXA_SCRIPT_BITCOINCONSENSUS_H
+#endif // PYRRHA_SCRIPT_BITCOINCONSENSUS_H

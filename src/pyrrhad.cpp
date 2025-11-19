@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "chainparams.h"
@@ -34,9 +34,9 @@
  * \section intro_sec Introduction
  *
  * This is the developer documentation of Bitcoin Unlimited
- * (https://www.bitcoinunlimited.info/). nexad or nexa-qt are clients for the
- * digital currency called Nexa, which enables instant payments to anyone,
- * anywhere in the world. Nexa uses peer-to-peer technology to operate
+ * (https://www.bitcoinunlimited.info/). pyrrhad or pyrrha-qt are clients for the
+ * digital currency called Pyrrha, which enables instant payments to anyone,
+ * anywhere in the world. Pyrrha uses peer-to-peer technology to operate
  * with no central authority: managing transactions and issuing money are
  * carried out collectively by the network.
  *
@@ -75,7 +75,7 @@ bool AppInit(int argc, char *argv[])
     //
     // Parameters
     //
-    // If Qt is used, parameters/nexa.conf are parsed in qt/nexa.cpp's main()
+    // If Qt is used, parameters/pyrrha.conf are parsed in qt/pyrrha.cpp's main()
     AllowedArgs::Pyrrhad allowedArgs(&tweaks);
     try
     {
@@ -99,7 +99,7 @@ bool AppInit(int argc, char *argv[])
         }
         else
         {
-            strUsage += "\n" + _("Usage:") + "\n" + "  nexad [options]                     " +
+            strUsage += "\n" + _("Usage:") + "\n" + "  pyrrhad [options]                     " +
                         strprintf(_("Start %s Daemon"), _(PACKAGE_NAME)) + "\n";
 
             strUsage += "\n" + allowedArgs.helpMessage();
@@ -118,7 +118,7 @@ bool AppInit(int argc, char *argv[])
         ss << "\n" << FORKS_CSV_FILE_HEADER;
         ss << NetworkDeploymentInfoCSV(CBaseChainParams::TESTNET);
         ss << NetworkDeploymentInfoCSV(CBaseChainParams::REGTEST);
-        ss << NetworkDeploymentInfoCSV(CBaseChainParams::NEXA);
+        ss << NetworkDeploymentInfoCSV(CBaseChainParams::PYRRHA);
         std::cout << ss.str();
         return true;
     }
@@ -155,8 +155,8 @@ bool AppInit(int argc, char *argv[])
         bool fCommandLine = false;
         for (int i = 1; i < argc; i++)
         {
-            if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "nexa:") &&
-                !boost::algorithm::istarts_with(argv[i], "nexa:"))
+            if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "pyrrha:") &&
+                !boost::algorithm::istarts_with(argv[i], "pyrrha:"))
             {
                 fCommandLine = true;
                 break;
@@ -165,7 +165,7 @@ bool AppInit(int argc, char *argv[])
 
         if (fCommandLine)
         {
-            fprintf(stderr, "Error: There is no RPC client functionality in nexad anymore. Use the nexa-cli "
+            fprintf(stderr, "Error: There is no RPC client functionality in pyrrhad anymore. Use the pyrrha-cli "
                             "utility instead.\n");
             return false;
         }
@@ -173,7 +173,7 @@ bool AppInit(int argc, char *argv[])
         fDaemon = GetBoolArg("-daemon", false);
         if (fDaemon)
         {
-            fprintf(stdout, "Nexa server starting\n");
+            fprintf(stdout, "Pyrrha server starting\n");
 
             // Daemonize
             pid_t pid = fork();
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
 {
     SetupEnvironment();
 
-    // Connect nexad signal handlers
+    // Connect pyrrhad signal handlers
     noui_connect();
 
     return (AppInit(argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);

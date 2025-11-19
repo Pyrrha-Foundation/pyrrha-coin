@@ -812,7 +812,7 @@ DBErrors CWalletDB::ZapWalletTx(CWallet *pwallet, vector<CWalletTxRef> &vWtx)
 void ThreadFlushWalletDB(const string &strFile)
 {
     // Make this thread recognisable as the wallet flushing thread
-    RenameThread("nexa-wallet");
+    RenameThread("pyrrha-wallet");
 
     static bool fOneThread;
     if (fOneThread)

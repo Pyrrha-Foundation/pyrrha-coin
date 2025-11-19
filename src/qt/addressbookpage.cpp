@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "addressbookpage.h"
@@ -14,7 +14,7 @@
 #include "csvmodelwriter.h"
 #include "editaddressdialog.h"
 #include "guiutil.h"
-#include "nexagui.h"
+#include "pyrrhagui.h"
 #include "platformstyle.h"
 
 #include <QIcon>
@@ -75,12 +75,12 @@ AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode _mode,
     switch (tab)
     {
     case SendingTab:
-        ui->labelExplanation->setText(tr("These are your Nexa addresses for sending payments. Always check the "
+        ui->labelExplanation->setText(tr("These are your Pyrrha addresses for sending payments. Always check the "
                                          "amount and the receiving address before sending coins."));
         ui->deleteAddress->setVisible(true);
         break;
     case ReceivingTab:
-        ui->labelExplanation->setText(tr("These are your Nexa addresses for receiving payments. It is recommended "
+        ui->labelExplanation->setText(tr("These are your Pyrrha addresses for receiving payments. It is recommended "
                                          "to use a new receiving address for each transaction."));
         ui->deleteAddress->setVisible(false);
         break;

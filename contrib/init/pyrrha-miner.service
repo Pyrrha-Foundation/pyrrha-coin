@@ -1,15 +1,15 @@
 [Unit]
 Description=Pyrrha Miner
-After=nexa.service
-Requires=nexa.service
+After=pyrrha.service
+Requires=pyrrha.service
 
 [Service]
-User=nexa
-Group=nexa
+User=pyrrha
+Group=pyrrha
 
 Type=simple
-PIDFile=/home/nexa/.nexa/nexa-miner.pid
-ExecStart=/home/nexa/nexa/bin/nexa-miner -conf=/home/nexa/.nexa/nexa.conf -cpus=8
+PIDFile=/home/pyrrha/.pyrrha/pyrrha-miner.pid
+ExecStart=/home/pyrrha/pyrrha/bin/pyrrha-miner -conf=/home/pyrrha/.pyrrha/pyrrha.conf -cpus=8
 
 Restart=always
 PrivateTmp=true

@@ -5,7 +5,7 @@
 #include "electrum/rostrum.h"
 #include "extversionkeys.h"
 #include "extversionmessage.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "util.h"
 
 #include <sstream>
@@ -18,7 +18,7 @@ using namespace electrum;
 
 BOOST_FIXTURE_TEST_SUITE(rostrum_tests, BasicTestingSetup)
 
-static bool rostrum_args_has(const std::string &arg, const std::string &network = "nexa")
+static bool rostrum_args_has(const std::string &arg, const std::string &network = "pyrrha")
 {
     const std::vector<std::string> args = rostrum_args(42, network);
     return std::find(begin(args), end(args), arg) != end(args);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(rawargs_verboseness)
 
 static void call_setter(std::unique_ptr<CExtversionMessage> &ver)
 {
-    constexpr char network[] = "nexa";
+    constexpr char network[] = "pyrrha";
     ver.reset(new CExtversionMessage);
     set_extversion_flags(*ver, network);
 }

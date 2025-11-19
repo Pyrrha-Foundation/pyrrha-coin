@@ -3,15 +3,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_CHAINPARAMSBASE_H
-#define NEXA_CHAINPARAMSBASE_H
+#ifndef PYRRHA_CHAINPARAMSBASE_H
+#define PYRRHA_CHAINPARAMSBASE_H
 
 #include <string>
 #include <vector>
 
 /**
- * CBaseChainParams defines the base parameters (shared between nexa-cli and nexad)
- * of a given instance of the Nexa system.
+ * CBaseChainParams defines the base parameters (shared between pyrrha-cli and pyrrhad)
+ * of a given instance of the Pyrrha system.
  */
 class CBaseChainParams
 {
@@ -21,7 +21,7 @@ public:
     static const std::string TESTNET;
     static const std::string SCALENET;
     static const std::string REGTEST;
-    static const std::string NEXA;
+    static const std::string PYRRHA;
 
     const std::string &DataDir() const { return strDataDir; }
     int RPCPort() const { return nRPCPort; }
@@ -49,7 +49,7 @@ void SelectBaseParams(const std::string &chain);
 
 /**
  * Looks for -regtest, -testnet and returns the appropriate BIP70 chain name.
- * @return CBaseChainParams::MAX_NETWORK_TYPES if an invalid combination is given. CBaseChainParams::NEXA by
+ * @return CBaseChainParams::MAX_NETWORK_TYPES if an invalid combination is given. CBaseChainParams::PYRRHA by
  * default.
  */
 std::string ChainNameFromCommandLine();
@@ -60,4 +60,4 @@ std::string ChainNameFromCommandLine();
  */
 bool AreBaseParamsConfigured();
 
-#endif // NEXA_CHAINPARAMSBASE_H
+#endif // PYRRHA_CHAINPARAMSBASE_H

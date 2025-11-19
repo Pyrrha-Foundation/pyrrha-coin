@@ -1,0 +1,21 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+      build-essential \
+      libtool \
+      autotools-dev \
+      automake \
+      pkg-config \
+      bsdmainutils \
+      libevent-dev \
+      libboost-all-dev \
+      libssl-dev \
+      libzmq3-dev \
+      git \
+      ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src

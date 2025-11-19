@@ -3,10 +3,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "nexaamountfield.h"
+#include "pyrrhaamountfield.h"
 
 #include "guiconstants.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "qvaluecombobox.h"
 
 #include <QAbstractSpinBox>
@@ -179,7 +179,7 @@ Q_SIGNALS:
     void valueChanged();
 };
 
-#include "nexaamountfield.moc"
+#include "pyrrhaamountfield.moc"
 
 BitcoinAmountField::BitcoinAmountField(QWidget *parent) : QWidget(parent), amount(0)
 {

@@ -831,7 +831,7 @@ class CTransaction(object):
         return "CTransaction(nVersion=%i vin=%s vout=%s nLockTime=%i)" \
             % (self.nVersion, repr(self.vin), repr(self.vout), self.nLockTime)
 
-    def hashPrevoutsNexa(self, hashcode, in_number):
+    def hashPrevoutsPyrrha(self, hashcode, in_number):
         if len(hashcode) == 0: hashcode = bytes([0])
         outCode = hashcode[0]&0xf0
         op_ser = b""
@@ -850,7 +850,7 @@ class CTransaction(object):
         return hash256(op_ser)
 
 
-    def hashInputAmountsNexa(self, hashcode, in_number):
+    def hashInputAmountsPyrrha(self, hashcode, in_number):
         if len(hashcode) == 0: hashcode = bytes([0])
         outCode = hashcode[0]&0xf0
         op_ser = b""
@@ -867,7 +867,7 @@ class CTransaction(object):
         return hash256(op_ser)
 
 
-    def hashSequenceNexa(self, hashcode, in_number):
+    def hashSequencePyrrha(self, hashcode, in_number):
         if len(hashcode) == 0: hashcode = bytes([0])
         outCode = hashcode[0]&0xf0
         op_ser = b""
@@ -883,7 +883,7 @@ class CTransaction(object):
             assert false, "unknown hashcode"
         return hash256(op_ser)
 
-    def hashOutputsNexa(self, hashcode, in_number):
+    def hashOutputsPyrrha(self, hashcode, in_number):
         if len(hashcode) == 0: hashcode = bytes([0])
         outCode = hashcode[0]&0xf
         op_ser = b""
@@ -903,7 +903,7 @@ class CTransaction(object):
             assert false, "unknown hashcode"
         return hash256(op_ser)
 
-    def SignatureHashNexa(self, in_number, scriptCode, hashcode = SIGHASH_ALL, single = False, debug=False):
+    def SignatureHashPyrrha(self, in_number, scriptCode, hashcode = SIGHASH_ALL, single = False, debug=False):
         """Calculate hash digest for given input. Returns it in binary, little-endian.
 
         txin is the corresponding input CTransaction. Supplying it is
@@ -917,19 +917,19 @@ class CTransaction(object):
             hashcode = bytes([hashcode])
         assert type(hashcode) == bytes  # New style sighashtype
 
-        h_prevouts = self.hashPrevoutsNexa(hashcode, in_number)
+        h_prevouts = self.hashPrevoutsPyrrha(hashcode, in_number)
         if debug:
             print("Hash prevouts:", hexlify(h_prevouts[::-1]))
 
-        h_inputamounts = self.hashInputAmountsNexa(hashcode, in_number)
+        h_inputamounts = self.hashInputAmountsPyrrha(hashcode, in_number)
         if debug:
             print("Hash input amounts:", hexlify(h_inputamounts[::-1]))
 
-        h_sequence = self.hashSequenceNexa(hashcode, in_number)
+        h_sequence = self.hashSequencePyrrha(hashcode, in_number)
         if debug:
             print("Hash sequence:", hexlify(h_sequence[::-1]))
 
-        h_outputs = self.hashOutputsNexa(hashcode, in_number)
+        h_outputs = self.hashOutputsPyrrha(hashcode, in_number)
         if debug:
             print("Hash outputs:", hexlify(h_outputs[::-1]))
 
@@ -2234,7 +2234,7 @@ class msg_headers(object):
 
     def deserialize(self, f):
         # In BCH/BTC these are serialized/deserialized as blocks with 0 transactions (regardless of the actual # tx)
-        # In Nexa these are serialized/deserialized as block headers
+        # In Pyrrha these are serialized/deserialized as block headers
         self.headers = deser_vector(f, CBlockHeader)
 
     def serialize(self, stype=SER_DEFAULT):

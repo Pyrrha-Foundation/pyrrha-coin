@@ -56,7 +56,7 @@ class BuDumpCBlockIndex(gdb.Command):
     def invoke(self, argument, from_tty):
         args = gdb.string_to_argv(argument)
         if len(args)!=2:
-          gdb.write("args:\n  CBlockIndex*: pointer to the chain\n  number: how far to follow the chain\nexample: btc-dump-bidx pindex 10\n")
+          gdb.write("args:\n  CBlockIndex*: pointer to the chain\n  number: how far to follow the chain\pyrrhample: btc-dump-bidx pindex 10\n")
           return
         ptr = gdb.parse_and_eval(args[0])
         count = gdb.parse_and_eval(args[1])

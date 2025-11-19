@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_TEST_LCH_H
-#define NEXA_TEST_LCH_H
+#ifndef PYRRHA_TEST_LCH_H
+#define PYRRHA_TEST_LCH_H
 
 #include <cstdint>
 

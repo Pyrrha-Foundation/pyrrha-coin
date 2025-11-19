@@ -1,13 +1,13 @@
 Pyrrha x.y.z.k is now available from:
 
-  <https://gitlab.com/nexa/nexa/-/releases/>
+  <https://gitlab.com/pyrrha/pyrrha/-/releases/>
 
 This is a new minor version release, including ........,
 various bugfixes and updated translations.
 
 Please report bugs using the issue tracker at gitlab:
 
-  <https://gitlab.com/nexa/nexa/-/issues>
+  <https://gitlab.com/pyrrha/pyrrha/-/issues>
 
 Upgrading and downgrading
 =========================

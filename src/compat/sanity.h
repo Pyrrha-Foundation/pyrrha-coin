@@ -3,10 +3,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_COMPAT_SANITY_H
-#define NEXA_COMPAT_SANITY_H
+#ifndef PYRRHA_COMPAT_SANITY_H
+#define PYRRHA_COMPAT_SANITY_H
 
 bool glibc_sanity_test();
 bool glibcxx_sanity_test();
 
-#endif // NEXA_COMPAT_SANITY_H
+#endif // PYRRHA_COMPAT_SANITY_H

@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SCRIPT_SIGCACHE_H
-#define NEXA_SCRIPT_SIGCACHE_H
+#ifndef PYRRHA_SCRIPT_SIGCACHE_H
+#define PYRRHA_SCRIPT_SIGCACHE_H
 
 #include "script/interpreter.h"
 
@@ -64,4 +64,4 @@ public:
 
 void InitSignatureCache();
 
-#endif // NEXA_SCRIPT_SIGCACHE_H
+#endif // PYRRHA_SCRIPT_SIGCACHE_H

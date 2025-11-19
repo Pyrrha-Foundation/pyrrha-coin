@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "chainparamsbase.h"
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        std::string appname("nexa-cli");
+        std::string appname("pyrrha-cli");
         std::string usage = "\n" + _("Usage:") + "\n" + "  " + appname + " [options] " +
                             strprintf(_("Send command to %s"), _(PACKAGE_NAME)) + "\n" + "  " + appname +
                             " [options] help                " + _("List commands") + "\n" + "  " + appname +

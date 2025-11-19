@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "init.h"
@@ -738,7 +738,7 @@ void ThreadImport(std::vector<fs::path> vImportFiles, uint64_t nTxIndexCache)
     if (pwalletMain)
     {
         // Check if wallet is encrypted
-        if (!pwalletMain->IsCrypted() && Params().NetworkIDString() == CBaseChainParams::NEXA)
+        if (!pwalletMain->IsCrypted() && Params().NetworkIDString() == CBaseChainParams::PYRRHA)
         {
             if (pwalletMain->GetBalance() > 0 || pwalletMain->GetImmatureBalance() > 0 ||
                 pwalletMain->GetUnconfirmedBalance() > 0 || chainActive.Tip()->height() == 0)
@@ -919,7 +919,7 @@ void InitLogging()
     LOGA(PACKAGE_NAME " version %s (%s)\n", version_string, CLIENT_DATE);
 }
 
-/** Initialize nexa.
+/** Initialize pyrrha.
  *  @pre Parameters should be parsed and config file should be read.
  */
 bool AppInit2(Config &config)

@@ -12,7 +12,7 @@
 #include "script/script.h"
 #include "script/script_error.h"
 #include "script/sign.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "txadmission.h"
 
 #include <boost/test/unit_test.hpp>

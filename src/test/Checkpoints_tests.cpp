@@ -10,7 +10,7 @@
 #include "checkpoints.h"
 
 #include "chainparams.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "uint256.h"
 
 #include <boost/test/unit_test.hpp>
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(sanity)
 #if 0 // TODO: Right now, no checkpoints defined
 
     // Test Get Total Block Estimate
-    const CCheckpointData &checkpoints = Params(CBaseChainParams::NEXA).Checkpoints();
+    const CCheckpointData &checkpoints = Params(CBaseChainParams::PYRRHA).Checkpoints();
     BOOST_CHECK(Checkpoints::GetTotalBlocksEstimate(checkpoints) >= 134444);
 
 

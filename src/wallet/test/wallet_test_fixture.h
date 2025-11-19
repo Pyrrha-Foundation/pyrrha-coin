@@ -3,17 +3,17 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_WALLET_TEST_WALLET_TEST_FIXTURE_H
-#define NEXA_WALLET_TEST_WALLET_TEST_FIXTURE_H
+#ifndef PYRRHA_WALLET_TEST_WALLET_TEST_FIXTURE_H
+#define PYRRHA_WALLET_TEST_WALLET_TEST_FIXTURE_H
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 /** Testing setup and teardown for wallet.
  */
 struct WalletTestingSetup: public TestingSetup {
-    WalletTestingSetup(const std::string& chainName = CBaseChainParams::NEXA);
+    WalletTestingSetup(const std::string& chainName = CBaseChainParams::PYRRHA);
     ~WalletTestingSetup();
 };
 
-#endif // NEXA_WALLET_TEST_WALLET_TEST_FIXTURE_H
+#endif // PYRRHA_WALLET_TEST_WALLET_TEST_FIXTURE_H
 

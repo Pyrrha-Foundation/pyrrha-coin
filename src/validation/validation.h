@@ -5,8 +5,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_VALIDATION_H
-#define NEXA_VALIDATION_H
+#ifndef PYRRHA_VALIDATION_H
+#define PYRRHA_VALIDATION_H
 
 #include "chainparams.h"
 #include "consensus/validation.h"

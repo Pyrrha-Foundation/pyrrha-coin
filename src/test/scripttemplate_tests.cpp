@@ -9,7 +9,7 @@
 #include "script/sighashtype.h"
 #include "script/sign.h"
 #include "test/scriptflags.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "unlimited.h"
 #include "util.h"
 #include "utilstrencodings.h"

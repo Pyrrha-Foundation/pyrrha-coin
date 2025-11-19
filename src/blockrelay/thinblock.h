@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_THINBLOCK_H
-#define NEXA_THINBLOCK_H
+#ifndef PYRRHA_THINBLOCK_H
+#define PYRRHA_THINBLOCK_H
 
 #include "bloom.h"
 #include "consensus/validation.h"
@@ -325,4 +325,4 @@ void BuildSeededBloomFilter(CBloomFilter &memPoolFilter,
     CNode *pfrom,
     bool fDeterministic = false);
 
-#endif // NEXA_THINBLOCK_H
+#endif // PYRRHA_THINBLOCK_H

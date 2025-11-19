@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SCRIPT_STANDARD_H
-#define NEXA_SCRIPT_STANDARD_H
+#ifndef PYRRHA_SCRIPT_STANDARD_H
+#define PYRRHA_SCRIPT_STANDARD_H
 
 #include "consensus/grouptokens.h"
 #include "script/interpreter.h"
@@ -181,4 +181,4 @@ CScript GetScriptForFreeze(CScriptNum nLockTime, const CPubKey &pubKey);
 CScript GetScriptLabelPublic(const std::string &labelPublic);
 
 
-#endif // NEXA_SCRIPT_STANDARD_H
+#endif // PYRRHA_SCRIPT_STANDARD_H

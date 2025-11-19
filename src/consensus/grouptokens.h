@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_TOKEN_GROUPS_H
-#define NEXA_TOKEN_GROUPS_H
+#ifndef PYRRHA_TOKEN_GROUPS_H
+#define PYRRHA_TOKEN_GROUPS_H
 
 #include "chainparams.h"
 #include "pubkey.h"
@@ -120,7 +120,7 @@ public:
     bool operator>(const CGroupTokenID &id) const { return data > id.data; }
     bool operator<=(const CGroupTokenID &id) const { return data <= id.data; }
     bool operator>=(const CGroupTokenID &id) const { return data >= id.data; }
-    //* returns true if this is a user-defined group -- ie NOT nexa or no group
+    //* returns true if this is a user-defined group -- ie NOT pyrrha or no group
     bool isUserGroup(void) const;
     //* returns true if this is a subgroup
     bool isSubgroup(void) const;
@@ -266,7 +266,7 @@ public:
         invalid = false;
     }
 
-    CGroupTokenID associatedGroup; // The group announced by the script (or the nexa group if no OP_GROUP)
+    CGroupTokenID associatedGroup; // The group announced by the script (or the pyrrha group if no OP_GROUP)
     GroupAuthorityFlags controllingGroupFlags; // if the utxo is a controller this is not NONE
     CAmount quantity; // The number of tokens specified in this script
     bool invalid;
@@ -367,4 +367,4 @@ bool IsScriptGrouped(const CScript &script, CScript::const_iterator *pc = nullpt
 inline CGroupTokenID GetGroupToken(const CScript &script) { return CGroupTokenInfo(script).associatedGroup; }
 extern CGroupTokenID NoGroup;
 
-#endif // NEXA_TOKEN_GROUPS_H
+#endif // PYRRHA_TOKEN_GROUPS_H

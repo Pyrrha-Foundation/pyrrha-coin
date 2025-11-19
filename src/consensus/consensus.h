@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_CONSENSUS_CONSENSUS_H
-#define NEXA_CONSENSUS_CONSENSUS_H
+#ifndef PYRRHA_CONSENSUS_CONSENSUS_H
+#define PYRRHA_CONSENSUS_CONSENSUS_H
 
 #include "chain.h"
 #include "script/interpreter.h"
@@ -51,7 +51,7 @@ static const unsigned int MAX_TX_NUM_VIN = 256;
 */
 static const int64_t ANCESTOR_HASH_IF_ODD = 5040;
 
-/** This is the default max bloom filter size allowed on the network.  In Nexa we have the ability
+/** This is the default max bloom filter size allowed on the network.  In Pyrrha we have the ability
  *  to communicate to our peer what max bloom filter size we will accept but still observe this value as a default.
  */
 static const unsigned int SMALLEST_MAX_BLOOM_FILTER_SIZE = 36000; // bytes
@@ -145,4 +145,4 @@ inline uint64_t GetMaxAllowedNetMessage()
 
     return nMaxSize + ONE_MEGABYTE;
 }
-#endif // NEXA_CONSENSUS_CONSENSUS_H
+#endif // PYRRHA_CONSENSUS_CONSENSUS_H

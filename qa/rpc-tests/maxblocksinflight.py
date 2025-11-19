@@ -85,7 +85,7 @@ class MaxBlocksInFlightTest(BitcoinTestFramework):
 
     def add_options(self, parser):
         parser.add_option("--testbinary", dest="testbinary",
-                          default=os.getenv("NEXAD", "nexad"),
+                          default=os.getenv("PYRRHAD", "pyrrhad"),
                           help="Binary to test max block requests behavior")
 
     def run_test(self):

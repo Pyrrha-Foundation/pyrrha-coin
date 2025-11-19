@@ -23,7 +23,7 @@ cashlib = None
 def loadCashLibOrExit(srcdir=None):
     try:
         path = findBitcoind(srcdir)
-        init(path + os.sep + ".libs" + os.sep + "libnexa.so")
+        init(path + os.sep + ".libs" + os.sep + "libpyrrha.so")
     except OSError as e:
         p = platform.platform()
         print("Platform  : " + p)
@@ -44,7 +44,7 @@ class Error(BaseException):
 def init(libbitcoincashfile=None):
     global cashlib
     if libbitcoincashfile is None:
-        libbitcoincashfile = "libnexa.so"
+        libbitcoincashfile = "libpyrrha.so"
         try:
             cashlib = CDLL(libbitcoincashfile)
         except OSError:

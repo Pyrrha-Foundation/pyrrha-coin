@@ -3,11 +3,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_NEXAGUI_H
-#define NEXA_QT_NEXAGUI_H
+#ifndef PYRRHA_QT_PYRRHAGUI_H
+#define PYRRHA_QT_PYRRHAGUI_H
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "amount.h"
@@ -66,7 +66,7 @@ public:
 
 #ifdef ENABLE_WALLET
     /** Set the wallet model.
-        The wallet model represents a nexa wallet, and offers access to the list of transactions, address book and
+        The wallet model represents a pyrrha wallet, and offers access to the list of transactions, address book and
        sending
         functionality.
     */
@@ -284,4 +284,4 @@ private Q_SLOTS:
     void onMenuSelection(QAction *action);
 };
 
-#endif // NEXA_QT_BITCOINGUI_H
+#endif // PYRRHA_QT_BITCOINGUI_H

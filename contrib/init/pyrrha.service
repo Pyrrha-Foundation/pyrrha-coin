@@ -3,13 +3,13 @@ Description=Pyrrha Full Node Daemon
 After=network.target
 
 [Service]
-User=nexa
-Group=nexa
+User=pyrrha
+Group=pyrrha
 
 Type=forking
-PIDFile=/home/nexa/.nexa/nexa.pid
-ExecStart=/home/nexa/nexa/bin/nexad -conf=/home/nexa/.nexa/nexa.conf -daemon
-ExecStop=/home/nexa/nexa/bin/nexa-cli -conf=/home/nexa/.nexa/nexa.conf stop
+PIDFile=/home/pyrrha/.pyrrha/pyrrha.pid
+ExecStart=/home/pyrrha/pyrrha/bin/pyrrhad -conf=/home/pyrrha/.pyrrha/pyrrha.conf -daemon
+ExecStop=/home/pyrrha/pyrrha/bin/pyrrha-cli -conf=/home/pyrrha/.pyrrha/pyrrha.conf stop
 
 Restart=always
 PrivateTmp=true

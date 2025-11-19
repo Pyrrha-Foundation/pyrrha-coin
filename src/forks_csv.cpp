@@ -159,7 +159,7 @@ bool ReadForksCsv(string activeNetworkID, istream& csvInput, Consensus::Params& 
 bool ValidateNetwork(const string& networkname)
 {
     // check that network is one we know about
-    if (networkname == CBaseChainParams::NEXA)
+    if (networkname == CBaseChainParams::PYRRHA)
         return true;
     else if (networkname == CBaseChainParams::TESTNET)
         return true;

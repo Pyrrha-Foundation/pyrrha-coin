@@ -17,7 +17,7 @@
 #include "txorphanpool.h"
 #include "util.h"
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <stdint.h>
 

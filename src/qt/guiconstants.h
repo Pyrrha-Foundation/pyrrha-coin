@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_GUICONSTANTS_H
-#define NEXA_QT_GUICONSTANTS_H
+#ifndef PYRRHA_QT_GUICONSTANTS_H
+#define PYRRHA_QT_GUICONSTANTS_H
 
 /* Milliseconds between model updates */
 static const int MODEL_UPDATE_DELAY1 = 500;
@@ -64,7 +64,7 @@ static const int MAX_URI_LENGTH = 255;
 #define QAPP_ORG_NAME "BitcoinUnlimited"
 #define QAPP_ORG_DOMAIN "bitcoinunlimited.info"
 #define QAPP_APP_NAME "Pyrrha"
-#define QAPP_APP_NAME_TESTNET "Nexa-testnet"
-#define QAPP_APP_NAME_REGTEST "Nexa-regtest"
+#define QAPP_APP_NAME_TESTNET "Pyrrha-testnet"
+#define QAPP_APP_NAME_REGTEST "Pyrrha-regtest"
 
-#endif // NEXA_QT_GUICONSTANTS_H
+#endif // PYRRHA_QT_GUICONSTANTS_H

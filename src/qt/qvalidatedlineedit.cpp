@@ -6,7 +6,7 @@
 #include "qvalidatedlineedit.h"
 
 #include "guiconstants.h"
-#include "nexaaddressvalidator.h"
+#include "pyrrhaaddressvalidator.h"
 
 QValidatedLineEdit::QValidatedLineEdit(QWidget *parent) : QLineEdit(parent), valid(true), checkValidator(0)
 {

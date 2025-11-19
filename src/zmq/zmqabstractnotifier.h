@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_ZMQ_ZMQABSTRACTNOTIFIER_H
-#define NEXA_ZMQ_ZMQABSTRACTNOTIFIER_H
+#ifndef PYRRHA_ZMQ_ZMQABSTRACTNOTIFIER_H
+#define PYRRHA_ZMQ_ZMQABSTRACTNOTIFIER_H
 
 #include "zmqconfig.h"
 
@@ -42,4 +42,4 @@ protected:
     std::string address;
 };
 
-#endif // NEXA_ZMQ_ZMQABSTRACTNOTIFIER_H
+#endif // PYRRHA_ZMQ_ZMQABSTRACTNOTIFIER_H

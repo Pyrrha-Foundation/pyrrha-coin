@@ -5,7 +5,7 @@
 #include "extversionmessage.h"
 #include "serialize.h"
 #include "streams.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <stdint.h>
 #include <vector>

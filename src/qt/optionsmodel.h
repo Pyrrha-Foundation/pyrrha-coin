@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_OPTIONSMODEL_H
-#define NEXA_QT_OPTIONSMODEL_H
+#ifndef PYRRHA_QT_OPTIONSMODEL_H
+#define PYRRHA_QT_OPTIONSMODEL_H
 
 #include "amount.h"
 
@@ -96,4 +96,4 @@ Q_SIGNALS:
 // Returns nullptr if this URL is valid, otherwise returns an untranslated error message
 const char *isInvalidThirdPartyTxUrlString(QString value);
 
-#endif // NEXA_QT_OPTIONSMODEL_H
+#endif // PYRRHA_QT_OPTIONSMODEL_H

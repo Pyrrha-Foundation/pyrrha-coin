@@ -12,7 +12,7 @@
 #include "rpc/blockchain.h"
 #include "unlimited.h"
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>

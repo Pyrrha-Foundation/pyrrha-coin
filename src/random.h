@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_RANDOM_H
-#define NEXA_RANDOM_H
+#ifndef PYRRHA_RANDOM_H
+#define PYRRHA_RANDOM_H
 
 #include "crypto/chacha20.h"
 #include "crypto/common.h"
@@ -197,4 +197,4 @@ bool Random_SanityCheck();
 /** Initialize the RNG. */
 void RandomInit();
 
-#endif // NEXA_RANDOM_H
+#endif // PYRRHA_RANDOM_H

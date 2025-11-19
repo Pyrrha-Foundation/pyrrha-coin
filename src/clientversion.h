@@ -3,11 +3,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_CLIENTVERSION_H
-#define NEXA_CLIENTVERSION_H
+#ifndef PYRRHA_CLIENTVERSION_H
+#define PYRRHA_CLIENTVERSION_H
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #else
 
 /**
@@ -66,4 +66,4 @@ std::string FormatSubVersion(const std::string &name, int nClientVersion, const 
 
 #endif // WINDRES_PREPROC
 
-#endif // NEXA_CLIENTVERSION_H
+#endif // PYRRHA_CLIENTVERSION_H

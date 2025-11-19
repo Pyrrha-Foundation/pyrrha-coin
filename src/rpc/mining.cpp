@@ -762,7 +762,7 @@ UniValue mkblocktemplate(const UniValue &params,
             // Everything checks out, proceed with the wallet-generated address. Note that we don't tell the wallet to
             // "KeepKey" this address -- which means future calls will return the same address from the wallet for
             // future mining candidates, which is fine and good (since these are, after all, mining *candidates*).
-            // This also means that the nexa-miner program will continue to mine to the same key for all blocks,
+            // This also means that the pyrrha-miner program will continue to mine to the same key for all blocks,
             // which is fine. If client code wants something more sophisticated, it can always specify coinbaseScript.
             coinbaseScript = tmpScriptPtr->reserveScript;
         }
@@ -1039,7 +1039,7 @@ UniValue estimatefee(const UniValue &params, bool fHelp)
                             "\nArguments:\n"
                             "1. nblocks     (numeric)\n"
                             "\nResult:\n"
-                            "n              (numeric) estimated fee-per-kilobyte (in Nexa)\n"
+                            "n              (numeric) estimated fee-per-kilobyte (in Pyrrha)\n"
                             "\n"
                             "A negative value is returned if not enough transactions and blocks\n"
                             "have been observed to make an estimate.\n"
@@ -1072,7 +1072,7 @@ UniValue estimatesmartfee(const UniValue &params, bool fHelp)
                             "1. nblocks     (numeric)\n"
                             "\nResult:\n"
                             "{\n"
-                            "  \"feerate\" : x.x,     (numeric) estimate fee-per-kilobyte (in Nexa)\n"
+                            "  \"feerate\" : x.x,     (numeric) estimate fee-per-kilobyte (in Pyrrha)\n"
                             "  \"blocks\" : 1         (numeric) hardcoded to 1 for backwards compatibility reasons\n"
                             "}\n"
                             "\n"

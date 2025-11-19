@@ -21,19 +21,19 @@ in `./configure` and tests were not explicitly disabled.
 After configuring, the C++ unit tests can be run with `make check`.
 This runs tests of several libraries.
 
-To run the nexa unit test suite sequentially, launch
-`src/test/test_nexa`.
+To run the pyrrha unit test suite sequentially, launch
+`src/test/test_pyrrha`.
 
 You can run it with the `--help` option to get a list of parameters
 supported by the Boost Test framework.  Some of these are very useful,
 specifically `--run_test=<name>` to run a particular subset of tests, e.g.
 
-    $ src/test/test_nexa --run_test=transaction_tests
+    $ src/test/test_pyrrha --run_test=transaction_tests
 
 If on Boost 1.59 or higher, you can also get a full list of tests
 using `--list_content`:
 
-    $ src/test/test_nexa --list_content
+    $ src/test/test_pyrrha --list_content
 
 The -qt GUI tests use a different framework which does not support
 the above options.

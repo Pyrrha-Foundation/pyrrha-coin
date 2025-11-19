@@ -6,13 +6,13 @@
 #include <boost/lexical_cast.hpp>
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "optionsmodel.h"
 
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 
 #include "amount.h"
 #include "init.h"
@@ -67,7 +67,7 @@ void OptionsModel::Init(bool resetSettings)
     nDisplayUnit = settings.value("nDisplayUnit").toInt();
 
     if (!settings.contains("strThirdPartyTxUrls"))
-        settings.setValue("strThirdPartyTxUrls", "https://explorer.nexa.org/tx/%s");
+        settings.setValue("strThirdPartyTxUrls", "https://explorer.pyrrha.org/tx/%s");
     strThirdPartyTxUrls = settings.value("strThirdPartyTxUrls", "").toString();
 
     if (!settings.contains("fCoinControlFeatures"))

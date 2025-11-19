@@ -5,11 +5,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_MAIN_H
-#define NEXA_MAIN_H
+#ifndef PYRRHA_MAIN_H
+#define PYRRHA_MAIN_H
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "amount.h"
@@ -306,4 +306,4 @@ public:
 };
 #endif
 
-#endif // NEXA_MAIN_H
+#endif // PYRRHA_MAIN_H

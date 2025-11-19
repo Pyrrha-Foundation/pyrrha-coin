@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "utilprocess.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/predef/os.h>
@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(this_process_path_test)
 #if BOOST_OS_LINUX || BOOST_OS_MACOS
     std::string path = this_process_path();
     // TODO: replace boost with std::string::ends_with in C++20
-    BOOST_CHECK(boost::algorithm::ends_with(path, "/test_nexa"));
+    BOOST_CHECK(boost::algorithm::ends_with(path, "/test_pyrrha"));
 #else
     BOOST_CHECK_THROW(this_process_path(), unsupported_platform_error);
 #endif

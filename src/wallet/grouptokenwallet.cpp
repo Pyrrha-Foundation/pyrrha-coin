@@ -552,8 +552,8 @@ void ConstructTx(CWalletTx &wtxNew,
         if (totalAvailable < totalNeeded + fee) // need to find a fee input
         {
             // find a fee input
-            std::vector<COutput> nexacoins;
-            wallet->FilterCoins(nexacoins,
+            std::vector<COutput> pyrrhacoins;
+            wallet->FilterCoins(pyrrhacoins,
                 [&tx](const COutput &coin)
                 {
                     // check we don't use a UTXO for the fee that we already added to the tx
@@ -568,7 +568,7 @@ void ConstructTx(CWalletTx &wtxNew,
 
             COutput feeCoin;
             CAmount feeCoinAmountNeeded = totalNeeded + fee - totalAvailable;
-            if (!NearestGreaterCoin(nexacoins, feeCoinAmountNeeded, feeCoin))
+            if (!NearestGreaterCoin(pyrrhacoins, feeCoinAmountNeeded, feeCoin))
             {
                 strError = strprintf("Not enough funds for fee of %d.", FormatMoney(fee));
                 throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
@@ -668,7 +668,7 @@ void GroupMelt(CWalletTx &wtxNew, const CGroupTokenID &grpID, CAmount totalNeede
     // Just pick the first one for now.
     for (auto coin : coins)
     {
-        totalBchAvailable += coin.tx->vout[coin.i].nValue; // The melt authority may have some NEXA in it
+        totalBchAvailable += coin.tx->vout[coin.i].nValue; // The melt authority may have some PYRRHA in it
         authority = coin;
         break;
     }
@@ -891,31 +891,31 @@ extern UniValue token(const UniValue &params, bool fHelp)
             "\nExamples:\n"
             "\nGet token info\n" +
             HelpExampleCli("token", "info") + "\nCreate a new token\n" + HelpExampleCli("token", "new APPL apple") +
-            HelpExampleCli("token", "new nexa:nqtsq5g59472zwd85c2esgslh6wh025r0x43ttlv2xy98jd0 ORNGE orange") +
-            HelpExampleCli("token", "new nexa:nqtsq5g5ltvwgj6ga6vlyxcay22uh2m8zy0rxzp8sf884gp9 GRP grape "
-                                    "http://nexa.org "
+            HelpExampleCli("token", "new pyrrha:nqtsq5g59472zwd85c2esgslh6wh025r0x43ttlv2xy98jd0 ORNGE orange") +
+            HelpExampleCli("token", "new pyrrha:nqtsq5g5ltvwgj6ga6vlyxcay22uh2m8zy0rxzp8sf884gp9 GRP grape "
+                                    "http://pyrrha.org "
                                     "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63") +
             "\nMint tokens\n" +
-            HelpExampleCli("token", "mint nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
-                                    "nexa:nqtsq5g553andqv5p33ylx7xyr76vu0mh56x5nlylhfzcyj2 30000") +
+            HelpExampleCli("token", "mint pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
+                                    "pyrrha:nqtsq5g553andqv5p33ylx7xyr76vu0mh56x5nlylhfzcyj2 30000") +
             "\nMelt tokens\n" +
-            HelpExampleCli("token", "mint nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum 500") +
+            HelpExampleCli("token", "mint pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum 500") +
             "\nGet wallet token balances\n" + HelpExampleCli("token", "balance") +
-            HelpExampleCli("token", "balance nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum") +
-            HelpExampleCli("token", "balance nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
-                                    "nexa:nqtsq5g553andqv5p33ylx7xyr76vu0mh56x5nlylhfzcyj2") +
+            HelpExampleCli("token", "balance pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum") +
+            HelpExampleCli("token", "balance pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
+                                    "pyrrha:nqtsq5g553andqv5p33ylx7xyr76vu0mh56x5nlylhfzcyj2") +
             "\nSend tokens\n" +
-            HelpExampleCli("token", "send nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
-                                    "nexa:nqtsq5g5swutfrulf565c6v42rk36gk9w9r8lwymly8ju76c 150") +
-            HelpExampleCli("token", "send nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
-                                    "nexa:nqtsq5g5swutfrulf565c6v42rk36gk9w9r8lwymly8ju76c 100 "
-                                    "nexa:nqtsq5g563td29kuumldxk0u6lsfrjyapxth5jqwmyepjmlw 300") +
+            HelpExampleCli("token", "send pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
+                                    "pyrrha:nqtsq5g5swutfrulf565c6v42rk36gk9w9r8lwymly8ju76c 150") +
+            HelpExampleCli("token", "send pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum "
+                                    "pyrrha:nqtsq5g5swutfrulf565c6v42rk36gk9w9r8lwymly8ju76c 100 "
+                                    "pyrrha:nqtsq5g563td29kuumldxk0u6lsfrjyapxth5jqwmyepjmlw 300") +
             "\nMake new authority\n" +
             HelpExampleCli("token",
-                "authority create nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdu0 "
-                "nexa:nqtsq5g5t8hqv7gflfp3gshvck0srh2a0ktd53kzc97c26w0 mint melt nochild rescript") +
+                "authority create pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdu0 "
+                "pyrrha:nqtsq5g5t8hqv7gflfp3gshvck0srh2a0ktd53kzc97c26w0 mint melt nochild rescript") +
             "\nMake subgroups\n " +
-            HelpExampleCli("token", "subgroup nexa:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum 1"));
+            HelpExampleCli("token", "subgroup pyrrha:tpyte9hwr6ew0agt67a0y2fnnccc0d8r62lwryq44rfhzmv7ngqqqza82qdum 1"));
 
     std::string operation;
     std::string p0 = params[0].get_str();
@@ -1246,7 +1246,7 @@ extern UniValue token(const UniValue &params, bool fHelp)
             totalBchNeeded += out.nAmount;
 
         CCoinControl coinControl;
-        coinControl.fAllowOtherInputs = true; // Allow a normal nexa input for change
+        coinControl.fAllowOtherInputs = true; // Allow a normal pyrrha input for change
         std::string strError;
 
         // Now find a mint authority
@@ -1595,7 +1595,7 @@ UniValue groupedlisttransactions(const UniValue &params, bool fHelp)
             "    \"account\":\"accountname\",       (string) DEPRECATED. The account name associated with the "
             "transaction. \n"
             "                                                It will be \"\" for the default account.\n"
-            "    \"address\":\"nexaaddress\",       (string) The nexa address of the transaction. Not present for \n"
+            "    \"address\":\"pyrrhaaddress\",       (string) The pyrrha address of the transaction. Not present for \n"
             "                                                move transactions (category = move).\n"
             "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off "
             "blockchain)\n"
@@ -1753,7 +1753,7 @@ UniValue groupedlistsinceblock(const UniValue &params, bool fHelp)
             "  \"transactions\": [\n"
             "    \"account\":\"accountname\",       (string) DEPRECATED. The account name associated with the "
             "transaction. Will be \"\" for the default account.\n"
-            "    \"address\":\"nexaaddress\",       (string) The nexa address of the transaction. Not present for "
+            "    \"address\":\"pyrrhaaddress\",       (string) The pyrrha address of the transaction. Not present for "
             "move transactions (category = move).\n"
             "    \"category\":\"send|receive\",     (string) The transaction category. 'send' has negative amounts, "
             "'receive' has positive amounts.\n"

@@ -11,7 +11,7 @@
 #include "script/script.h"
 #include "script/script_error.h"
 #include "script/sign.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "validation/parallel.h"
 
 #include <vector>
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(sign)
 {
     LOCK(cs_main);
     std::string popNetwork = Params().NetworkIDString();
-    SelectParams("regtest"); // P2SH disabled on nexa mainnet
+    SelectParams("regtest"); // P2SH disabled on pyrrha mainnet
     // Pay-to-script-hash looks like this:
     // scriptSig:    <sig> <sig...> <serialized_script>
     // scriptPubKey: HASH160 <hash> EQUAL
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(sign)
         txFrom.vout[i + 4].scriptPubKey = standardScripts[i];
         txFrom.vout[i + 4].nValue = 10 * COIN;
     }
-    // All P2SH-like outputs are non-standard in Nexa (since P2SH is removed in main net)
+    // All P2SH-like outputs are non-standard in Pyrrha (since P2SH is removed in main net)
     BOOST_CHECK(!IsStandardTx(MakeTransactionRef(CTransaction(txFrom)), reason));
 
     CMutableTransaction txTo[8]; // Spending transactions
@@ -132,13 +132,13 @@ BOOST_AUTO_TEST_CASE(sign)
             txTo[i].vin[0].scriptSig = sigSave;
         }
 
-    SelectParams(popNetwork); // P2SH disabled on nexa mainnet
+    SelectParams(popNetwork); // P2SH disabled on pyrrha mainnet
 }
 
 BOOST_AUTO_TEST_CASE(norecurse)
 {
     std::string popNetwork = Params().NetworkIDString();
-    SelectParams("regtest"); // P2SH disabled on nexa mainnet
+    SelectParams("regtest"); // P2SH disabled on pyrrha mainnet
 
     ScriptError err;
     // Make sure only the outer pay-to-script-hash does the
@@ -163,14 +163,14 @@ BOOST_AUTO_TEST_CASE(norecurse)
 
     BOOST_CHECK(Verify(scriptSig2, p2sh2, true, err));
     BOOST_CHECK_MESSAGE(err == SCRIPT_ERR_OK, ScriptErrorString(err));
-    SelectParams(popNetwork); // P2SH disabled on nexa mainnet
+    SelectParams(popNetwork); // P2SH disabled on pyrrha mainnet
 }
 
 BOOST_AUTO_TEST_CASE(set)
 {
     LOCK(cs_main);
     std::string popNetwork = Params().NetworkIDString();
-    SelectParams("regtest"); // P2SH disabled on nexa mainnet
+    SelectParams("regtest"); // P2SH disabled on pyrrha mainnet
 
     // Test the CScript::Set* methods
     CBasicKeyStore keystore;
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(set)
         txFrom.vout[i].scriptPubKey = outer[i];
         txFrom.vout[i].nValue = 10 * COIN;
     }
-    // All P2SH-like outputs are non-standard in Nexa (since P2SH is removed in main net)
+    // All P2SH-like outputs are non-standard in Pyrrha (since P2SH is removed in main net)
     BOOST_CHECK(!IsStandardTx(MakeTransactionRef(CTransaction(txFrom)), reason));
 
     CMutableTransaction txTo[4]; // Spending transactions
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(set)
         BOOST_CHECK_MESSAGE(
             IsStandardTx(MakeTransactionRef(CTransaction(txTo[i])), reason), strprintf("txTo[%d].IsStandard", i));
     }
-    SelectParams(popNetwork); // P2SH disabled on nexa mainnet
+    SelectParams(popNetwork); // P2SH disabled on pyrrha mainnet
 }
 
 BOOST_AUTO_TEST_CASE(is)
@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_CASE(AreInputsStandard)
 {
     LOCK(cs_main);
     std::string popNetwork = Params().NetworkIDString();
-    SelectParams("regtest"); // P2SH disabled on nexa mainnet
+    SelectParams("regtest"); // P2SH disabled on pyrrha mainnet
 
     CCoinsView coinsDummy;
     CCoinsViewCache coins(&coinsDummy);
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(AreInputsStandard)
         GetP2SHSigOpCount(MakeTransactionRef(CTransaction(txToNonStd2)), coins, STANDARD_SCRIPT_VERIFY_FLAGS), 20U);
     // Check that no sigops show up when P2SH is not activated.
     BOOST_CHECK_EQUAL(GetP2SHSigOpCount(MakeTransactionRef(CTransaction(txToNonStd2)), coins, SCRIPT_VERIFY_NONE), 0U);
-    SelectParams(popNetwork); // P2SH disabled on nexa mainnet
+    SelectParams(popNetwork); // P2SH disabled on pyrrha mainnet
 }
 
 BOOST_AUTO_TEST_SUITE_END()

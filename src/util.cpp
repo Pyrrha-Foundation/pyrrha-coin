@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "compat.h"
@@ -139,8 +139,8 @@ std::string to_internal(const std::string &);
 
 } // namespace boost
 
-const char *const CONF_FILENAME = "nexa.conf";
-const char *const PID_FILENAME = "nexa.pid";
+const char *const CONF_FILENAME = "pyrrha.conf";
+const char *const PID_FILENAME = "pyrrha.pid";
 const char *const FORKS_CSV_FILENAME = "forks.csv"; // bip135 added
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
@@ -304,7 +304,7 @@ fs::path GetDefaultDataDir()
 // Unix: ~/.bitcoin
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / CBaseChainParams::NEXA;
+    return GetSpecialFolderPath(CSIDL_APPDATA) / CBaseChainParams::PYRRHA;
 #else
     fs::path pathRet;
     char *pszHome = getenv("HOME");
@@ -314,10 +314,10 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/" / CBaseChainParams::NEXA;
+    return pathRet / "Library/Application Support/" / CBaseChainParams::PYRRHA;
 #else
     // Unix
-    return pathRet / (std::string(".") + CBaseChainParams::NEXA);
+    return pathRet / (std::string(".") + CBaseChainParams::PYRRHA);
 #endif
 #endif
 }
@@ -393,8 +393,8 @@ static void CreateConfigFile(const fs::path &path)
     FILE *file2 = fsbridge::fopen(path, "w");
     if (file2)
     {
-        fprintf(file2, "## NEXA run-time configuration settings.\n");
-        fprintf(file2, "## Use GUI->Help->command-line options or spec.nexa.org for available settings.\n");
+        fprintf(file2, "## PYRRHA run-time configuration settings.\n");
+        fprintf(file2, "## Use GUI->Help->command-line options or spec.pyrrha.org for available settings.\n");
         fclose(file2);
     }
     return;

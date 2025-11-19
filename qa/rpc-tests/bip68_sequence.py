@@ -47,7 +47,7 @@ class BIP68Test(BitcoinTestFramework):
         #print("Running test sequence-lock-unconfirmed-inputs")
         #self.test_sequence_lock_unconfirmed_inputs()
 
-        # NEXA: bip68 is always activated, skip these tests
+        # PYRRHA: bip68 is always activated, skip these tests
         # print("Verifying nVersion=2 transactions aren't standard")
         # self.test_version2_relay(before_activation=True)
 

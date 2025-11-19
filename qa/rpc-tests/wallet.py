@@ -46,10 +46,10 @@ class WalletTest (BitcoinTestFramework):
         fee = balance_with_fee - curr_balance
         target_fee = fee_per_byte * tx_size
         if fee < target_fee:
-            raise AssertionError("Fee of %s NEXA too low! (Should be %s NEXA)"%(str(fee), str(target_fee)))
+            raise AssertionError("Fee of %s PYRRHA too low! (Should be %s PYRRHA)"%(str(fee), str(target_fee)))
         # allow the node's estimation to be at most 2 bytes off
         if fee > fee_per_byte * (tx_size + 2):
-            raise AssertionError("Fee of %s NEXA too high! (Should be %s NEXA)"%(str(fee), str(target_fee)))
+            raise AssertionError("Fee of %s PYRRHA too high! (Should be %s PYRRHA)"%(str(fee), str(target_fee)))
         return curr_balance
 
     def setup_chain(self,bitcoinConfDict=None, wallets=None):
@@ -70,20 +70,20 @@ class WalletTest (BitcoinTestFramework):
         addr2 = n.getnewaddress("p2pkh")
 
         r = n.getaddressforms(addr)
-        assert r["nexa"] == r["p2pkt"]
+        assert r["pyrrha"] == r["p2pkt"]
         assert "pubkey" in r
         assert r["outScript"].split()[1] == "1"
         assert r["outScript"].split()[0] == "0"
 
         r2 = n2.getaddressforms(addr)
-        assert r2["nexa"] == r["nexa"]
+        assert r2["pyrrha"] == r["pyrrha"]
         assert not "pubkey" in r2
         assert not "p2pkt" in r2  # because this wallet does not know this pubkey so cannot give info
         assert not "p2pkh" in r2  # because this wallet does not know this pubkey so cannot give info
         assert r2["outScript"] == r["outScript"]
 
         r = n.getaddressforms(addr2)
-        assert r["nexa"] == r["p2pkh"]
+        assert r["pyrrha"] == r["p2pkh"]
         assert "pubkey" in r
         assert not "outScript" in r
 
@@ -489,10 +489,10 @@ class WalletTest (BitcoinTestFramework):
         # verify that none of the importaddress calls added the address with a label (bug fix check)
         txns = self.nodes[2].listreceivedbyaddress(0, True, True)
         assert_array_result(txns,
-                            {"address": self.nodes[2].getaddressforms(p2shAddress)["nexa"]},
+                            {"address": self.nodes[2].getaddressforms(p2shAddress)["pyrrha"]},
                             {"label": ""})
         assert_array_result(txns,
-                            {"address": self.nodes[2].getaddressforms(p2shAddress2)["nexa"]},
+                            {"address": self.nodes[2].getaddressforms(p2shAddress2)["pyrrha"]},
                             {"label": ""})
 
         #check if wallet or blochchain maintenance changes the balance

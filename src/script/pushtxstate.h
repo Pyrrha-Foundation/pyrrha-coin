@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_PUSHTXSTATE_H
-#define NEXA_PUSHTXSTATE_H
+#ifndef PYRRHA_PUSHTXSTATE_H
+#define PYRRHA_PUSHTXSTATE_H
 #include "interpreter.h"
 #include "script/script_error.h"
 
@@ -15,7 +15,7 @@ enum PushTxStateSpecifier
     TX_IDEM = 0x3,
     TX_INCOMING_AMOUNT = 0x5,
     TX_OUTGOING_AMOUNT = 0x6,
-    GROUP_INCOMING_AMOUNT = 0x7, // This is either the token amount for a particular group or the fenced Nexa amount
+    GROUP_INCOMING_AMOUNT = 0x7, // This is either the token amount for a particular group or the fenced Pyrrha amount
     GROUP_OUTGOING_AMOUNT = 0x8,
     GROUP_INCOMING_COUNT = 0x9, // COUNT is the number of inputs or outputs
     GROUP_OUTGOING_COUNT = 0xA,

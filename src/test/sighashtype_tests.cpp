@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "script/sighashtype.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <boost/test/unit_test.hpp>
 

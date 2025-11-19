@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "base58.h"
@@ -78,16 +78,16 @@ static int AppInitRawTx(int argc, char *argv[])
     {
         // First part of help message is specific to this utility
         std::string strUsage =
-            strprintf(_("%s nexa-tx utility version"), _(PACKAGE_NAME)) + " " + FormatFullVersion() + "\n";
+            strprintf(_("%s pyrrha-tx utility version"), _(PACKAGE_NAME)) + " " + FormatFullVersion() + "\n";
 
         fprintf(stdout, "%s", strUsage.c_str());
 
         if (mapArgs.count("-version"))
             return false;
 
-        strUsage = "\n" + _("Usage:") + "\n" + "  nexa-tx [options] <hex-tx> [commands]  " +
-                   _("Update hex-encoded nexa transaction") + "\n" + "  nexa-tx [options] -create [commands]   " +
-                   _("Create hex-encoded nexa transaction") + "\n" + "\n";
+        strUsage = "\n" + _("Usage:") + "\n" + "  pyrrha-tx [options] <hex-tx> [commands]  " +
+                   _("Update hex-encoded pyrrha transaction") + "\n" + "  pyrrha-tx [options] -create [commands]   " +
+                   _("Create hex-encoded pyrrha transaction") + "\n" + "\n";
 
         fprintf(stdout, "%s", strUsage.c_str());
 
@@ -263,7 +263,7 @@ static void MutateTxAddOutAddr(CMutableTransaction &tx, const string &strInput)
         throw runtime_error("TX output missing or too many separators");
     if (vStrInputParts.size() == 3)
     {
-        if (vStrInputParts[1] != "nexatest" && vStrInputParts[1] != "nexa" && vStrInputParts[1] != "nexareg")
+        if (vStrInputParts[1] != "pyrrhatest" && vStrInputParts[1] != "pyrrha" && vStrInputParts[1] != "pyrrhareg")
         {
             throw runtime_error(tfm::format("TX output unknown destination address type %s.", vStrInputParts[1]));
         }
@@ -680,7 +680,7 @@ static int CommandLineRawTx(int argc, char *argv[])
             if (argc < 2)
                 throw runtime_error("too few parameters");
 
-            // param: hex-encoded nexa transaction
+            // param: hex-encoded pyrrha transaction
             string strHexTx(argv[1]);
             if (strHexTx == "-") // "-" implies standard input
                 strHexTx = readStdin();

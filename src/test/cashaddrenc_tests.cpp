@@ -7,7 +7,7 @@
 #include "cashaddrenc.h"
 #include "chainparams.h"
 #include "random.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "uint256.h"
 
 #include <boost/test/unit_test.hpp>
@@ -16,7 +16,7 @@ namespace
 {
 std::vector<std::string> GetNetworks()
 {
-    return {CBaseChainParams::NEXA, CBaseChainParams::TESTNET, CBaseChainParams::REGTEST};
+    return {CBaseChainParams::PYRRHA, CBaseChainParams::TESTNET, CBaseChainParams::REGTEST};
 }
 
 uint160 insecure_GetRandUInt160(FastRandomContext &rand)
@@ -81,7 +81,7 @@ BOOST_FIXTURE_TEST_SUITE(cashaddrenc_tests, BasicTestingSetup)
 BOOST_AUTO_TEST_CASE(encode_decode_all_sizes)
 {
     FastRandomContext rand(true);
-    const CChainParams &params = Params(CBaseChainParams::NEXA);
+    const CChainParams &params = Params(CBaseChainParams::PYRRHA);
 
     for (auto ps : valid_sizes)
     {
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(random_dst)
     FastRandomContext rand(true);
 
     const size_t NUM_TESTS = 5000;
-    const CChainParams &params = Params(CBaseChainParams::NEXA);
+    const CChainParams &params = Params(CBaseChainParams::PYRRHA);
 
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE(check_padding)
     BOOST_CHECK_EQUAL(data.size(), 34UL);
 
     const CTxDestination nodst = CNoDestination{};
-    const CChainParams params = Params(CBaseChainParams::NEXA);
+    const CChainParams params = Params(CBaseChainParams::PYRRHA);
 
     for (uint8_t i = 0; i < 32; i++)
     {
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(check_type)
     std::vector<uint8_t> data;
     data.resize(34);
 
-    const CChainParams params = Params(CBaseChainParams::NEXA);
+    const CChainParams params = Params(CBaseChainParams::PYRRHA);
 
     for (uint8_t v = 0; v < 16; v++)
     {
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(check_type)
 BOOST_AUTO_TEST_CASE(check_size)
 {
     const CTxDestination nodst = CNoDestination{};
-    const CChainParams params = Params(CBaseChainParams::NEXA);
+    const CChainParams params = Params(CBaseChainParams::PYRRHA);
 
     std::vector<uint8_t> data;
 
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(test_addresses)
     {
         std::vector<std::vector<uint8_t> > hash{ParseHex("deabc3430515c6585e4db9b51eed7881972057fa")};
         const CChainParams params = Params(CBaseChainParams::REGTEST);
-        std::vector<std::string> pubkey = {"nexareg:qr02hs6rq52uvkz7fkum28hd0zqewgzhlgeakv8hkz"};
+        std::vector<std::string> pubkey = {"pyrrhareg:qr02hs6rq52uvkz7fkum28hd0zqewgzhlgeakv8hkz"};
         for (size_t i = 0; i < hash.size(); ++i)
         {
             const CTxDestination dstKey = CKeyID(uint160(hash[i]));
@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE(test_addresses)
     {
         std::vector<std::vector<uint8_t> > hash{ParseHex("775ebf6694518d925139b2ae42147fc57539ca00")};
         const CChainParams params = Params(CBaseChainParams::TESTNET);
-        std::vector<std::string> pubkey = {"nexatest:qpm4a0mxj3gcmyj38xe2uss50lzh2ww2qq36a79aj6"};
+        std::vector<std::string> pubkey = {"pyrrhatest:qpm4a0mxj3gcmyj38xe2uss50lzh2ww2qq36a79aj6"};
         for (size_t i = 0; i < hash.size(); ++i)
         {
             const CTxDestination dstKey = CKeyID(uint160(hash[i]));

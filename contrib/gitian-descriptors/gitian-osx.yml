@@ -1,5 +1,5 @@
 ---
-name: "nexa-osx"
+name: "pyrrha-osx"
 enable_cache: true
 suites:
 - "focal"
@@ -30,8 +30,8 @@ packages:
 - "ca-certificates"
 reference_datetime: "2020-08-20 00:00:00"
 remotes:
-- "url": "https://gitlab.com/nexa/nexa.git"
-  "dir": "nexa"
+- "url": "https://gitlab.com/pyrrha/pyrrha.git"
+  "dir": "pyrrha"
 files:
 - "MacOSX10.15.sdk.tar.xz"
 script: |
@@ -78,7 +78,7 @@ script: |
   done
   export PATH=${WRAP_DIR}:${PATH}
 
-  cd nexa
+  cd pyrrha
   BASEPREFIX=`pwd`/depends
 
   mkdir -p ${BASEPREFIX}/SDKs
@@ -93,14 +93,14 @@ script: |
   ./autogen.sh
   ./configure --prefix=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`
   make dist
-  SOURCEDIST=`echo nexa-*.tar.gz`
+  SOURCEDIST=`echo pyrrha-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
 
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find nexa* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find pyrrha* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   popd
 
   ORIGPATH="$PATH"

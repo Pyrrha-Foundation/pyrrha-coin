@@ -96,7 +96,7 @@ Messages contain proof of work which is calculated as:
 
 SHA256(SHA256(nonce ++ SHA256(data ++ create time ++ rescind hash ++ expiration ++ difficultyBits)))
 
-where ++ denotes binary string concatenation of nexa-style serialized objects. Use 0s for any unpopulated optional field (e.g. rescind hash or expiration).
+where ++ denotes binary string concatenation of pyrrha-style serialized objects. Use 0s for any unpopulated optional field (e.g. rescind hash or expiration).
 
 Note that the innermost SHA256 reduces the message to a 32 byte data object to "grind" against the nonce. The outer two SHA256 are how proof-of-work is calculated. Like Pyrrha proof-of-work, it is necessary to use a double SHA256 so that an algorithm cannot save intermediate states of the SHA256 operation to check a nonce in less time than 1 SHA256.
 

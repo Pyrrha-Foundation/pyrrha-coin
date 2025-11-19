@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_LOCK_ORDER_H
-#define NEXA_LOCK_ORDER_H
+#ifndef PYRRHA_LOCK_ORDER_H
+#define PYRRHA_LOCK_ORDER_H
 
 #include <inttypes.h>
 #include <map>

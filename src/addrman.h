@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_ADDRMAN_H
-#define NEXA_ADDRMAN_H
+#ifndef PYRRHA_ADDRMAN_H
+#define PYRRHA_ADDRMAN_H
 
 #include "netaddress.h"
 #include "protocol.h"
@@ -636,4 +636,4 @@ public:
     }
 };
 
-#endif // NEXA_ADDRMAN_H
+#endif // PYRRHA_ADDRMAN_H

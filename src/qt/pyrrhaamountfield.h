@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_NEXAAMOUNTFIELD_H
-#define NEXA_QT_NEXAAMOUNTFIELD_H
+#ifndef PYRRHA_QT_PYRRHAAMOUNTFIELD_H
+#define PYRRHA_QT_PYRRHAAMOUNTFIELD_H
 
 #include "amount.h"
 
@@ -73,4 +73,4 @@ private Q_SLOTS:
     void unitChanged(int idx);
 };
 
-#endif // NEXA_QT_NEXAAMOUNTFIELD_H
+#endif // PYRRHA_QT_PYRRHAAMOUNTFIELD_H

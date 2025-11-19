@@ -6,7 +6,7 @@
 #include "transactiondesc.h"
 
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "paymentserver.h"
 #include "transactionrecord.h"
 

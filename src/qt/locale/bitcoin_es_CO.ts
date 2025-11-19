@@ -310,7 +310,7 @@ Estas son las direcciones de Pyrrha para enviar pagos . Siempre verifique la can
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../nexagui.cpp" line="+729"/>
+        <location filename="../pyrrhagui.cpp" line="+729"/>
         <source>Synchronizing with network...</source>
         <translation>Sincronizando con la red...</translation>
     </message>
@@ -1924,7 +1924,7 @@ Estas son las direcciones de Pyrrha para enviar pagos . Siempre verifique la can
         </translation>
     </message>
     <message>
-        <location filename="../nexaunits.cpp" line="+187"/>
+        <location filename="../pyrrhaunits.cpp" line="+187"/>
         <source>Amount</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4029,7 +4029,7 @@ Estas son las direcciones de Pyrrha para enviar pagos . Siempre verifique la can
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../nexagui.cpp" line="+322"/>
+        <location filename="../pyrrhagui.cpp" line="+322"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4213,7 +4213,7 @@ Estas son las direcciones de Pyrrha para enviar pagos . Siempre verifique la can
 <context>
     <name>pyrrha</name>
     <message>
-        <location filename="../nexastrings.cpp" line="+173"/>
+        <location filename="../pyrrhastrings.cpp" line="+173"/>
         <source>Loading wallet...</source>
         <translation>Cargando billetera...</translation>
     </message>

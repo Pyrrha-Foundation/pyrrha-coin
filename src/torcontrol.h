@@ -6,8 +6,8 @@
 /**
  * Functionality for communicating with Tor.
  */
-#ifndef NEXA_TORCONTROL_H
-#define NEXA_TORCONTROL_H
+#ifndef PYRRHA_TORCONTROL_H
+#define PYRRHA_TORCONTROL_H
 
 #include "threadgroup.h"
 
@@ -18,4 +18,4 @@ void StartTorControl();
 void InterruptTorControl();
 void StopTorControl();
 
-#endif /* NEXA_TORCONTROL_H */
+#endif /* PYRRHA_TORCONTROL_H */

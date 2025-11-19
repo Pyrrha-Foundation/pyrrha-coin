@@ -1,0 +1,33 @@
+# /etc/conf.d/pyrrhad: config file for /etc/init.d/pyrrhad
+
+# Config file location
+#PYRRHAD_CONFIGFILE="/etc/pyrrha/pyrrha.conf"
+
+# What directory to write pidfile to?  (created and owned by $PYRRHAD_USER)
+#PYRRHAD_PIDDIR="/var/run/pyrrhad"
+
+# What filename to give the pidfile
+#PYRRHAD_PIDFILE="${PYRRHAD_PIDDIR}/pyrrhad.pid"
+
+# Where to write pyrrhad data (be mindful that the blockchain is large)
+#PYRRHAD_DATADIR="/var/lib/pyrrhad"
+
+# User and group to own pyrrhad process
+#PYRRHAD_USER="pyrrha"
+#PYRRHAD_GROUP="pyrrha"
+
+# Path to pyrrhad executable
+#PYRRHAD_BIN="/usr/bin/pyrrhad"
+
+# Nice value to run pyrrhad under
+#PYRRHAD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+PYRRHAD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for pyrrhad to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+PYRRHAD_SIGTERM_TIMEOUT=60

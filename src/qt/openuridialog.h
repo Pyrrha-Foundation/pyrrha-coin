@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_QT_OPENURIDIALOG_H
-#define NEXA_QT_OPENURIDIALOG_H
+#ifndef PYRRHA_QT_OPENURIDIALOG_H
+#define PYRRHA_QT_OPENURIDIALOG_H
 
 #include <QDialog>
 
@@ -36,4 +36,4 @@ private:
     const Config *cfg;
 };
 
-#endif // NEXA_QT_OPENURIDIALOG_H
+#endif // PYRRHA_QT_OPENURIDIALOG_H

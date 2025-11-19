@@ -1,27 +1,27 @@
 #!/bin/bash
 set -e
 
-if [[ "$1" == "nexa-cli" || "$1" == "nexa-tx" || "$1" == "nexad" || "$1" == "test_nexa" ]]; then
-  mkdir -p "$NEXA_DATA"
+if [[ "$1" == "pyrrha-cli" || "$1" == "pyrrha-tx" || "$1" == "pyrrhad" || "$1" == "test_pyrrha" ]]; then
+  mkdir -p "$PYRRHA_DATA"
 
-  if [[ ! -s "$NEXA_DATA/nexa.conf" ]]; then
-    cat <<EOF > "$NEXA_DATA/nexa.conf"
+  if [[ ! -s "$PYRRHA_DATA/pyrrha.conf" ]]; then
+    cat <<EOF > "$PYRRHA_DATA/pyrrha.conf"
     printtoconsole=1
     rpcallowip=::/0
-    rpcpassword=${NEXA_RPC_PASSWORD:-password}
-    rpcuser=${NEXA_RPC_USER:-nexa}
+    rpcpassword=${PYRRHA_RPC_PASSWORD:-password}
+    rpcuser=${PYRRHA_RPC_USER:-pyrrha}
 EOF
-    chown nexa:nexa "$NEXA_DATA/nexa.conf"
+    chown pyrrha:pyrrha "$PYRRHA_DATA/pyrrha.conf"
   fi
 
   # ensure correct ownership and linking of data directory
   # we do not update group ownership here, in case users want to mount
   # a host directory and still retain access to it
-  chown -R nexa "$NEXA_DATA"
-  ln -sfn "$NEXA_DATA" /home/nexa/.nexa
-  chown -h nexa:nexa /home/nexa/.nexa
+  chown -R pyrrha "$PYRRHA_DATA"
+  ln -sfn "$PYRRHA_DATA" /home/pyrrha/.pyrrha
+  chown -h pyrrha:pyrrha /home/pyrrha/.pyrrha
 
-  exec gosu nexa "$@"
+  exec gosu pyrrha "$@"
 fi
 
 exec "$@"

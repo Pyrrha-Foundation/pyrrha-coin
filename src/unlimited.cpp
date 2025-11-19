@@ -1217,8 +1217,8 @@ UniValue getminingcandidate(const UniValue &params, bool fHelp)
             "3. \"name\"      (string, optional) The identity of the mining node (for statistics).\n"
             "                                     Default: all unnamed nodes are counted as 1 node\n" +
             HelpExampleCli("getminingcandidate", "") + HelpExampleCli("getminingcandidate", "1000") +
-            HelpExampleCli("getminingcandidate", "1000 nexa:qq9rw090p2eu9drv6ptztwx4ghpftwfa0gyqvlvx2q") +
-            HelpExampleCli("getminingcandidate", "null nexa:qq9rw090p2eu9drv6ptztwx4ghpftwfa0gyqvlvx2q") +
+            HelpExampleCli("getminingcandidate", "1000 pyrrha:qq9rw090p2eu9drv6ptztwx4ghpftwfa0gyqvlvx2q") +
+            HelpExampleCli("getminingcandidate", "null pyrrha:qq9rw090p2eu9drv6ptztwx4ghpftwfa0gyqvlvx2q") +
             HelpExampleCli("getminingcandidate", "null null miner1"));
     }
 
@@ -1780,7 +1780,7 @@ UniValue getaddressforms(const UniValue &params, bool fHelp)
                             "\nResult:\n"
                             "{\n"
                             "\"legacy\": \"base58 encoding (OBSOLETE DO NOT USE)\",\n"
-                            "\"nexa\": \"nexa prefixed address\",\n"
+                            "\"pyrrha\": \"pyrrha prefixed address\",\n"
                             "\nIf this wallet is unlocked and owns this address additional information is supplied:\n"
                             "\"pubkey\": \"public key corresponding to this address\"\n"
                             "\"p2pkh\": \"The pay-to-pub-key-hash address corresponding to this pubkey\"\n"
@@ -1808,7 +1808,7 @@ UniValue getaddressforms(const UniValue &params, bool fHelp)
 
     UniValue node(UniValue::VOBJ);
     node.pushKV("legacy", legacyAddr);
-    node.pushKV("nexa", cashAddr);
+    node.pushKV("pyrrha", cashAddr);
 
 #ifdef ENABLE_WALLET
     {

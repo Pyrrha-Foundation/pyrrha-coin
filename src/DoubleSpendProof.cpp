@@ -73,7 +73,7 @@ void hashTx(DoubleSpendProof::Spender &spender, const CTransaction &tx, int inpu
     DbgAssert(!spender.pushData.front().empty(), return);
     auto sigHashType = SigHashType(spender.pushData.front());
 
-    SignatureHashNexaComponents(tx, inputIndex, sigHashType, spender.hashPrevOutputs, spender.hashSequence,
+    SignatureHashPyrrhaComponents(tx, inputIndex, sigHashType, spender.hashPrevOutputs, spender.hashSequence,
         spender.hashInAmounts, spender.hashOutputs);
 }
 
@@ -101,7 +101,7 @@ public:
         p("DSP construct hash:\n");
         SigHashType sighashtype(m_spender.pushData.front());
         uint256 sighash;
-        if (!SignatureHashNexa(scriptCode, m_spender.txVersion, m_spender.lockTime, sighashtype,
+        if (!SignatureHashPyrrha(scriptCode, m_spender.txVersion, m_spender.lockTime, sighashtype,
                 m_spender.hashPrevOutputs, m_spender.hashSequence, m_spender.hashInAmounts, m_spender.hashOutputs,
                 sighash, nullptr))
             return false;

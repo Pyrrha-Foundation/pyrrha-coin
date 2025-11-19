@@ -1,5 +1,5 @@
 ---
-name: "nexa-win"
+name: "pyrrha-win"
 enable_cache: true
 suites:
 - "focal"
@@ -24,8 +24,8 @@ packages:
 - "rename"
 reference_datetime: "2020-08-20 00:00:00"
 remotes:
-- "url": "https://gitlab.com/nexa/nexa.git"
-  "dir": "nexa"
+- "url": "https://gitlab.com/pyrrha/pyrrha.git"
+  "dir": "pyrrha"
 files: []
 script: |
   set -e -o pipefail
@@ -93,7 +93,7 @@ script: |
 
   export PATH=${WRAP_DIR}:${PATH}
 
-  cd nexa
+  cd pyrrha
   BASEPREFIX=`pwd`/depends
   # Build dependencies for each host
   for i in $HOSTS; do
@@ -104,14 +104,14 @@ script: |
   ./autogen.sh
   ./configure --prefix=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`
   make dist
-  SOURCEDIST=`echo nexa-*.tar.gz`
+  SOURCEDIST=`echo pyrrha-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
 
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find nexa* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find pyrrha* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   mkdir -p $OUTDIR/src
   cp ../$SOURCEDIST $OUTDIR/src
   popd
@@ -133,7 +133,7 @@ script: |
     make ${MAKEOPTS} -C src check-symbols
     make deploy
     make install-strip
-    cp -f nexa*setup*.exe $OUTDIR/
+    cp -f pyrrha*setup*.exe $OUTDIR/
     cd installed
     find . -name "lib*.la" -delete
     find . -name "lib*.a" -delete

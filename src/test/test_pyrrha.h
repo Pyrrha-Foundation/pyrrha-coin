@@ -2,8 +2,8 @@
 // Copyright (c) 2015-2023 The Bitcoin Unlimited developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef NEXA_TEST_NEXA_H
-#define NEXA_TEST_NEXA_H
+#ifndef PYRRHA_TEST_PYRRHA_H
+#define PYRRHA_TEST_PYRRHA_H
 
 #include "chainparamsbase.h"
 #include "fs.h"
@@ -52,7 +52,7 @@ struct BasicTestingSetup
 {
     ECCVerifyHandle globalVerifyHandle;
 
-    BasicTestingSetup(const std::string &chainName = CBaseChainParams::NEXA);
+    BasicTestingSetup(const std::string &chainName = CBaseChainParams::PYRRHA);
     ~BasicTestingSetup();
 };
 
@@ -65,7 +65,7 @@ struct TestingSetup : public BasicTestingSetup
     fs::path pathTemp;
     boost::thread_group threadGroup;
 
-    TestingSetup(const std::string &chainName = CBaseChainParams::NEXA);
+    TestingSetup(const std::string &chainName = CBaseChainParams::PYRRHA);
     ~TestingSetup();
 };
 
@@ -174,10 +174,10 @@ public:
 
 extern FalseScriptImportedState fsis;
 
-// Test blocks for unit tests. These functions return real blocks taken from the NEXA mainnet blockchain.
+// Test blocks for unit tests. These functions return real blocks taken from the PYRRHA mainnet blockchain.
 CBlock TestBlock1();
 CBlock TestBlock2();
 CBlock TestBlock3();
 CBlock TestBlock4();
 
-#endif // NEXA_TEST_NEXA_H
+#endif // PYRRHA_TEST_PYRRHA_H

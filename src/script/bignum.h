@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_BIGNUM_H
-#define NEXA_BIGNUM_H
+#ifndef PYRRHA_BIGNUM_H
+#define PYRRHA_BIGNUM_H
 
 #include <exception>
 #ifndef ANDROID // limit dependencies: BigNum is a NO_OP on android since script machine not needed
@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #define MAX_BIGNUM_MAGNITUDE_SIZE 512
 #define MAX_BIGNUM_BITSHIFT_SIZE (MAX_BIGNUM_MAGNITUDE_SIZE * 8)

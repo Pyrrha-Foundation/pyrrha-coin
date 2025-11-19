@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SCRIPT_SCRIPT_H
-#define NEXA_SCRIPT_SCRIPT_H
+#ifndef PYRRHA_SCRIPT_SCRIPT_H
+#define PYRRHA_SCRIPT_SCRIPT_H
 
 #include "crypto/common.h"
 #include "prevector.h"
@@ -283,7 +283,7 @@ enum opcodetype
     // 207
     OP_NATIVE_INTROSPECTION_RESERVED2 = 0xcf,
 
-    // NEXA opcodes
+    // PYRRHA opcodes
     OP_PLACE = 0xe9,
     OP_PUSH_TX_STATE = 0xea,
     OP_SETBMD = 0xeb,
@@ -933,4 +933,4 @@ public:
     virtual ~CReserveScript() {}
 };
 
-#endif // NEXA_SCRIPT_SCRIPT_H
+#endif // PYRRHA_SCRIPT_SCRIPT_H

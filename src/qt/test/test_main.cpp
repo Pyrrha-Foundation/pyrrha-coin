@@ -4,10 +4,10 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
-#include "nexaaddressvalidatortests.h"
+#include "pyrrhaaddressvalidatortests.h"
 #include "util.h"
 #include "uritests.h"
 #include "compattests.h"

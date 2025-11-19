@@ -246,18 +246,18 @@ class GroupTokensTest (BitcoinTestFramework):
         grp0Id = t["groupIdentifier"]
         self.checkTokenInfo(self.nodes[0], grp0Id)
 
-        t = self.nodes[0].token("new", auth0Addr, "TICK", "NameGoesHere", "https://www.nexa.org", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
+        t = self.nodes[0].token("new", auth0Addr, "TICK", "NameGoesHere", "https://www.pyrrha.org", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
         raw = self.nodes[0].decoderawtransaction(self.nodes[0].gettransaction(t["transaction"])["hex"])
-        self.checkGroupNew(raw,"TICK", "NameGoesHere", "https://www.nexa.org", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
-        self.checkTokenInfo(self.nodes[0], t["groupIdentifier"], "TICK", "NameGoesHere", "https://www.nexa.org", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
+        self.checkGroupNew(raw,"TICK", "NameGoesHere", "https://www.pyrrha.org", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
+        self.checkTokenInfo(self.nodes[0], t["groupIdentifier"], "TICK", "NameGoesHere", "https://www.pyrrha.org", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
 
-        t = self.nodes[0].token("new", "TICK2", "AnotherNameGoesHere", "https://www.nexa.org/smthing", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
+        t = self.nodes[0].token("new", "TICK2", "AnotherNameGoesHere", "https://www.pyrrha.org/smthing", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
         self.checkGroupNew(self.nodes[0].decoderawtransaction(self.nodes[0].gettransaction(t["transaction"])["hex"]),
-        "TICK2", "AnotherNameGoesHere", "https://www.nexa.org/smthing", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
-        self.checkTokenInfo(self.nodes[0], t["groupIdentifier"], "TICK2", "AnotherNameGoesHere", "https://www.nexa.org/smthing", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
+        "TICK2", "AnotherNameGoesHere", "https://www.pyrrha.org/smthing", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
+        self.checkTokenInfo(self.nodes[0], t["groupIdentifier"], "TICK2", "AnotherNameGoesHere", "https://www.pyrrha.org/smthing", "1296fdd732e34fa750256095bb68dcd78091c49ab9382a35dce89ea15e055a63")
 
         try:
-            t = self.nodes[0].token("new", "TICK2", "AnotherNameGoesHere", "https://www.nexa.org/smthing")
+            t = self.nodes[0].token("new", "TICK2", "AnotherNameGoesHere", "https://www.pyrrha.org/smthing")
             assert False  # bad param combination (missing - each param is optional in the spec but in the RPC if you give a url to a desc doc you need to provide the dsha256 hash of that doc)
         except JSONRPCException as e:
             pass
@@ -272,7 +272,7 @@ class GroupTokensTest (BitcoinTestFramework):
             pass
 
         try:
-            t = self.nodes[0].token("new", auth1Addr, "TICK2", "AnotherNameGoesHere", "https://www.nexa.org/smthing")
+            t = self.nodes[0].token("new", auth1Addr, "TICK2", "AnotherNameGoesHere", "https://www.pyrrha.org/smthing")
             assert False
         except JSONRPCException as e:
             pass

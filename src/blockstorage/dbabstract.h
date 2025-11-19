@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_DBABSTRACT_H
-#define NEXA_DBABSTRACT_H
+#ifndef PYRRHA_DBABSTRACT_H
+#define PYRRHA_DBABSTRACT_H
 
 #include "chain.h"
 #include "undo.h"
@@ -64,4 +64,4 @@ public:
     virtual ~CDatabaseAbstract() {}
 };
 
-#endif // NEXA_DBABSTRACT_H
+#endif // PYRRHA_DBABSTRACT_H

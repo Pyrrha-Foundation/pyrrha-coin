@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 // must include first to ensure FD_SETSIZE is correctly set
@@ -576,7 +576,7 @@ void CNode::copyStats(CNodeStats &stats)
         nPingUsecWait = GetStopwatchMicros() - nPingUsecStart;
     }
 
-    // Raw ping time is in microseconds, but show it to user as whole seconds (Nexa users should be well used to
+    // Raw ping time is in microseconds, but show it to user as whole seconds (Pyrrha users should be well used to
     // small numbers with many decimal places by now :)
     stats.dPingTime = (((double)nPingUsecTime) / 1e6);
     stats.dPingMin = (((double)nMinPingUsecTime) / 1e6);
@@ -1793,7 +1793,7 @@ void ThreadMapPort()
             }
         }
 
-        string strDesc = "Nexa " + FormatFullVersion();
+        string strDesc = "Pyrrha " + FormatFullVersion();
 
         while (true)
         {
@@ -2133,7 +2133,7 @@ void ThreadOpenConnections()
             {
                 CAddress addr;
                 // NOTE: Because the only nodes we are connecting to here are the ones the user put in their
-                //      nexa.conf/commandline args as "-connect", we don't use the semaphore to limit outbound
+                //      pyrrha.conf/commandline args as "-connect", we don't use the semaphore to limit outbound
                 //      connections
                 OpenNetworkConnection(addr, false, nullptr, strAddr.c_str());
                 for (int i = 0; i < 10 && i < nLoop; i++)
@@ -2907,7 +2907,7 @@ void StartNode()
     }
 
     // We need to initialize vAddedNodes here.  It is now used in AcceptConnection to limit the number of inbound
-    // connections based on the configured "addnode" options from nexa.conf/command line, however the old
+    // connections based on the configured "addnode" options from pyrrha.conf/command line, however the old
     // initialization location in ThreadOpenAddedConnections was both started after ThreadSocketHandler, which
     // calls AcceptConnection, and has an explicit 15 second delay to the start of ThreadOpenAddedConnections
     // which allows any nodes actively trying to connect to this node during startup to exceed the inbound connection

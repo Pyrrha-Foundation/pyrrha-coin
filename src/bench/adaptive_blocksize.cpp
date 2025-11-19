@@ -7,7 +7,7 @@
 #include "consensus/adaptive_blocksize.h"
 #include "random.h"
 #include "utiltime.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <algorithm>
 #include <random>

@@ -23,7 +23,7 @@ static std::string monitoring_host() { return GetArg("-electrum.monitoring.host"
 static std::string rpc_host() { return GetArg("-electrum.host", "0.0.0.0"); }
 static std::string rpc_port(const std::string &network)
 {
-    std::map<std::string, std::string> portmap = {{"nexa", "20001"}, {"testnet", "30001"}, {"regtest", "30403"}};
+    std::map<std::string, std::string> portmap = {{"pyrrha", "20001"}, {"testnet", "30001"}, {"regtest", "30403"}};
 
     auto defaultPort = portmap.find(network);
     if (defaultPort == end(portmap))
@@ -38,7 +38,7 @@ static std::string rpc_port(const std::string &network)
 static std::string ws_host() { return GetArg("-electrum.ws.host", "0.0.0.0"); }
 static std::string ws_port(const std::string &network)
 {
-    const std::map<std::string, std::string> portmap = {{"nexa", "20003"}, {"testnet", "30003"}, {"regtest", "30404"}};
+    const std::map<std::string, std::string> portmap = {{"pyrrha", "20003"}, {"testnet", "30003"}, {"regtest", "30404"}};
 
     auto defaultPort = portmap.find(network);
     if (defaultPort == end(portmap))
@@ -127,11 +127,11 @@ namespace electrum
 {
 std::string rostrum_path()
 {
-    // look for rostrum in same path as nexad
-    boost::filesystem::path nexad_dir(this_process_path());
-    nexad_dir = nexad_dir.remove_filename();
+    // look for rostrum in same path as pyrrhad
+    boost::filesystem::path pyrrhad_dir(this_process_path());
+    pyrrhad_dir = pyrrhad_dir.remove_filename();
 
-    auto default_path = nexad_dir / ROSTRUM_BIN;
+    auto default_path = pyrrhad_dir / ROSTRUM_BIN;
     const std::string path = GetArg("-electrum.exec", default_path.string());
 
     if (path.empty())
@@ -159,7 +159,7 @@ std::vector<std::string> rostrum_args(int rpcport, const std::string &network)
         args.push_back("-vvvv");
     }
 
-    // address to nexad rpc interface
+    // address to pyrrhad rpc interface
     {
         rpcport = GetArg("-rpcport", rpcport);
         std::stringstream ss;
@@ -170,7 +170,7 @@ std::vector<std::string> rostrum_args(int rpcport, const std::string &network)
     args.push_back("--electrum-rpc-addr=" + rpc_host() + ":" + rpc_port(network));
     args.push_back("--electrum-ws-addr=" + ws_host() + ":" + ws_port(network));
 
-    // nexad data dir (for cookie file)
+    // pyrrhad data dir (for cookie file)
     args.push_back("--daemon-dir=" + GetDataDir(false).string());
 
     // Where to store rostrum database files.
@@ -179,7 +179,7 @@ std::vector<std::string> rostrum_args(int rpcport, const std::string &network)
 
     // Tell rostrum what network we're on
     const std::map<std::string, std::string> netmapping = {
-        {"nexa", "bitcoin"}, {"testnet", "testnet"}, {"regtest", "regtest"}};
+        {"pyrrha", "bitcoin"}, {"testnet", "testnet"}, {"regtest", "regtest"}};
     if (!netmapping.count(network))
     {
         std::stringstream ss;
@@ -195,9 +195,9 @@ std::vector<std::string> rostrum_args(int rpcport, const std::string &network)
     }
     else
     {
-        // This explicit code ought to work for any network, but it is only needed for NEXA because electrs
+        // This explicit code ought to work for any network, but it is only needed for PYRRHA because electrs
         // guesses "testnet3" since we told it testnet was being used.
-        if (network == CBaseChainParams::NEXA)
+        if (network == CBaseChainParams::PYRRHA)
         {
             args.push_back("--cookie-file=" + (GetDataDir() / ".cookie").string());
         }

@@ -6,7 +6,7 @@
 #include "paymentserver.h"
 
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 #include "optionsmodel.h"
 
 #include "chainparams.h"
@@ -44,14 +44,14 @@
 #include <QTextDocument>
 #include <QUrlQuery>
 
-const int NEXA_IPC_CONNECT_TIMEOUT = 1000; // milliseconds
+const int PYRRHA_IPC_CONNECT_TIMEOUT = 1000; // milliseconds
 // BIP70 payment protocol messages
 const char *BIP70_MESSAGE_PAYMENTACK = "PaymentACK";
 const char *BIP70_MESSAGE_PAYMENTREQUEST = "PaymentRequest";
 // BIP71 payment protocol media types
-const char *BIP71_MIMETYPE_PAYMENT = "application/nexa-payment";
-const char *BIP71_MIMETYPE_PAYMENTACK = "application/nexa-paymentack";
-const char *BIP71_MIMETYPE_PAYMENTREQUEST = "application/nexa-paymentrequest";
+const char *BIP71_MIMETYPE_PAYMENT = "application/pyrrha-payment";
+const char *BIP71_MIMETYPE_PAYMENTACK = "application/pyrrha-paymentack";
+const char *BIP71_MIMETYPE_PAYMENTREQUEST = "application/pyrrha-paymentrequest";
 
 X509_STORE *PaymentServer::certStore = nullptr;
 void PaymentServer::freeCertStore()
@@ -70,7 +70,7 @@ void PaymentServer::freeCertStore()
 //
 static QString ipcServerName()
 {
-    QString name("NexaQt");
+    QString name("PyrrhaQt");
 
     // Append a simple hash of the datadir
     // Note that GetDataDir(true) returns a different path
@@ -234,7 +234,7 @@ static bool ipcCanParseLegacyURI(const QString &arg, const std::string &network)
 void PaymentServer::ipcParseCommandLine(int argc, char *argv[])
 {
     std::array<const std::string *, 3> networks = {
-        {&CBaseChainParams::NEXA, &CBaseChainParams::TESTNET, &CBaseChainParams::REGTEST}};
+        {&CBaseChainParams::PYRRHA, &CBaseChainParams::TESTNET, &CBaseChainParams::REGTEST}};
 
     const std::string *chosenNetwork = nullptr;
 
@@ -320,7 +320,7 @@ bool PaymentServer::ipcSendCommandLine()
     {
         QLocalSocket *socket = new QLocalSocket();
         socket->connectToServer(ipcServerName(), QIODevice::WriteOnly);
-        if (!socket->waitForConnected(NEXA_IPC_CONNECT_TIMEOUT))
+        if (!socket->waitForConnected(PYRRHA_IPC_CONNECT_TIMEOUT))
         {
             delete socket;
             socket = nullptr;
@@ -335,7 +335,7 @@ bool PaymentServer::ipcSendCommandLine()
 
         socket->write(block);
         socket->flush();
-        socket->waitForBytesWritten(NEXA_IPC_CONNECT_TIMEOUT);
+        socket->waitForBytesWritten(PYRRHA_IPC_CONNECT_TIMEOUT);
         socket->disconnectFromServer();
 
         delete socket;
@@ -354,7 +354,7 @@ PaymentServer::PaymentServer(QObject *parent, bool startLocalServer)
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // Install global event filter to catch QFileOpenEvents
-    // on Mac: sent when you click nexa: links
+    // on Mac: sent when you click pyrrha: links
     // other OSes: helpful when dealing with payment request files
     if (parent)
         parent->installEventFilter(this);
@@ -384,7 +384,7 @@ PaymentServer::PaymentServer(QObject *parent, bool startLocalServer)
 
 PaymentServer::~PaymentServer() { google::protobuf::ShutdownProtobufLibrary(); }
 //
-// OSX-specific way of handling nexa: URIs and PaymentRequest mime types.
+// OSX-specific way of handling pyrrha: URIs and PaymentRequest mime types.
 // Also used by paymentservertests.cpp and when opening a payment request file
 // via "Open URI..." menu entry.
 //
@@ -411,7 +411,7 @@ void PaymentServer::initNetManager()
     if (netManager != nullptr)
         delete netManager;
 
-    // netManager is used to fetch paymentrequests given in nexa: URIs
+    // netManager is used to fetch paymentrequests given in pyrrha: URIs
     netManager = new QNetworkAccessManager(this);
 
     QNetworkProxy proxy;
@@ -492,7 +492,7 @@ bool PaymentServer::handleURI(const QString &scheme, const QString &s)
     {
         Q_EMIT message(tr("URI handling"),
             tr("URI cannot be parsed! This can be caused by an invalid "
-               "Nexa address or malformed URI parameters."),
+               "Pyrrha address or malformed URI parameters."),
             CClientUIInterface::ICON_WARNING);
     }
 
@@ -507,14 +507,14 @@ void PaymentServer::handleURIOrFile(const QString &s)
         return;
     }
 
-    // nexa: CashAddr URI
+    // pyrrha: CashAddr URI
     QString schemeCash = GUIUtil::bitcoinURIScheme(Params(), true);
     if (handleURI(schemeCash, s))
     {
         return;
     }
 
-    // nexa: Legacy URI
+    // pyrrha: Legacy URI
     QString schemeLegacy = GUIUtil::bitcoinURIScheme(Params(), false);
     if (handleURI(schemeLegacy, s))
     {

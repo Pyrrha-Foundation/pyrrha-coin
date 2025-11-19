@@ -5,8 +5,8 @@
 
 #include "guiutil.h"
 
-#include "nexaaddressvalidator.h"
-#include "nexaunits.h"
+#include "pyrrhaaddressvalidator.h"
+#include "pyrrhaunits.h"
 #include "qvalidatedlineedit.h"
 #include "walletmodel.h"
 
@@ -132,7 +132,7 @@ void setupAddressWidget(QValidatedLineEdit *widget, QWidget *parent)
     // We don't want translators to use own addresses in translations
     // and this is the only place, where this address is supplied.
     widget->setPlaceholderText(
-        QObject::tr("Enter a NEXA address (e.g. %1)").arg(QString::fromStdString(DummyAddress(params, GetConfig()))));
+        QObject::tr("Enter a PYRRHA address (e.g. %1)").arg(QString::fromStdString(DummyAddress(params, GetConfig()))));
     widget->setValidator(new BitcoinAddressEntryValidator(params.CashAddrPrefix(), parent));
     widget->setCheckValidator(new BitcoinAddressCheckValidator(parent));
 }
@@ -150,7 +150,7 @@ QString bitcoinURIScheme(const CChainParams &params, bool useCashAddr)
 {
     if (!useCashAddr)
     {
-        return "nexa";
+        return "pyrrha";
     }
     return QString::fromStdString(params.CashAddrPrefix());
 }
@@ -238,7 +238,7 @@ bool parseBitcoinURI(const QString &scheme, const QUrl &uri, SendCoinsRecipient 
 bool parseBitcoinURI(const QString &scheme, QString uri, SendCoinsRecipient *out)
 {
     //
-    //    Cannot handle this later, because nexa
+    //    Cannot handle this later, because pyrrha
     //    will cause Qt to see the part after as host,
     //    which will lower-case it (and thus invalidate the address).
     if (uri.startsWith(scheme + "://", Qt::CaseInsensitive))
@@ -656,7 +656,7 @@ TableViewLastColumnResizingFixer::TableViewLastColumnResizingFixer(QTableView *t
 fs::path static StartupShortcutPath()
 {
     std::string chain = ChainNameFromCommandLine();
-    if (chain == CBaseChainParams::NEXA)
+    if (chain == CBaseChainParams::PYRRHA)
         return GetSpecialFolderPath(CSIDL_STARTUP) / "Pyrrha.lnk";
     if (chain == CBaseChainParams::TESTNET) // Remove this special case when CBaseChainParams::TESTNET = "testnet4"
         return GetSpecialFolderPath(CSIDL_STARTUP) / "Pyrrha (testnet).lnk";
@@ -756,7 +756,7 @@ fs::path static GetAutostartDir()
 fs::path static GetAutostartFilePath()
 {
     std::string chain = ChainNameFromCommandLine();
-    if (chain == CBaseChainParams::NEXA)
+    if (chain == CBaseChainParams::PYRRHA)
         return GetAutostartDir() / "Pyrrha.desktop";
     return GetAutostartDir() / strprintf("Pyrrha-%s.lnk", chain);
 }
@@ -799,7 +799,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         // Write a Pyrrha.desktop file to the autostart directory:
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
-        if (chain == CBaseChainParams::NEXA)
+        if (chain == CBaseChainParams::PYRRHA)
             optionFile << "Name=Pyrrha\n";
         else
             optionFile << strprintf("Name=Pyrrha (%s)\n", chain);
@@ -861,28 +861,28 @@ LSSharedFileListItemRef findStartupItemInList(LSSharedFileListRef list, CFURLRef
 
 bool GetStartOnSystemStartup()
 {
-    CFURLRef nexaAppUrl = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFURLRef pyrrhaAppUrl = CFBundleCopyBundleURL(CFBundleGetMainBundle());
     LSSharedFileListRef loginItems = LSSharedFileListCreate(nullptr, kLSSharedFileListSessionLoginItems, nullptr);
-    LSSharedFileListItemRef foundItem = findStartupItemInList(loginItems, nexaAppUrl);
+    LSSharedFileListItemRef foundItem = findStartupItemInList(loginItems, pyrrhaAppUrl);
     // findStartupItemInList retains the item it returned, need to release
     if (foundItem)
         CFRelease(foundItem);
     CFRelease(loginItems);
-    CFRelease(nexaAppUrl);
+    CFRelease(pyrrhaAppUrl);
     return !!foundItem;
 }
 
 bool SetStartOnSystemStartup(bool fAutoStart)
 {
-    CFURLRef nexaAppUrl = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFURLRef pyrrhaAppUrl = CFBundleCopyBundleURL(CFBundleGetMainBundle());
     LSSharedFileListRef loginItems = LSSharedFileListCreate(nullptr, kLSSharedFileListSessionLoginItems, nullptr);
-    LSSharedFileListItemRef foundItem = findStartupItemInList(loginItems, nexaAppUrl);
+    LSSharedFileListItemRef foundItem = findStartupItemInList(loginItems, pyrrhaAppUrl);
 
     if (fAutoStart && !foundItem)
     {
-        // add nexa app to startup item list
+        // add pyrrha app to startup item list
         LSSharedFileListInsertItemURL(
-            loginItems, kLSSharedFileListItemBeforeFirst, nullptr, nullptr, nexaAppUrl, nullptr, nullptr);
+            loginItems, kLSSharedFileListItemBeforeFirst, nullptr, nullptr, pyrrhaAppUrl, nullptr, nullptr);
     }
     else if (!fAutoStart && foundItem)
     {
@@ -893,7 +893,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
     if (foundItem)
         CFRelease(foundItem);
     CFRelease(loginItems);
-    CFRelease(nexaAppUrl);
+    CFRelease(pyrrhaAppUrl);
     return true;
 }
 #else
@@ -1041,7 +1041,7 @@ QString formatTimeOffset(int64_t nTimeOffset)
     return QString(QObject::tr("%1 s")).arg(QString::number((int)nTimeOffset, 10));
 }
 
-QString uriPrefix() { return "nexa"; }
+QString uriPrefix() { return "pyrrha"; }
 QString formateNiceTimeOffset(qint64 secs)
 {
     // Represent time from last generated block in human readable text

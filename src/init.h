@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_INIT_H
-#define NEXA_INIT_H
+#ifndef PYRRHA_INIT_H
+#define PYRRHA_INIT_H
 
 #include "threadgroup.h"
 #include "tweak.h"
@@ -38,4 +38,4 @@ extern CTweak<bool> avoidReconsiderMostWorkChain;
 /** Returns licensing information (for -version) */
 std::string LicenseInfo();
 
-#endif // NEXA_INIT_H
+#endif // PYRRHA_INIT_H

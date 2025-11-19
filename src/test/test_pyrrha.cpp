@@ -3,9 +3,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#define BOOST_TEST_MODULE Nexa Test Suite
+#define BOOST_TEST_MODULE Pyrrha Test Suite
 
-#include "test_nexa.h"
+#include "test_pyrrha.h"
 
 #include "blockstorage/blockcache.h"
 #include "chainparams.h"
@@ -74,7 +74,7 @@ TestingSetup::TestingSetup(const std::string &chainName) : BasicTestingSetup(cha
     RegisterAllCoreRPCCommands(tableRPC);
     ClearDatadirCache();
     pathTemp =
-        GetTempPath() / strprintf("test_nexa_%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30)));
+        GetTempPath() / strprintf("test_pyrrha_%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30)));
     fs::create_directories(pathTemp);
     blockcache.Init();
     pblocktree = new CBlockTreeDB(1 << 20, "", true);
@@ -200,7 +200,7 @@ struct StartupShutdown
         options_description optDef("Options");
         optDef.add_options()("testhelp", "program options information")(
             "log_level", "set boost logging (all, test_suite, message, warning, error, ...)")(
-            "log_nexa", value<std::string>()->required(), "nexa logging destination (console, none)");
+            "log_pyrrha", value<std::string>()->required(), "pyrrha logging destination (console, none)");
         variables_map opts;
         store(parse_command_line(boost::unit_test::framework::master_test_suite().argc,
                   boost::unit_test::framework::master_test_suite().argv, optDef),
@@ -212,14 +212,14 @@ struct StartupShutdown
             exit(0);
         }
 
-        if (opts.count("log_nexa"))
+        if (opts.count("log_pyrrha"))
         {
-            std::string s = opts["log_nexa"].as<std::string>();
+            std::string s = opts["log_pyrrha"].as<std::string>();
             if (s == "console")
             {
                 /* To enable this, add
-                   -- --log_nexa console
-                   to the end of the test_nexa argument list. */
+                   -- --log_pyrrha console
+                   to the end of the test_pyrrha argument list. */
                 Logging::LogToggleCategory(ALL, true);
                 fPrintToConsole = true;
                 fPrintToDebugLog = false;

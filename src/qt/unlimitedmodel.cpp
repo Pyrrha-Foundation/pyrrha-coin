@@ -7,13 +7,13 @@
 #include <limits>
 
 #if defined(HAVE_CONFIG_H)
-#include "nexa-config.h"
+#include "pyrrha-config.h"
 #endif
 
 #include "unlimitedmodel.h"
 
 #include "guiutil.h"
-#include "nexaunits.h"
+#include "pyrrhaunits.h"
 
 #include "amount.h"
 #include "init.h"

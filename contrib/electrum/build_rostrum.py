@@ -169,8 +169,8 @@ def build_flags(debug, target, builddir):
         return flags
     return flags + ["--release"]
 
-cargo_run(["build", "--verbose", "--locked", "--features=nexa"] + build_flags(args.debug, args.target, args.builddir))
-cargo_run(["test", "--verbose", "--locked", "--features=nexa"] + build_flags(args.debug, args.target, args.builddir))
+cargo_run(["build", "--verbose", "--locked", "--features=pyrrha"] + build_flags(args.debug, args.target, args.builddir))
+cargo_run(["test", "--verbose", "--locked", "--features=pyrrha"] + build_flags(args.debug, args.target, args.builddir))
 
 def build_type_dir(debug):
     if debug:

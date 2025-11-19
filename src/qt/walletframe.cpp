@@ -5,7 +5,7 @@
 
 #include "walletframe.h"
 
-#include "nexagui.h"
+#include "pyrrhagui.h"
 #include "walletview.h"
 
 #include <cstdio>

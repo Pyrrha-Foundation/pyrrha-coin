@@ -1291,7 +1291,7 @@
   <customwidget>
    <class>BitcoinAmountField</class>
    <extends>QLineEdit</extends>
-   <header>nexaamountfield.h</header>
+   <header>pyrrhaamountfield.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -14,8 +14,8 @@ By [enabling SSL support](https://github.com/BitcoinUnlimited/ElectrsCash/blob/m
 
 ## Starting the server
 
-Add `electrum=1` to your nexa.conf file, or pass `-electrum=1` argument to nexad when from command line. You may want to also add `debug=electrum` to enable useful logging.
-To allow incoming connections from any wallet, use `electrum.host=0.0.0.0`.  `electrum.port=1234` will change the listening port.  The default port is 50001.  Don't forget to configure your firewall to pass this port though (similar to what you did for nexa port 8333), if you have a firewall/NAT.
+Add `electrum=1` to your pyrrha.conf file, or pass `-electrum=1` argument to pyrrhad when from command line. You may want to also add `debug=electrum` to enable useful logging.
+To allow incoming connections from any wallet, use `electrum.host=0.0.0.0`.  `electrum.port=1234` will change the listening port.  The default port is 50001.  Don't forget to configure your firewall to pass this port though (similar to what you did for pyrrha port 8333), if you have a firewall/NAT.
 
 
 The RPC call `getelectruminfo` gives you runtime details, such as indexing status of the server. More detailed metrics are available via Prometheus, see monitoring section of the [usage document](https://github.com/BitcoinUnlimited/ElectrsCash/blob/master/doc/usage.md).

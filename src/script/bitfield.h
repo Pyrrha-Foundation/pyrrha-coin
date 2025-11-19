@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_SCRIPT_BITFIELD_H
-#define NEXA_SCRIPT_BITFIELD_H
+#ifndef PYRRHA_SCRIPT_BITFIELD_H
+#define PYRRHA_SCRIPT_BITFIELD_H
 
 #include "script/script_error.h"
 
@@ -12,4 +12,4 @@
 
 bool DecodeBitfield(const std::vector<uint8_t> &vch, unsigned size, uint32_t &bitfield, ScriptError *serror);
 
-#endif // NEXA_SCRIPT_BITFIELD_H
+#endif // PYRRHA_SCRIPT_BITFIELD_H

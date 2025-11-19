@@ -5,7 +5,7 @@
 
 #include "bandb.h"
 #include "fs.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 
 #include <string>
 

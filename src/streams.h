@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NEXA_STREAMS_H
-#define NEXA_STREAMS_H
+#ifndef PYRRHA_STREAMS_H
+#define PYRRHA_STREAMS_H
 
 #include "serialize.h"
 #include "support/allocators/zeroafterfree.h"
@@ -662,4 +662,4 @@ public:
     }
 };
 
-#endif // NEXA_STREAMS_H
+#endif // PYRRHA_STREAMS_H

@@ -10,7 +10,7 @@
 #include "base58.h"
 #include "dstencode.h"
 #include "key.h"
-#include "test/test_nexa.h"
+#include "test/test_pyrrha.h"
 #include "utilstrencodings.h"
 
 #include <boost/test/unit_test.hpp>
