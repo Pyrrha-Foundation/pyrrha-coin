@@ -542,7 +542,7 @@ public:
 
         std::vector<unsigned char> nonce; // TODO make this difficulty higher and hard code solution
         std::vector<unsigned char> hardCodedNonce;
-        nonce = hardCodedNonce = ParseHex("ee160300");
+        nonce = hardCodedNonce = ParseHex("c94a0200");
         const char* pszTimestamp =
             "2025-11-20: After the flood of farms, Pyrrha returns PoW to the people.";
 
@@ -550,7 +550,7 @@ public:
         genesis = CreateGenesisBlock(
             pszTimestamp,
             CScript() << OP_1,      // neutral script; no premine address
-            1763668800,             // nTime: fixed launch timestamp
+            1735689600,               // nTime: fixed launch timestamp
             nonce,
             tgtBits,
             0 * COIN                // no premine: fully fair launch
@@ -570,7 +570,7 @@ public:
 #else
         consensus.hashGenesisBlock = genesis.GetHash();
         assert(
-        consensus.hashGenesisBlock == uint256S("592bd483fea323c30e51297e412d5cf262b376db46a00c110a6654f6dc1451c8"));
+        consensus.hashGenesisBlock == uint256S("e8c07029b604a5dc2fdd879b56484b95904454e0149f45bbaf9fc703cb4ebe2f"));
 
 #endif
         /**
