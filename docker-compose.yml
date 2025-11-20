@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  node1:
+    image: pyrrha-coin-build:latest
+    container_name: pyrrha-node1
+    command: >
+      /src/src/pyrrhad
+      -pyrrha
+      -printtoconsole
+      -server=1
+      -rpcbind=0.0.0.0
+      -rpcallowip=0.0.0.0/0
+      -rpcuser=pyrrha
+      -rpcpassword=pyrrha123
+      -port=7228
+      -rpcport=7227
+      -addnode=pyrrha-node2
+      -addnode=pyrrha-node3
+    ports:
+      - "7227:7227"   # RPC exposed to host
+      - "7228:7228"   # P2P exposed to host (optional)
+    volumes:
+      - ./data/node1:/root/.pyrrha
+
+  node2:
+    image: pyrrha-coin-build:latest
+    container_name: pyrrha-node2
+    command: >
+      /src/src/pyrrhad
+      -pyrrha
+      -printtoconsole
+      -server=1
+      -rpcbind=0.0.0.0
+      -rpcallowip=0.0.0.0/0
+      -rpcuser=pyrrha
+      -rpcpassword=pyrrha123
+      -port=7228
+      -rpcport=7227
+      -addnode=pyrrha-node1
+    # internal-only, no exposed ports → avoids conflicts
+    volumes:
+      - ./data/node2:/root/.pyrrha
+
+  node3:
+    image: pyrrha-coin-build:latest
+    container_name: pyrrha-node3
+    command: >
+      /src/src/pyrrhad
+      -pyrrha
+      -printtoconsole
+      -server=1
+      -rpcbind=0.0.0.0
+      -rpcallowip=0.0.0.0/0
+      -rpcuser=pyrrha
+      -rpcpassword=pyrrha123
+      -port=7228
+      -rpcport=7227
+      -addnode=pyrrha-node1
+    # internal-only
+    volumes:
+      - ./data/node3:/root/.pyrrha
+
