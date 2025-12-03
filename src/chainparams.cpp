@@ -253,11 +253,11 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xf9;
-        pchMessageStart[1] = 0xbe;
-        pchMessageStart[2] = 0xb4;
-        pchMessageStart[3] = 0xd9;
-        nDefaultPort = BTCBCH_DEFAULT_MAINNET_PORT;
+        pchMessageStart[0] = 0x72;
+        pchMessageStart[1] = 0x27;
+        pchMessageStart[2] = 0x12;
+        pchMessageStart[3] = 0x21;
+        nDefaultPort = PYRRHA_PORT;
         nPruneAfterHeight = 100000;
         consensus.nShortBlockWindow = SHORT_BLOCK_WINDOW;
         consensus.nLongBlockWindow = LONG_BLOCK_WINDOW;
@@ -274,20 +274,19 @@ public:
         // printf("fakemainnet soln %d hex:%s\n", worked, HexStr(genesis.nonce).c_str());
         // printf("fakemainnet GB hash %s\n", consensus.hashGenesisBlock.GetHex().c_str());
 
-        // List of Bitcoin Cash compatible seeders
-        vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "btccash-seeder.bitcoinunlimited.info", true));
-        vSeeds.push_back(CDNSSeedData("bitcoinforks.org", "seed-bch.bitcoinforks.org", true));
-        vSeeds.push_back(CDNSSeedData("bchd.cash", "seed.bchd.cash", true));
-        vSeeds.push_back(CDNSSeedData("bch.loping.net", "seed.bch.loping.net", true));
-        vSeeds.push_back(CDNSSeedData("electroncash.de", "dnsseed.electroncash.de", true));
-        vSeeds.push_back(CDNSSeedData("flowee.cash", "seed.flowee.cash", true));
+        vSeeds.push_back(CDNSSeedData("nextchain.cash", "seed.nextchain.cash", true));
+        vSeeds.push_back(CDNSSeedData("pyrrha.org", "seeder.pyrrha.org", true));
+        vSeeds.push_back(CDNSSeedData("bitcoinunlimited.info", "pyrrha-seeder.bitcoinunlimited.info", true));
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 0);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 5);
-        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 128);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
-        cashaddrPrefix = "bitcoincash";
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 68);
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 35);
+        base58Prefixes[EXT_PUBLIC_KEY] =
+            boost::assign::list_of(0x42)(0x69)(0x67)(0x20).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY] =
+            boost::assign::list_of(0x42)(0x6c)(0x6b)(0x73).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[SCRIPT_TEMPLATE_ADDRESS] = std::vector<unsigned char>(1, 8);
+        cashaddrPrefix = "pyrrha";
 
         // BITCOINUNLIMITED START
         vFixedSeeds = std::vector<SeedSpec6>();
